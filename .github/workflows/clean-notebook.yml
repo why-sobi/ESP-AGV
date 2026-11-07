@@ -1,0 +1,50 @@
+name: Clean Jupyter Notebook Outputs
+
+on:
+  push:
+    branches:
+      - '**' # Runs on pushes to any branch
+
+permissions:
+  contents: write
+
+jobs:
+  clean-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install nbconvert
+        run: pip install nbconvert
+
+      - name: Clear notebook outputs
+        run: |
+          # Find all tracked .ipynb files and strip outputs
+          git ls-files '*.ipynb' | while read -r notebook; do
+            if [ -f "$notebook" ]; then
+              echo "Cleaning $notebook"
+              jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace "$notebook"
+            fi
+          done
+
+      - name: Commit cleaned notebooks if changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if there are any changes after stripping outputs
+          if git diff --quiet; then
+            echo "No notebooks needed cleaning."
+          else
+            git add *.ipynb
+            git commit -m "chore: auto-strip Jupyter notebook outputs"
+            git push
+          fi
