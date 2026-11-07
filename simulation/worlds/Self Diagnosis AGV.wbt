@@ -9,8 +9,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.24231645128096066 0.25354753242265204 0.9364808520418271 1.6238415961868489
-  position 0.0019482262707816078 -1.8608369471716601 1.1221219596017524
+  orientation -0.3786720927481011 0.38723827448999776 0.8406271259861786 1.7425456354032591
+  position 0.026293379649044962 -1.3832301595984882 1.6525254224276966
 }
 TexturedBackgroundLight {
 }
@@ -20,7 +20,7 @@ RectangleArena {
   floorAppearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "../textures/base track.png"
+        "../../maps/image/base track.png"
       ]
       repeatS FALSE
       repeatT FALSE
