@@ -25,8 +25,10 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
+**IMPORTANT**: In `simulation/controller/epuck_data/runtime.ini` update the python path to .venv   
 
-To run the simulation, open `simulation/worlds/Self Diagnosis AGV.wbt` in Webots.
+To run the simulation, open `simulation/worlds/Self Diagnosis AGV.wbt` in Webots. 
+
 
 ## Usage
 
