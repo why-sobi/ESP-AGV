@@ -9,14 +9,17 @@ a route; the robot driver follows that route while the line follower handles
 local steering. This extends the original line-following project; it does not
 replace line following.
 
-Anomaly detection remains an independent project objective. The planned motor
-and IR autoencoders can still train on healthy telemetry and monitor runs while
-the route planner chooses where to go. The navigation layer supplies route
-context; the anomaly detector observes motor commands/odometry and IR streams.
-Record map, route, and operating-mode IDs with telemetry so route-specific
-normal behavior is not confused with a fault. Healthy training and validation
-data should cover the routes and speeds expected at inference, or models should
-be evaluated/conditioned by route or operating mode.
+Anomaly detection remains an independent project objective. Motor and IR
+autoencoders train on healthy Webots telemetry and monitor simulated runs while
+the route planner chooses where to go. Route and operating-mode context should
+be recorded so expected path/speed variation is not mislabeled as a fault.
+Healthy training, validation, and test runs should cover the intended
+simulation routes and speeds.
+
+The agreed target is **simulation-only operation with an ESP32-S3 compute
+target**: Webots produces sensor/encoder telemetry; a Python bridge streams it
+to the ESP over USB serial; the ESP computes control and, eventually, anomaly
+scores; the bridge applies returned wheel commands in Webots.
 
 The planner and driver should exchange a versioned route message containing
 node and edge IDs, for example:
@@ -36,13 +39,11 @@ node and edge IDs, for example:
 }
 ```
 
-The same message can be delivered locally in Webots or sent to physical hardware
-over HTTPS/MQTT. Transporting a route is transferable; **localization and
-confirming that an edge or junction has been reached are separate requirements**.
-The Webots Supervisor can provide ground-truth pose for simulation. A deployed
-AGV needs an appropriate localization source, such as infrastructure markers,
-fiducials, or a separately validated localization system. Wheel encoders alone
-accumulate position error and do not identify a named junction.
+For the ESP simulation loop, the route planner's graph output must be converted
+to relative junction actions and transmitted by the Python bridge. Webots
+Supervisor pose may be used for simulation route following, while the ESP's
+prototype route follower uses relative junction actions and IR readings. The
+live bridge and graph-to-action conversion are not implemented yet.
 
 The planner's input is a graph description; distances and node coordinates must
 come from a surveyed/calibrated map, not guesses from the texture:
@@ -80,9 +81,9 @@ Once a surveyed map exists, the planner can be called with
 - `maps/paths/base track.json` is the current draft generated from
   `maps/image/base track.png`. It is not yet a surveyed Webots-world map.
   The current extraction has four candidate junction nodes and six edges,
-  including parallel connections between some nodes. These are algorithmic
-  candidates, not verified route semantics; inspect them in the preview before
-  using them to plan.
+  including parallel connections between some nodes. The configured route was
+  visually checked and tested, but all candidate nodes, edges, and alternate
+  route semantics still need review before being treated as validated.
 - `scripts/route_planner.py` loads and validates named-node maps, then computes
   the minimum-distance route with Dijkstra's algorithm. Edges can be one-way or
   bidirectional and may carry a speed limit. It emits JSON to stdout or a file
@@ -94,11 +95,24 @@ Once a surveyed map exists, the planner can be called with
   uses ground sensors for local line correction and line-loss stopping, and
   records route telemetry. The previous sensor-only controller remains as
   `epuck_data`.
+- `simulation/controllers/epuck_data/epuck_data.py` logs each PD session to a
+  unique CSV under `data/sensor_runs`, preserving run boundaries.
+- `scripts/prepare_telemetry.py` derives actual wheel velocities, creates
+  separate motor/IR windows, splits by run before windowing, fits scalers on
+  training data only, and rejects exact duplicate runs. The pilot dataset has
+  one unique training run and one different-speed validation run; there is no
+  final test set or model yet.
+- `esp32-s3/` is an ESP-IDF project for the ESP32-S3. Its current firmware
+  accepts route actions and three simulated IR readings over serial, runs the
+  PD/junction prototype, and returns wheel targets. A standalone COM3 smoke
+  test passed. The Webots bridge, motor telemetry inputs, and anomaly inference
+  are still future work.
 - The current Webots route integration is still a prototype: its pixel-to-world
   transform uses the explicitly configured 1 m by 1 m arena. A headless
   Webots run completed the two-edge mission with all ground sensors seeing the
-  line and a maximum recorded centerline error of 0.0228 m. This validates the
-  current simulation transform/route, not other tracks or hardware.
+  line and a maximum recorded centerline error of 0.0228 m. The user also
+  visually confirmed the configured route. This validates that tested
+  simulation setup, not every map route.
 - `docs/USAGE.md` describes the converter, visualizer, planner, and test
   commands. Use it as the quick-start workflow; this file records the design
   decisions and failure history.
@@ -114,9 +128,9 @@ Once a surveyed map exists, the planner can be called with
    priority, time, battery, or fault constraints can later change the edge cost
    without changing the route-message contract.
 3. **Keep path planning separate from low-level line following and transport.**
-   A Webots Supervisor or a remote planner can choose a route. The robot driver
-   still needs to track that route and report progress; MQTT/HTTPS does not
-   replace localization.
+   The route planner chooses the path, the controller follows it, and the
+   transport only carries commands/telemetry. The planned Webots-to-ESP link is
+   USB serial via a Python bridge.
 4. **Do not treat a sensor pattern as a globally unique junction ID.**
    Three ground IR sensors can indicate local line position, but the same
    pattern may occur on a curve, a broad section, or multiple junctions.
@@ -157,6 +171,9 @@ Once a surveyed map exists, the planner can be called with
    for hardware; the current Supervisor controller is simulation-only.
 4. Validate routes through the circular feature and multi-branch junctions,
    including unreachable destinations and changed maps.
-5. Continue the line-following data collection and dual-autoencoder work.
-6. Select and validate physical localization and communication before claiming
-   the Webots navigation behavior transfers to hardware.
+5. Collect diverse healthy Webots runs and controlled fault runs; train and
+   evaluate the motor/IR autoencoders.
+6. Deploy preprocessing and inference to the ESP32-S3 and compare its scores
+   with the Python reference.
+7. Implement and validate the Webots Python serial bridge, route-action
+   conversion, and end-to-end closed-loop behavior.

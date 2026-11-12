@@ -1,15 +1,17 @@
+import csv
+from datetime import datetime
 from pathlib import Path
-import sys
 
 from controller import Robot
-import pandas as pd
 
 # 1. Workspace path resolution
 controller_dir = Path(__file__).resolve().parent
 root_dir = controller_dir.parent.parent.parent
 data_dir = root_dir / "data"
-data_dir.mkdir(parents=True, exist_ok=True)
-csv_path = data_dir / "SensorData-v2(PD) (2).csv"
+run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
+run_dir = data_dir / "sensor_runs"
+run_dir.mkdir(parents=True, exist_ok=True)
+csv_path = run_dir / f"pd-line-follow-{run_id}.csv"
 
 # 2. Initialize Webots Robot & Timestep
 robot = Robot()
@@ -56,135 +58,151 @@ junction_confirm_steps = 2
 junction_release_steps = 3
 controller_dt = time_step / 1000.0   # Webots step duration in seconds, for the error derivative.
 batch_size = 500                    # Write to CSV in batches every 500 steps to protect data
-data_log = []                       # Batching data before flushing
+data_log = []                       # Buffer rows before writing them as one batch
 
-print(f"Starting simulation. Batch-saving data every {batch_size} steps...")
+print(f"Starting healthy-baseline candidate run {run_id}; saving to {csv_path}")
 
 step_count = 0
 
-while robot.step(time_step) != -1:
-    current_time = robot.getTime()
+with csv_path.open("w", newline="", encoding="utf-8") as log_file:
+    writer = csv.writer(log_file)
+    writer.writerow(
+        [
+            "run_id",
+            "controller",
+            "time",
+            "target_vel_left",
+            "target_vel_right",
+            "actual_pos_left",
+            "actual_pos_right",
+            "gs_left",
+            "gs_center",
+            "gs_right",
+        ]
+    )
 
-    v_left      = gs_left.getValue()
-    v_center    = gs_center.getValue()
-    v_right     = gs_right.getValue()
-    
-    # Lower readings indicate the dark line, so convert them into line strengths.
-    # Each line_* value is the sensor's positive amount below the background threshold.
-    line_left       = max(0.0, line_threshold - v_left)
-    line_center     = max(0.0, line_threshold - v_center)
-    line_right      = max(0.0, line_threshold - v_right)
-    line_strength   = line_left + line_center + line_right  # Total line signal; zero means no sensor sees it.
+    while robot.step(time_step) != -1:
+        current_time = robot.getTime()
 
-    left_active = line_left >= min_line_strength
-    center_active = line_center >= min_line_strength
-    right_active = line_right >= min_line_strength
-    both_sides_active = left_active and right_active
+        v_left      = gs_left.getValue()
+        v_center    = gs_center.getValue()
+        v_right     = gs_right.getValue()
 
-    if junction_choice is None:
-        if both_sides_active:
-            junction_frames += 1
-        else:
-            junction_frames = 0
+        # Lower readings indicate the dark line, so convert them into line strengths.
+        # Each line_* value is its positive amount below the background threshold.
+        line_left       = max(0.0, line_threshold - v_left)
+        line_center     = max(0.0, line_threshold - v_center)
+        line_right      = max(0.0, line_threshold - v_right)
+        line_strength   = line_left + line_center + line_right
 
-        if junction_frames >= junction_confirm_steps:
-            if center_active:
-                # At a three-way junction, continue forward through the center.
-                junction_choice = "straight"
-            else:
-                # With only two side branches, continue the last turn direction.
-                # If there is no useful history, the default is to choose left.
-                junction_choice = "left" if last_turn_direction < 0 else "right"
-    else:
-        if both_sides_active:
-            junction_clear_frames = 0
-        else:
-            junction_clear_frames += 1
-
-        if junction_clear_frames >= junction_release_steps:
-            junction_choice = None
-            junction_frames = 0
-            junction_clear_frames = 0
-
-    if line_strength < min_line_strength:
-        # Search slowly in the last known direction instead of driving blind
-        # at the normal line-following speed.
-        search_steering = max_steering * last_turn_direction * 0.5
-        target_left = 1.0 + search_steering
-        target_right = 1.0 - search_steering
-        filtered_error_rate = 0.0
-    else:
-        if junction_choice == "straight":
-            error = 0.0
-        elif junction_choice == "left":
-            error = -1.0
-        elif junction_choice == "right":
-            error = 1.0
-        else:
-            # Positive error means the line is to the robot's right.
-            error = (line_right - line_left) / line_strength
+        left_active = line_left >= min_line_strength
+        center_active = line_center >= min_line_strength
+        right_active = line_right >= min_line_strength
+        both_sides_active = left_active and right_active
 
         if junction_choice is None:
-            raw_error_rate = (error - previous_error) / controller_dt
-            raw_error_rate = max(-derivative_limit, min(derivative_limit, raw_error_rate))
-            filtered_error_rate = (
-                derivative_smoothing * raw_error_rate
-                + (1.0 - derivative_smoothing) * filtered_error_rate
-            )
+            if both_sides_active:
+                junction_frames += 1
+            else:
+                junction_frames = 0
+
+            if junction_frames >= junction_confirm_steps:
+                if center_active:
+                    # At a three-way junction, continue forward through the center.
+                    junction_choice = "straight"
+                else:
+                    # With only two side branches, continue the last turn direction.
+                    # If there is no useful history, the default is to choose left.
+                    junction_choice = "left" if last_turn_direction < 0 else "right"
         else:
-            # A discrete branch choice should not create a derivative kick.
+            if both_sides_active:
+                junction_clear_frames = 0
+            else:
+                junction_clear_frames += 1
+
+            if junction_clear_frames >= junction_release_steps:
+                junction_choice = None
+                junction_frames = 0
+                junction_clear_frames = 0
+
+        if line_strength < min_line_strength:
+            # Search slowly in the last known direction instead of driving blind
+            # at the normal line-following speed.
+            search_steering = max_steering * last_turn_direction * 0.5
+            target_left = 1.0 + search_steering
+            target_right = 1.0 - search_steering
             filtered_error_rate = 0.0
+        else:
+            if junction_choice == "straight":
+                error = 0.0
+            elif junction_choice == "left":
+                error = -1.0
+            elif junction_choice == "right":
+                error = 1.0
+            else:
+                # Positive error means the line is to the robot's right.
+                error = (line_right - line_left) / line_strength
 
-        if error < 0.0:
-            last_turn_direction = -1.0
-        elif error > 0.0:
-            last_turn_direction = 1.0
+            if junction_choice is None:
+                raw_error_rate = (error - previous_error) / controller_dt
+                raw_error_rate = max(-derivative_limit, min(derivative_limit, raw_error_rate))
+                filtered_error_rate = (
+                    derivative_smoothing * raw_error_rate
+                    + (1.0 - derivative_smoothing) * filtered_error_rate
+                )
+            else:
+                # A discrete branch choice should not create a derivative kick.
+                filtered_error_rate = 0.0
 
-        previous_error = error
+            if error < 0.0:
+                last_turn_direction = -1.0
+            elif error > 0.0:
+                last_turn_direction = 1.0
 
-        # Reduce forward speed as the line moves farther from center.
-        turn_amount = min(1.0, abs(error))
-        base_speed = max_speed - (max_speed - min_speed) * turn_amount
+            previous_error = error
 
-        # PD is sufficient for lateral tracking; an integral term could wind up
-        # during sensor bias or line loss.
-        steering = kp * error + kd * filtered_error_rate
-        steering = max(-max_steering, min(max_steering, steering))
+            # Reduce forward speed as the line moves farther from center.
+            turn_amount = min(1.0, abs(error))
+            base_speed = max_speed - (max_speed - min_speed) * turn_amount
 
-        target_left = base_speed + steering
-        target_right = base_speed - steering
+            # PD is sufficient for lateral tracking; an integral term could wind up
+            # during sensor bias or line loss.
+            steering = kp * error + kd * filtered_error_rate
+            steering = max(-max_steering, min(max_steering, steering))
 
-    # Keep both targets in the forward, supported motor-speed range.
-    target_left = max(0.0, min(max_wheel_speed, target_left))
-    target_right = max(0.0, min(max_wheel_speed, target_right))
+            target_left = base_speed + steering
+            target_right = base_speed - steering
 
-    left_motor.setVelocity(target_left)
-    right_motor.setVelocity(target_right)
+        # Keep both targets in the forward, supported motor-speed range.
+        target_left = max(0.0, min(max_wheel_speed, target_left))
+        target_right = max(0.0, min(max_wheel_speed, target_right))
 
-    # Collect telemetry
-    data_log.append({
-        "time": current_time,
-        "target_vel_left": target_left,
-        "target_vel_right": target_right,
-        "actual_pos_left": left_sensor.getValue(),
-        "actual_pos_right": right_sensor.getValue(),
-        "gs_left": v_left,
-        "gs_center": v_center,
-        "gs_right": v_right
-    })
+        left_motor.setVelocity(target_left)
+        right_motor.setVelocity(target_right)
 
-    step_count += 1
+        data_log.append(
+            [
+                run_id,
+                "pd_line_follow",
+                current_time,
+                target_left,
+                target_right,
+                left_sensor.getValue(),
+                right_sensor.getValue(),
+                v_left,
+                v_center,
+                v_right,
+            ]
+        )
 
-    # Periodic batch flush to disk
-    if step_count % batch_size == 0:
-        df = pd.DataFrame(data_log)
-        header = not csv_path.exists()
-        df.to_csv(csv_path, mode='a', index=False, header=header)
-        data_log.clear()
-        print(f"[Batch Flush] Saved {step_count} total steps to {csv_path}")
+        step_count += 1
+        if step_count % batch_size == 0:
+            writer.writerows(data_log)
+            log_file.flush()
+            data_log.clear()
+            print(f"[Batch Flush] Saved {step_count} rows to {csv_path}")
 
-if data_log:
-    df = pd.DataFrame(data_log)
-    header = not csv_path.exists()
-    df.to_csv(csv_path, mode='a', index=False, header=header)
-    print(f"[Final Flush] Saved remaining data to {csv_path}")
+    if data_log:
+        writer.writerows(data_log)
+        log_file.flush()
+        print(f"[Final Flush] Saved {len(data_log)} remaining rows to {csv_path}")

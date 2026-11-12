@@ -1,89 +1,94 @@
 # Project Usage
 
-Run commands from the repository root in PowerShell. The image tools use the
-project virtual environment, which includes Pillow and NumPy:
+Run commands from the repository root in PowerShell unless a section says
+otherwise. This project is simulation-first: Webots supplies the robot,
+environment, sensors, and encoder readings. The ESP32-S3 is an external
+computation target connected by USB serial; this is **not** a physical AGV
+workflow.
+
+## Project files and what they do
+
+| Path | Purpose |
+|---|---|
+| `simulation/worlds/Self Diagnosis AGV.wbt` | Webots world, track texture, robot, and selected controller |
+| `simulation/controllers/epuck_route/` | Map route execution in Webots; uses Supervisor pose and ground-sensor correction |
+| `simulation/controllers/epuck_data/` | Sensor-only PD line follower and per-session telemetry collector |
+| `maps/image/` | Track images used by the world and map-conversion tools |
+| `maps/paths/` | Editable graph-map JSON files |
+| `maps/visualizations/` | Generated standalone HTML map previews |
+| `maps/routes/mission.json` | Webots route mission, speed, and simulation settings |
+| `scripts/pathToMap.py` | Converts a path image into a draft graph map |
+| `scripts/visualizeMap.py` | Generates an HTML map editor/preview |
+| `scripts/route_planner.py` | Validates the graph and finds shortest paths |
+| `scripts/prepare_telemetry.py` | Converts independent telemetry runs into scaled motor/IR windows |
+| `scripts/esp_serial_smoke_test.py` | Tests the flashed ESP controller over COM3 with simulated sensor frames |
+| `esp32-s3/` | ESP-IDF project, serial protocol, and prototype PD/junction firmware |
+| `data/route_runs/` | Per-run telemetry from the map-based Webots controller |
+| `data/sensor_runs/` | Per-session telemetry from the sensor-only PD controller |
+| `data/datasets/` | Prepared model-input arrays and dataset metadata |
+| `docs/STATUS.md`, `docs/TODO.md`, `docs/DECISIONS.md` | Verified status, next work, and design history |
+
+Build output, local ESP-IDF configuration, Python caches, and installed Python
+environments are not project source files.
+
+## Set up Python and Webots
+
+Create/activate the virtual environment and install the repository dependencies:
 
 ```powershell
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-Or invoke `.\.venv\Scripts\python.exe` directly in each command.
+Confirm both controller `runtime.ini` files point to this repository's
+`.venv\Scripts\python.exe`. Open
+`simulation\worlds\Self Diagnosis AGV.wbt` in Webots and start the simulation.
+The committed world selects `epuck_route`.
 
-## Convert a path image to a draft map
+## Make a map from a new track image
 
-The converter treats dark pixels as the path, extracts an approximate centerline,
-and saves a JSON file using the image's basename:
+1. Put the image in `maps\image` (or another chosen image folder). The
+   converter expects a dark path against a lighter background.
+2. Convert it to a draft JSON map; the JSON takes the image basename:
 
-```powershell
-.\.venv\Scripts\python.exe scripts\pathToMap.py `
-  -img "maps\image\base track.png" `
-  -out "maps\paths"
-```
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\pathToMap.py `
+     -img "maps\image\new-track.png" `
+     -out "maps\paths"
+   ```
 
-This creates `maps\paths\base track.json`. Useful options:
+3. Generate and open the HTML preview:
 
-```powershell
---threshold 128          # grayscale threshold, from 0 to 255
---max-dimension 600      # processing size; higher retains more detail
---pixels-per-meter 100   # optional calibrated scale for edge distances
-```
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\visualizeMap.py `
+     -map "maps\paths\new-track.json"
+   ```
 
-Do not pass a guessed scale. Without calibration, geometry and distances remain
-in image pixels, and the JSON explicitly marks the Webots transform as
-uncalibrated. Conversion is a starting point, not automatic map surveying.
+   By default the preview is `maps\visualizations\new-track.html`. Zoom, pan,
+   inspect the candidate graph, and hand-edit the JSON to correct node locations,
+   edge connections, directionality, names, and geometry. Rerun the preview
+   after edits.
 
-## Visualize and edit the map
+4. To run that track in Webots, update the arena `ImageTexture.url` in
+   `simulation\worlds\Self Diagnosis AGV.wbt` to the new image and make the
+   arena `floorSize` match the real proportions. Review the map's
+   `world_transform` so pixel coordinates align with that arena, then visually
+   verify robot alignment. Image conversion does not automatically survey or
+   calibrate the world transform.
+5. Update the map path constants near the top of
+   `simulation\controllers\epuck_route\epuck_route.py` to point to the new JSON.
+   Edit `maps\routes\mission.json` for start/destination nodes and test the
+   planned route. Do not rely on automatically generated IDs until the graph
+   has been reviewed.
 
-Generate a standalone HTML preview in the sibling `visualizations` folder:
+Useful converter options include `--threshold`, `--max-dimension`, and
+`--pixels-per-meter`. Only provide a pixels-per-meter scale when measured; a
+guessed scale makes distances and world alignment untrustworthy.
 
-```powershell
-.\.venv\Scripts\python.exe scripts\visualizeMap.py `
-  -map "maps\paths\base track.json"
-```
+## Plan and run a route
 
-Open `maps\visualizations\base track.html` in a browser. Scroll to zoom, drag to pan,
-and hover over nodes or edges to see details. If the source image is available
-in a nearby `image` or `textures` folder, it appears as a faded background.
-
-Use `-out-dir <folder>` to choose another preview folder, or `-out <file.html>`
-to set an exact output file.
-
-Edit the JSON in a text editor, then rerun the visualization command to refresh
-the preview. Hand edits commonly include:
-
-- Give automatically generated node IDs meaningful, stable names.
-- Move, add, or remove nodes to match real junctions, endpoints, and stations.
-- Correct each edge's `from` and `to` node IDs, centerline geometry, and
-  `bidirectional` flag.
-- Set calibrated edge `distance` values and optional `speed_limit` values.
-
-The map uses:
-
-- `nodes`: unique `id` plus numeric `x` and `y` coordinates; optional `name`.
-- `edges`: unique `id`, `from`, `to`, positive `distance`, optional
-  `speed_limit`, `bidirectional` boolean, and optional `geometry` as an ordered
-  list of `[x, y]` points.
-- `coordinate_system`: the origin and units used by the coordinates.
-
-Keep all coordinates in one coordinate system. For Webots execution, the image
-coordinates still need a calibrated transform to world coordinates.
-
-## Plan a route
-
-The planner accepts a map JSON and start/destination node IDs:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\route_planner.py `
-  "maps\paths\base track.json" node-001 node-004
-```
-
-It prints a JSON route containing the ordered node IDs and edge steps. Dijkstra's
-algorithm minimizes the sum of edge `distance` values. At present, `speed_limit`
-is carried into route output but does not affect route selection.
-
-The draft map IDs are temporary: inspect the preview and use the exact node IDs
-present in the JSON. The output is useful for checking graph connectivity, but
-`-out` can save the route as JSON for reuse:
+Use the exact node IDs from the reviewed map:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\route_planner.py `
@@ -91,48 +96,131 @@ present in the JSON. The output is useful for checking graph connectivity, but
   -out "maps\routes\active_route.json"
 ```
 
-### Run the route in Webots
+Edit `maps\routes\mission.json` to select `start_node`,
+`destination_node`, and `wheel_speed_rad_s`. Then run the world in Webots. The
+current route controller plans a shortest-distance path, uses Supervisor pose
+to track map geometry, and uses the three ground sensors for local correction
+and line-loss stopping. It writes one CSV per run to `data\route_runs`.
 
-The current world is configured with a Supervisor-enabled e-puck and the
-`epuck_route` controller. Edit `maps\routes\mission.json` to select
-`start_node` and `destination_node`, then open
-`simulation\worlds\Self Diagnosis AGV.wbt` in Webots and start the simulation.
-The controller calculates the shortest route, spawns the robot at the selected
-start node for repeatable simulation tests, follows the edge centerlines, uses
-ground IR readings for local correction/line-loss stopping, and writes telemetry
-to `data\route_runs`.
+Supervisor pose is ground-truth simulation information, not an ESP input
+mechanism. The eventual ESP route interface will use relative junction actions;
+graph-to-action conversion and the live Webots serial bridge are not yet
+implemented.
 
-The current map-to-world transform assumes the image fills the 1 m by 1 m
-arena. It is explicitly marked uncalibrated; the mission allows that transform
-for simulation testing only. Check the robot against the track in Webots before
-trusting route execution. Set `spawn_at_start_node` to `false` to disable the
-simulation-only teleport, but then the robot must already be positioned at the
-configured start node. This Supervisor controller is not a hardware driver;
-physical hardware needs a localization adapter and its own safe start logic.
+## Collect telemetry
 
-The previous sensor-only controller remains available as `epuck_data` for
-line-following experiments without map navigation.
+### Map-based route runs
 
-## Current Webots and anomaly-detection status
+The configured `epuck_route` controller automatically writes a timestamped CSV
+under `data\route_runs` when a route executes. Columns include route/edge IDs,
+pose, centerline error, target motor speeds, wheel encoder positions, and all
+three ground IR readings. The route controller follows map geometry using
+Supervisor pose, so these runs are useful for simulation baselines but do not
+test the ESP control loop.
 
-The route-aware Webots controller now loads the draft graph and mission, runs
-the shortest-path planner, uses Supervisor pose to track the planned
-centerlines, and logs route telemetry. It still needs visual Webots validation
-because image-to-world calibration has not been confirmed. This is a
-simulation-only first integration, not yet validated for hardware.
+### Sensor-only PD runs
 
-The original anomaly-detection objective remains separate from route planning:
-collect healthy data while line following, derive motor velocities from wheel
-odometry, build temporal windows, train the motor and IR autoencoders, and
-validate thresholds using fault-injected runs. Include route and speed context
-when collecting data so expected differences between paths are not mislabeled
-as faults.
+Select `epuck_data` as the e-puck controller in Webots, then run one simulation
+session per recording. It writes a new timestamped CSV to `data\sensor_runs`;
+it does not append another simulation-time episode to a shared filename. The
+logged features are target wheel speeds, wheel encoder positions, and the
+three ground sensors.
 
-## Run tests
+Use separate healthy runs and label/keep fault-injected runs separately. Before
+calling a run healthy, inspect whether the robot completed the intended track,
+sampling cadence, sensor loss, and command ranges.
+
+## Prepare motor and IR autoencoder inputs
+
+The current pilot illustrates the preparation workflow:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\prepare_telemetry.py `
+  --runs `
+    "data\route_runs\route-20261112-232535.csv" `
+    "data\route_runs\route-20261112-232818.csv" `
+  --out "data\datasets\sim-baseline-v1" `
+  --window 20 `
+  --stride 1
+```
+
+Replace those example paths with your healthy run files. The script:
+
+- derives actual wheel angular velocities from encoder-position differences;
+- builds independent temporal windows for motor and IR features;
+- detects time resets in old appended files and splits those into episodes;
+- rejects short episodes and exact duplicate telemetry runs;
+- assigns independent runs to training and validation before windowing; and
+- fits motor and IR scaling statistics on training runs only.
+
+The output contains:
+
+- `windows.npz`: `motor_train`, `ir_train`, `motor_validation`, and
+  `ir_validation` arrays, with shape `[windows, time, features]`;
+- `metadata.json`: feature names, run split, sampling/sensor-quality summaries,
+  scaler parameters, exclusions, and an explicit note that there is no final
+  test split yet.
+
+At least two non-duplicate healthy runs are needed to create both training and
+validation sets. One unique run creates training windows only. Do not treat
+overlapping windows from the same run as independent train/validation data.
+The checked-in pilot uses one 2.5 rad/s run for training and one 3.0 rad/s run
+for validation on the same route. It validates the pipeline, not model quality;
+there is no trained model or controlled-fault evaluation yet.
+
+## ESP32-S3 firmware and serial smoke test
+
+The ESP32-S3 N16R8 has a prototype ESP-IDF controller project under
+`esp32-s3`. Use the VS Code ESP-IDF terminal configured for ESP-IDF 6.0.1:
+
+```powershell
+cd esp32-s3
+idf.py set-target esp32s3
+idf.py build
+idf.py -p COM3 flash
+```
+
+Flashing is optional for building and overwrites firmware on the connected ESP.
+Close the IDF monitor or any other process that owns COM3 before flashing or
+running another serial test.
+
+To check the flashed prototype from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\esp_serial_smoke_test.py --port COM3
+```
+
+The script sends a short route and synthetic IR frames, then checks PD
+wheel-speed outputs, one junction action, junction clearing, stop at destination,
+and invalid-route rejection. It does **not** launch Webots; the data is
+synthetic and the returned wheel commands are not applied to the simulated
+robot.
+
+See `esp32-s3\README.md` for the serial frame format and firmware limitations.
+The current firmware consumes route actions and three IR readings and returns
+wheel speeds. The motor autoencoder needs target and measured wheel features,
+and its inference needs to be implemented and added to the ESP protocol.
+
+## Model, deployment, and integration status
+
+No autoencoder training/evaluation scripts or trained model artifacts are
+available yet. The next steps are to collect more distinct healthy runs, create
+controlled fault runs, train and evaluate motor/IR models, determine thresholds
+from held-out healthy data, and then implement ESP-compatible inference.
+
+After that, implement the Python Webots bridge. It must stream the needed
+telemetry to the ESP, send the route/action sequence, read wheel commands and
+anomaly results, and apply/log them in Webots. The end-to-end loop—Webots to
+ESP and back to Webots—has not yet been built or tested.
+
+## Tests
+
+Run the map and telemetry-preparation tests:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s scripts -p "test_*.py" -v
 ```
 
-The tests cover image conversion, map visualization, and graph route planning;
-they do not test physical/Webots route following.
+These are unit tests for the Python tools. The serial smoke test requires the
+flashed ESP and an available COM port. Neither test suite replaces full
+Webots/ESP closed-loop validation.

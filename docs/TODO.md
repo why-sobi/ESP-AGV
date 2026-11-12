@@ -2,56 +2,80 @@
 
 ## Currently Doing
 
-- **Review and name the graph** in `maps/paths/base track.json`
-  using `maps/visualizations/base track.html`. Confirm nodes correspond to real
-  route decision points and that the circular section's connections are right.
-  Rename generated node/edge IDs to stable meaningful names.
-- Expand Webots route tests beyond the first verified two-edge mission; check
-  route selection and stopping behavior around the loop and all junctions.
+Build a repeatable, diverse Webots telemetry dataset and turn it into a
+validated anomaly-detection model. Keep Webots as the simulation environment;
+the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
-## Next: Make a testable navigation loop
+## 1. Collect and qualify healthy runs
 
-1. **Validate the graph and route output.**
-   Run the planner for selected start/destination pairs, including both
-   directions through the circular feature and each multi-branch junction.
-   Confirm every planned edge exists and follows the intended path.
-3. **Validate and refine route execution.**
-   The initial Supervisor-based route controller is now connected. Confirm it
-   follows one edge, reaches a junction, selects the planned branch, and exits
-   the circular feature correctly.
-4. **Test in Webots incrementally.**
-   Start with one edge, then one junction, then the circular feature, then
-   multi-edge missions. Log the route ID, current edge/node, pose, sensor data,
-   wheel targets, and odometry for each run.
+- Collect separate, identifiable healthy runs for each supported route and
+  speed mode. The current two unique runs cover one route at 2.5 and 3.0 rad/s
+  only and are a pipeline pilot.
+- Review sensor-loss fraction, sampling intervals, route completion, edge IDs,
+  and motor-command ranges before labeling a run healthy.
+- Use `epuck_data` when collecting sensor-only PD data, or `epuck_route` for
+  route-aware runs. Each controller writes per-session telemetry.
+- Collect additional distinct runs; exact duplicates do not create an
+  independent validation/test set.
 
-## Preserve the original anomaly-detection objective
+## 2. Prepare and validate the dataset
 
-6. **Stabilize healthy line following and data collection.**
-   Tune the PD controller on known paths, check wheel commands and sensor
-   behavior, and write each simulation run to a clearly identified output file.
-   Confirm logging has uniform timestep intervals and flushes data on shutdown.
-7. **Build the feature pipeline.**
-   Derive wheel velocities from odometry, create temporal windows, split by
-   separate simulation runs, and fit scaling only on healthy training data.
-8. **Train and validate the dual autoencoders.**
-   Train the motor and ground-IR models on healthy data, set thresholds from
-   held-out healthy validation runs, and test false-positive rates.
-9. **Evaluate controlled faults.**
-   Inject motor and sensor faults in Webots, check which model responds first,
-   and document cross-coupling and fault-isolation limits.
-10. **Carry route context into anomaly analysis.**
-    Record map, route, edge, and speed context. Ensure healthy training and
-    evaluation data cover expected routes and operating modes so normal route
-    changes are not mistaken for faults.
+- Run `scripts/prepare_telemetry.py` on healthy CSVs.
+- Inspect the per-run metadata and verify the train/validation split is by
+  independent runs, not overlapping windows.
+- Decide the final window length/features based on data and model experiments.
+- Reserve separate healthy runs for final false-positive testing.
 
-## Later / Hardware Readiness
+## 3. Create and evaluate anomaly models
 
-- Select and validate a physical localization method; encoder dead reckoning
-  alone is not reliable node identification.
-- Define the route-message interface and transport (local file for simulation;
-  HTTPS/MQTT may be used for a hardware planner).
-- Verify route/map versioning, stale-route handling, and safe stop behavior if
-  localization or route progress is lost.
-- Revisit route cost once requirements are known. The current Dijkstra planner
-  minimizes distance; edge speed limits are carried as metadata but do not yet
-  affect route selection.
+- Implement the motor and ground-IR autoencoders and their training/evaluation
+  scripts.
+- Train only on healthy training runs; fit scaling only on those runs.
+- Compare temporal model choices and measure validation reconstruction error.
+- Set per-model thresholds using held-out healthy validation data.
+- Add controlled Webots motor and sensor faults. Measure detection delay,
+  false-positive rate on healthy test runs, and subsystem cross-coupling.
+
+## 4. Deploy inference to the ESP32-S3
+
+- Select a model representation/runtime supported by ESP-IDF and verify
+  operator coverage, RAM/flash use, and inference latency.
+- Port preprocessing and the exact training scaler parameters; test ESP scores
+  against Python outputs on the same recorded windows.
+- Define how the ESP reports motor/IR anomaly scores and threshold decisions.
+
+## 5. Connect Webots, Python, and the ESP
+
+- Implement the Python bridge: send route actions once, then stream sensor,
+  timing, and required motor/odometry features; receive wheel commands and
+  anomaly results.
+- Extend the serial protocol to carry the motor telemetry needed by the motor
+  autoencoder; the current protocol sends only three IR readings and returns
+  wheel targets.
+- Keep one process responsible for COM3. Add framing, sequence checking,
+  timeouts, safe-stop behavior, and reconnect/error handling.
+- Convert graph routes to the ESP's relative junction-action sequence and
+  verify the return leg is planned from destination back to dock.
+- Run Webots with the ESP in the control loop. Check timing, command
+  application, route state, anomaly scores, and safe stop on communication loss.
+
+## Navigation follow-up
+
+- Review generated graph semantics and stable node/edge names.
+- Exercise more routes, especially the circular section and multi-branch
+  junctions.
+- Re-test map conversion, visualization, hand-editing, and Webots image/scale
+  alignment on a second track.
+
+## Completion criteria
+
+- Dataset manifests identify independent runs and support healthy-only train,
+  healthy validation, healthy test, and labeled fault test sets.
+- Python model metrics and threshold results are reproducible from saved
+  configuration and data manifests.
+- ESP inference agrees with Python within defined numerical tolerances and
+  satisfies memory/timing limits.
+- Webots is driven by ESP-produced wheel commands through the Python serial
+  bridge, and anomaly detections/telemetry are logged with route context.
+- Communication loss, malformed frames, line loss, and destination completion
+  result in documented, tested safe behavior.

@@ -1,121 +1,67 @@
-# E-Puck AGV: Navigation and Anomaly Detection Status
+# Project Status
 
-This status covers the original line-following/anomaly-detection objective and
-the map-based navigation work added to handle route choices on fixed tracks.
-Navigation extends line following; it does not replace the anomaly-detection
-goal.
+## Agreed project goal
 
----
+Keep the AGV in the Webots simulation environment. Webots provides simulated
+sensors and odometry; the ESP32-S3 will run the control and anomaly-detection
+computation; Webots applies the returned wheel commands to its simulated robot.
+The eventual loop is:
 
-## Current Progress & What’s Done
+```text
+Webots sensors/encoders -> Python bridge over USB serial (COM3) -> ESP32-S3
+ESP32-S3 wheel commands/anomaly scores -> Python bridge -> Webots motors/logging
+```
 
-1. **Development and Webots setup:** The repository uses a project virtual
-   environment and controller-specific `runtime.ini` configuration.
-2. **Line-following and telemetry:** `epuck_data` remains the sensor-only
-   PD line-following controller. It logs motor targets, wheel encoders, and
-   three ground IR sensors. Initial testing exposed overshoot and jitter from
-   sharp sensor derivatives and high steering commands.
-3. **Map and route tools:** `pathToMap.py` builds a draft graph from the track
-   image, `visualizeMap.py` writes previews under `maps/visualizations`, and
-   `route_planner.py` computes shortest paths through named nodes.
-4. **Webots route integration:** The world uses a Supervisor-enabled
-   `epuck_route` controller. It computes a route from `maps/routes/mission.json`,
-   follows edge centerlines with Supervisor pose and ground-sensor correction,
-   and logs telemetry under `data/route_runs`. A headless Webots run completed
-   the configured two-edge route; measured maximum centerline error was about
-   0.023 m with no line-loss frames. This validates only the tested route and
-   simulation configuration.
-5. **Current limitations:** The extracted graph still needs semantic review
-   and meaningful node/edge names. The Supervisor route controller is a
-   simulation prototype, not a physical AGV controller.
+The Webots simulation remains the environment throughout this plan.
 
+## Verified
 
+- The graph planner, path-image converter, map visualizer, and Webots route
+  controller are implemented. The user visually checked the configured
+  simulation route.
+- The configured two-edge route has completed headless Webots runs at 2.5 and
+  3.0 rad/s. These runs are saved in `data/route_runs`.
+- The ESP32-S3 N16R8 project builds and has been flashed over COM3 with an
+  ESP32-S3/16 MB-flash configuration.
+- `scripts/esp_serial_smoke_test.py` successfully sent route and simulated
+  sensor messages over COM3 and verified PD wheel outputs, junction-action
+  handling, destination stop, and invalid-route rejection.
+- `epuck_data` now writes a separate timestamped CSV per session under
+  `data/sensor_runs` instead of appending to a shared filename.
+- `scripts/prepare_telemetry.py` derives wheel velocities, creates 20-step
+  motor/IR windows, splits by run before windowing, fits scalers on training
+  data only, and rejects exact duplicate runs.
+- The pilot dataset under `data/datasets/sim-baseline-v1` contains 454 training
+  windows from a 2.5 rad/s run and 385 validation windows from a 3.0 rad/s run.
+  Exact-duplicate detection is implemented and unit-tested; duplicate recordings
+  are not treated as independent runs.
+- The Python script test suite passes (18 tests at last verification).
 
----
+## Not yet implemented
 
-## Phase 1: Data Collection & Control Loop
+- The Python Webots-to-ESP bridge. Webots still runs its own controller; the
+  smoke test is a separate host script and does not drive Webots.
+- A graph-route-to-relative-junction-action converter for the ESP.
+- Anomaly-detection model definitions, training/evaluation scripts, fault
+  injection harness, threshold selection, and ESP model inference.
+- End-to-end testing where the ESP computes the commands that Webots applies.
 
-### What to Do
+## Current data/model status
 
-1. **Tune and validate line following:** Use `epuck_data` for sensor-only
-   PD experiments. The map-based `epuck_route` is currently the world's
-   configured controller and uses route geometry plus IR feedback.
-2. **Record healthy baseline data:** Run 10–15 minutes of healthy operation for
-   each intended route/speed mode, saving each run separately with route
-   metadata.
+The current 2-run dataset proves the telemetry-preparation path, not model
+quality. It covers one route at two speeds, has no independent final test split,
+and does not cover controlled faults. The next data milestone is multiple
+distinct healthy runs across the routes/speeds we want to support, followed by
+separately labeled fault-injection runs. Train only on healthy data; use
+different healthy runs for validation and final testing.
 
-### Checks to Handle
+The anomaly-detection target remains simulated telemetry. ESP deployment means
+running the trained inference computation on the ESP32-S3 while Webots remains
+the source of sensor data and the destination for wheel commands.
 
-* Verify that telemetry logging drops no frames and time intervals remain uniform ($\Delta t = \text{Webots timestep}$).
-* Check that ground IR values do not flatline or rail out prematurely during normal tracking.
+## References
 
-### ESP-IDF Gotchas
-
-* **Simulation Step vs. Controller Loop Desync:** Ensure your logging frequency strictly matches your `robot.step(timestep)` frequency. If you log asynchronously or miss steps, your $\Delta t$ for velocity derivatives will become corrupted with variable time-deltas.
-* **Sensor Saturation:** Make sure your ground IR sensors don't hit their absolute min/max limits on straightaways. If they rail out early, your proportional error loses sensitivity.
-
----
-
-## Phase 2: Feature Engineering & Preprocessing
-
-### What to Do
-
-1. **Derive Instantaneous Velocity:** Convert cumulative wheel positions (`actual_pos`) into actual velocities by calculating differences over time ($\Delta \text{pos} / \Delta t$).
-2. **Construct Rolling Windows:** Group sequential telemetry steps into sliding temporal windows (e.g., lookback window of $W = 10$ or $20$ steps) so the models capture temporal behavior patterns rather than isolated frames.
-3. **Feature Scaling:** Normalize all input features using `StandardScaler` (mean = 0, variance = 1) based *strictly* on the healthy training dataset.
-
-### Checks to Handle
-
-* Ensure no `NaN` or `Inf` values exist after computing velocity derivatives or sliding windows.
-* Confirm feature shapes match the expected tensor dimensions for PyTorch (`[Batch_Size, Window_Size, Features]`).
-
-### ESP-IDF Gotchas
-
-* **Data Leakage in Scaling:** Never compute your `StandardScaler` mean and variance across the entire dataset (train + validation + test). Fit the scaler *only* on the training split, then transform the validation/test splits using those exact parameters.
-* **Finite Difference Noise:** Raw odometry positions from physics engines can have minor quantization noise. When you take the derivative ($\Delta \text{pos} / \Delta t$), that noise gets amplified. Consider a mild rolling average or Savitzky-Golay filter if your derived velocities look overly jagged.
-
----
-
-## Phase 3: Model Architecture & Training
-
-### What to Do
-
-1. **Implement Dual Autoencoders:** Build two separate PyTorch models:
-* **Motor Autoencoder:** Inputs target velocities vs. actual derived velocities/odometry.
-* **IR Autoencoder:** Inputs ground IR sensor streams (`gs0`, `gs1`, `gs2`).
-
-
-2. **Train on Healthy Data Only:** Train both models using Mean Squared Error (MSE) loss exclusively on data collected from healthy PID runs.
-
-### Checks to Handle
-
-* Monitor training and validation loss curves to ensure they converge smoothly without severe overfitting.
-* Use a validation split (e.g., 80% train, 20% validation) derived from a *separate* healthy simulation run to prevent data leakage.
-
-### ESP-IDF Gotchas
-
-* **Architecture Choice for Temporal Data:** A standard dense/MLP autoencoder treats every time step independently, missing temporal context. Since you are using sliding windows ($W$), use either a **1D Convolutional Autoencoder** or a **LSTM/GRU Autoencoder** so the model actually learns the *sequence* of motion, not just static frames.
-* **Over-reconstruction:** If your autoencoder latent space is too large, it will learn to perfectly reconstruct *anything*—including anomalies. Keep the bottleneck compressed enough that it forces the model to generalize normal behavior.
-
----
-
-## Phase 4: Anomaly Detection & Fault Isolation
-
-### What to Do
-
-1. **Establish Error Thresholds:** Calculate reconstruction error (MSE) across the validation dataset and set an anomaly threshold using a high statistical percentile (e.g., the 99th percentile of validation error).
-2. **Inject Controlled Hardware Faults:** Test the system in Webots by introducing artificial anomalies:
-* *Motor Fault:* Mechanically drag a wheel, simulate a motor stall, or introduce friction.
-* *Sensor Fault:* Block an IR sensor with dust/debris or flatline a sensor signal.
-
-
-
-### Checks to Handle
-
-* **Fault Isolation (Decoupling):** Confirm that a motor failure spikes the error *only* in the Motor Autoencoder while leaving the IR Autoencoder calm, and vice versa.
-* **False Positive Rate (FPR):** Test the model on a normal, healthy run it hasn't seen before to ensure it doesn't trigger false alarms.
-
-### ESP-IDF Gotchas
-
-* **Cascading Physical Failures:** In reality, physics couples systems together. If a motor stalls, the robot drifts off the line, causing the IR sensors to see different values. This can cause a *motor* fault to bleed into the *IR* autoencoder error stream. Look at the *leading edge* of the error spike (which subsystem failed first?) rather than just raw simultaneous triggers when diagnosing root causes.
-* **Threshold Tuning Trap:** Setting the threshold via static percentiles works for simulation, but real-world hardware has ambient noise drift. Keep your threshold evaluation window rolling if you eventually move this logic to the ESP32-S3.
+- `docs/USAGE.md`: commands, project files, data collection, preparation, ESP
+  checks, and what is or is not wired together.
+- `docs/TODO.md`: ordered next steps and completion criteria.
+- `docs/DECISIONS.md`: navigation, simulation-first architecture, and lessons.

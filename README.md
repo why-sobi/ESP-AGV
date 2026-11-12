@@ -1,18 +1,24 @@
 # ESP-AGV
 
-A line-following AGV (automated guided vehicle) project built on the e-puck robot in Webots. The goals are:
+A simulation-first AGV project using the e-puck robot in Webots. Webots remains
+the environment; an ESP32-S3 is being integrated as an external compute target
+for line control and anomaly inference.
 
-- Follow a line track with a PD controller.
-- Log motor and ground IR sensor telemetry for anomaly detection.
-- Plan routes over a named graph of the track.
+- Follow the track with PD line control and map-based route planning.
+- Collect simulated motor/encoder and ground-IR telemetry.
+- Train motor and IR autoencoders on healthy telemetry and evaluate injected
+  faults.
+- Send telemetry and route actions from Webots through a Python/USB-serial
+  bridge to the ESP32-S3; apply returned wheel commands in Webots.
 
 ## Repository layout
 
 ```
 data/          Logged sensor data (CSV)
 docs/          Design notes, status, TODO, and usage guide
+esp32-s3/      ESP-IDF firmware and serial controller prototype
 maps/          Track image and generated graph maps
-scripts/       Map tools, route planner, ETL notebook, and tests
+scripts/       Map tools, route planner, telemetry preparation, and tests
 simulation/    Webots world and robot controllers
 ```
 
@@ -25,7 +31,9 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
-**IMPORTANT**: In `simulation/controller/epuck_data/runtime.ini` update the python path to .venv   
+For Webots, confirm `simulation/controllers/epuck_data/runtime.ini` and
+`simulation/controllers/epuck_route/runtime.ini` point to the project Python
+interpreter.
 
 To run the simulation, open `simulation/worlds/Self Diagnosis AGV.wbt` in Webots. 
 
@@ -60,4 +68,12 @@ See [docs/USAGE.md](docs/USAGE.md) for more detail.
 
 ## Status
 
-The route planner is not connected to the Webots controller yet, and the track map is still an uncalibrated draft. See [docs/STATUS.md](docs/STATUS.md) and [docs/TODO.md](docs/TODO.md) for progress and next steps.
+The map planner is connected to the Webots route controller, and the configured
+two-edge mission has been visually and headlessly tested. The ESP32-S3 firmware
+has been flashed and its serial controller smoke-tested. Telemetry preparation
+works, but the current dataset is a small pipeline pilot: model training,
+inference deployment, and the Webots-to-ESP bridge are not yet implemented.
+
+See [docs/USAGE.md](docs/USAGE.md) for commands and project-file workflows,
+[docs/STATUS.md](docs/STATUS.md) for verified scope, and
+[docs/TODO.md](docs/TODO.md) for the next steps.

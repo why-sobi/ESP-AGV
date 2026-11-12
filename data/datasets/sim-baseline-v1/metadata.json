@@ -1,0 +1,92 @@
+{
+  "data_origin": "Webots simulation telemetry; not physical hardware telemetry",
+  "window_size_samples": 20,
+  "stride_samples": 1,
+  "motor_features": [
+    "target_vel_left",
+    "target_vel_right",
+    "actual_vel_left",
+    "actual_vel_right"
+  ],
+  "ir_features": [
+    "gs_left",
+    "gs_center",
+    "gs_right"
+  ],
+  "scaling": {
+    "fit_on": "training runs only",
+    "motor_mean": [
+      2.498522015690631,
+      2.4909071597850563,
+      2.4931633192388962,
+      2.4927484143763174
+    ],
+    "motor_scale": [
+      0.6774358740724786,
+      0.6773764597140849,
+      0.6847564511189553,
+      0.686205983136561
+    ],
+    "ir_mean": [
+      507.6617393636882,
+      309.61070427382776,
+      486.316691590045
+    ],
+    "ir_scale": [
+      218.56660239969005,
+      63.825858190353934,
+      225.43903824138422
+    ]
+  },
+  "train_runs": [
+    {
+      "run_id": "route-20261112-232535#episode-0",
+      "window_start": 0,
+      "window_count": 454
+    }
+  ],
+  "validation_runs": [
+    {
+      "run_id": "route-20261112-232818#episode-0",
+      "window_start": 0,
+      "window_count": 385
+    }
+  ],
+  "run_quality": {
+    "route-20261112-232535#episode-0": {
+      "rows": 474,
+      "duration_seconds": 15.168000000000001,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.4947145877378434
+    },
+    "route-20261112-232818#episode-0": {
+      "rows": 405,
+      "duration_seconds": 12.96,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0024752475247524753,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.9913019938863967
+    }
+  },
+  "excluded_episodes": [],
+  "test_split": null,
+  "test_split_note": "A separate test split needs additional diverse runs."
+}
