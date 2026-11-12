@@ -30,6 +30,7 @@ class VisualizeMapTests(unittest.TestCase):
             html = output_path.read_text(encoding="utf-8")
 
             self.assertEqual(output_path.name, "example.html")
+            self.assertEqual(output_path.parent.name, "visualizations")
             self.assertIn("road-1", html)
             self.assertIn("start", html)
             self.assertIn("polyline", html)
@@ -66,6 +67,17 @@ class VisualizeMapTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(ValueError, "at least two points"):
                 visualize_map(map_path)
+
+    def test_output_path_and_output_directory_are_exclusive(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            map_path = root / "map.json"
+            map_path.write_text(
+                '{"nodes":[{"id":"a","x":0,"y":0}], "edges":[]}',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "either output_path or output_dir"):
+                visualize_map(map_path, root / "explicit.html", root / "visualizations")
 
 
 if __name__ == "__main__":

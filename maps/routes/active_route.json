@@ -1,0 +1,26 @@
+{
+  "map_id": "base track",
+  "map_version": 1,
+  "start": "node-003",
+  "destination": "node-001",
+  "nodes": [
+    "node-003",
+    "node-002",
+    "node-001"
+  ],
+  "steps": [
+    {
+      "edge_id": "edge-005",
+      "from": "node-003",
+      "to": "node-002",
+      "speed_limit": null
+    },
+    {
+      "edge_id": "edge-001",
+      "from": "node-002",
+      "to": "node-001",
+      "speed_limit": null
+    }
+  ],
+  "total_distance": 1793.5880000000002
+}

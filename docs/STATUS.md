@@ -1,24 +1,33 @@
-# E-Puck AGV Dual Autoencoder Anomaly Detection: Project Status & Blueprint
+# E-Puck AGV: Navigation and Anomaly Detection Status
 
-This document tracks our current implementation progress, the complete end-to-end blueprint, validation checks, and the critical engineering "gotchas" to avoid common pitfalls in the trenches.
+This status covers the original line-following/anomaly-detection objective and
+the map-based navigation work added to handle route choices on fixed tracks.
+Navigation extends line following; it does not replace the anomaly-detection
+goal.
 
 ---
 
 ## Current Progress & What’s Done
 
-1. **Environment & Workspace Setup:**
-* Established workspace layout containing `data`, `esp32-s3`, and `simulation` directories.
-* Successfully configured Python virtual environment (`.venv`) and resolved Webots C-extension/MSVC CRT binary mismatches by aligning the environment and configuring per-controller `runtime.ini` files to point directly to `.venv\Scripts\python.exe`.
-
-
-2. **Telemetry Logging Pipeline:**
-* Implemented a Webots controller script that logs time, target motor velocities, wheel odometry (`actual_pos`), and ground IR sensors (`gs0`, `gs1`, `gs2`).
-* Configured robust batch-writing to `data/SensorData-v1.csv` to ensure data safety during simulation runs.
-
-
-3. **Data Inspection & Initial Analysis:**
-* Verified data ingestion using exploratory scripts/notebooks (`15,000+` telemetry rows captured).
-* Identified that the initial placeholder logic produces jerky, high-frequency square-wave oscillations, highlighting the need for a smooth PID controller before training anomaly detectors.
+1. **Development and Webots setup:** The repository uses a project virtual
+   environment and controller-specific `runtime.ini` configuration.
+2. **Line-following and telemetry:** `epuck_data` remains the sensor-only
+   PD line-following controller. It logs motor targets, wheel encoders, and
+   three ground IR sensors. Initial testing exposed overshoot and jitter from
+   sharp sensor derivatives and high steering commands.
+3. **Map and route tools:** `pathToMap.py` builds a draft graph from the track
+   image, `visualizeMap.py` writes previews under `maps/visualizations`, and
+   `route_planner.py` computes shortest paths through named nodes.
+4. **Webots route integration:** The world uses a Supervisor-enabled
+   `epuck_route` controller. It computes a route from `maps/routes/mission.json`,
+   follows edge centerlines with Supervisor pose and ground-sensor correction,
+   and logs telemetry under `data/route_runs`. A headless Webots run completed
+   the configured two-edge route; measured maximum centerline error was about
+   0.023 m with no line-loss frames. This validates only the tested route and
+   simulation configuration.
+5. **Current limitations:** The extracted graph still needs semantic review
+   and meaningful node/edge names. The Supervisor route controller is a
+   simulation prototype, not a physical AGV controller.
 
 
 
@@ -28,8 +37,12 @@ This document tracks our current implementation progress, the complete end-to-en
 
 ### What to Do
 
-1. **Upgrade to a PID Controller:** Replace the hardcoded threshold `if-else` script with a Proportional-Derivative (PD) line-following controller for smooth steering corrections based on error inputs ($\text{gs\_left} - \text{gs\_right}$).
-2. **Record Baseline Data:** Run the simulation for 10–15 minutes under completely healthy, normal operating conditions using the PID controller.
+1. **Tune and validate line following:** Use `epuck_data` for sensor-only
+   PD experiments. The map-based `epuck_route` is currently the world's
+   configured controller and uses route geometry plus IR feedback.
+2. **Record healthy baseline data:** Run 10–15 minutes of healthy operation for
+   each intended route/speed mode, saving each run separately with route
+   metadata.
 
 ### Checks to Handle
 

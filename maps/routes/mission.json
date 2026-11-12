@@ -1,0 +1,12 @@
+{
+  "start_node": "node-003",
+  "destination_node": "node-001",
+  "spawn_at_start_node": true,
+  "wheel_speed_rad_s": 2.5,
+  "lookahead_m": 0.045,
+  "node_radius_m": 0.025,
+  "max_path_error_m": 0.12,
+  "line_threshold": 400.0,
+  "sensor_heading_gain": 0.2,
+  "quit_webots_on_complete": false
+}

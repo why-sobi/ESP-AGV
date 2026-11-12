@@ -1,4 +1,7 @@
 import unittest
+import json
+import tempfile
+from pathlib import Path
 
 from route_planner import TrackMap, shortest_route
 
@@ -102,6 +105,17 @@ class RoutePlannerTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "positive finite"):
             TrackMap.from_dict(invalid)
+
+    def test_route_json_contains_each_edge_in_order(self) -> None:
+        route = shortest_route(sample_map(), "start", "goal")
+
+        payload = route.to_dict()
+
+        self.assertEqual(payload["nodes"], ["start", "junction", "loop", "goal"])
+        self.assertEqual(
+            [step["edge_id"] for step in payload["steps"]],
+            ["approach", "loop-entry", "loop-exit"],
+        )
 
 
 if __name__ == "__main__":

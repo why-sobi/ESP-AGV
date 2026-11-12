@@ -73,7 +73,8 @@ Once a surveyed map exists, the planner can be called with
   pixel coordinates, skeleton, node clusters, and edge geometry need human
   review; the image-to-Webots transform is not calibrated automatically.
 - `scripts/visualizeMap.py -map <map.json>` writes a standalone HTML preview
-  beside the map. It displays the edge centerlines, node/edge IDs, coordinates,
+  under the sibling `maps/visualizations/` directory by default. It displays
+  edge centerlines, node/edge IDs, coordinates,
   and (when it can locate the source image) a faded image overlay. Zoom/pan in
   the browser, edit the JSON in an editor, then rerun the command to refresh.
 - `maps/paths/base track.json` is the current draft generated from
@@ -84,14 +85,20 @@ Once a surveyed map exists, the planner can be called with
   using them to plan.
 - `scripts/route_planner.py` loads and validates named-node maps, then computes
   the minimum-distance route with Dijkstra's algorithm. Edges can be one-way or
-  bidirectional and may carry a speed limit. It emits JSON suitable for a
-  planner/driver boundary.
+  bidirectional and may carry a speed limit. It emits JSON to stdout or a file
+  with `-out`.
 - `scripts/test_route_planner.py` exercises loops, one-way connections,
   unreachable destinations, invalid map data, and the zero-length route case.
-- The planner is intentionally not connected to the Webots steering controller
-  yet. The current track has not been surveyed into a trustworthy graph, and
-  the current robot has no route-localization method. Connecting it before
-  resolving those would give a false impression of autonomous map navigation.
+- `simulation/controllers/epuck_route/epuck_route.py` connects the graph planner
+  to a Supervisor-enabled Webots e-puck. It follows planned edge centerlines,
+  uses ground sensors for local line correction and line-loss stopping, and
+  records route telemetry. The previous sensor-only controller remains as
+  `epuck_data`.
+- The current Webots route integration is still a prototype: its pixel-to-world
+  transform uses the explicitly configured 1 m by 1 m arena. A headless
+  Webots run completed the two-edge mission with all ground sensors seeing the
+  line and a maximum recorded centerline error of 0.0228 m. This validates the
+  current simulation transform/route, not other tracks or hardware.
 - `docs/USAGE.md` describes the converter, visualizer, planner, and test
   commands. Use it as the quick-start workflow; this file records the design
   decisions and failure history.
@@ -142,15 +149,14 @@ Once a surveyed map exists, the planner can be called with
 
 ## Remaining work
 
-1. Survey the current Webots track into named nodes and edges, including
-   distances, directionality, and intended node IDs. Do not invent coordinates
-   from the texture alone; calibrate image/world coordinates in Webots.
-2. Choose the simulation localization adapter and expose a small interface that
-   the physical localization system can replace. For an initial Webots demo,
-   Supervisor pose is the simplest reliable ground truth.
-3. Define how the driver detects arrival at a node and advances to the next
-   route step. This is separate from finding the shortest path.
-4. Validate routes on the circular feature and at multi-branch junctions,
+1. Validate the reviewed graph semantics and branch choices at all junctions;
+   the initial Webots run tested only one route.
+2. Refine the generated graph and names against the visualized path; pixel
+   skeleton extraction can merge nearby segments or produce parallel edges.
+3. Keep route tracking/localization behind an interface that can be replaced
+   for hardware; the current Supervisor controller is simulation-only.
+4. Validate routes through the circular feature and multi-branch junctions,
    including unreachable destinations and changed maps.
-5. Select and validate the physical localization and communication design
-   before claiming the Webots navigation behavior transfers to hardware.
+5. Continue the line-following data collection and dual-autoencoder work.
+6. Select and validate physical localization and communication before claiming
+   the Webots navigation behavior transfers to hardware.

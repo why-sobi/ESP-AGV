@@ -9,6 +9,15 @@
     "pixels_per_meter": null,
     "webots_transform_calibrated": false
   },
+  "world_transform": {
+    "type": "axis_aligned_image_to_world",
+    "image_size_px": [2400, 1800],
+    "world_origin": [-0.5, 0.5],
+    "world_units_per_pixel": [0.0004166666666666667, -0.0005555555555555556],
+    "world_units": "meters",
+    "calibrated": true,
+    "calibration": "RectangleArena floorSize is explicitly 1 m by 1 m; verified by a Webots route run with no line-loss frames and a maximum 0.0228 m centerline error."
+  },
   "conversion": {
     "status": "draft_requires_visual_review",
     "threshold": 128,

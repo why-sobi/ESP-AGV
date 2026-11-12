@@ -221,10 +221,21 @@ def main() -> None:
     parser.add_argument("map_file", type=Path)
     parser.add_argument("start")
     parser.add_argument("destination")
+    parser.add_argument(
+        "-out",
+        type=Path,
+        help="Write the route JSON to this file instead of stdout.",
+    )
     args = parser.parse_args()
 
     route = shortest_route(load_track_map(args.map_file), args.start, args.destination)
-    print(json.dumps(route.to_dict(), indent=2))
+    route_json = json.dumps(route.to_dict(), indent=2) + "\n"
+    if args.out:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(route_json, encoding="utf-8")
+        print(f"Route written to {args.out}")
+    else:
+        print(route_json, end="")
 
 
 if __name__ == "__main__":

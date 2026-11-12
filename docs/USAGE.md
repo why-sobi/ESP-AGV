@@ -34,16 +34,19 @@ uncalibrated. Conversion is a starting point, not automatic map surveying.
 
 ## Visualize and edit the map
 
-Generate a standalone HTML preview beside the JSON:
+Generate a standalone HTML preview in the sibling `visualizations` folder:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\visualizeMap.py `
   -map "maps\paths\base track.json"
 ```
 
-Open `maps\paths\base track.html` in a browser. Scroll to zoom, drag to pan,
+Open `maps\visualizations\base track.html` in a browser. Scroll to zoom, drag to pan,
 and hover over nodes or edges to see details. If the source image is available
 in a nearby `image` or `textures` folder, it appears as a faded background.
+
+Use `-out-dir <folder>` to choose another preview folder, or `-out <file.html>`
+to set an exact output file.
 
 Edit the JSON in a text editor, then rerun the visualization command to refresh
 the preview. Hand edits commonly include:
@@ -80,14 +83,43 @@ is carried into route output but does not affect route selection.
 
 The draft map IDs are temporary: inspect the preview and use the exact node IDs
 present in the JSON. The output is useful for checking graph connectivity, but
-the current planner is not connected to the Webots robot driver.
+`-out` can save the route as JSON for reuse:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\route_planner.py `
+  "maps\paths\base track.json" node-003 node-001 `
+  -out "maps\routes\active_route.json"
+```
+
+### Run the route in Webots
+
+The current world is configured with a Supervisor-enabled e-puck and the
+`epuck_route` controller. Edit `maps\routes\mission.json` to select
+`start_node` and `destination_node`, then open
+`simulation\worlds\Self Diagnosis AGV.wbt` in Webots and start the simulation.
+The controller calculates the shortest route, spawns the robot at the selected
+start node for repeatable simulation tests, follows the edge centerlines, uses
+ground IR readings for local correction/line-loss stopping, and writes telemetry
+to `data\route_runs`.
+
+The current map-to-world transform assumes the image fills the 1 m by 1 m
+arena. It is explicitly marked uncalibrated; the mission allows that transform
+for simulation testing only. Check the robot against the track in Webots before
+trusting route execution. Set `spawn_at_start_node` to `false` to disable the
+simulation-only teleport, but then the robot must already be positioned at the
+configured start node. This Supervisor controller is not a hardware driver;
+physical hardware needs a localization adapter and its own safe start logic.
+
+The previous sensor-only controller remains available as `epuck_data` for
+line-following experiments without map navigation.
 
 ## Current Webots and anomaly-detection status
 
-The current Webots controller is a line-following and telemetry-logging
-prototype. It does not yet load the map or execute planned routes. Webots
-Supervisor localization, route progress detection, and the route-to-controller
-interface still need implementation and simulation testing.
+The route-aware Webots controller now loads the draft graph and mission, runs
+the shortest-path planner, uses Supervisor pose to track the planned
+centerlines, and logs route telemetry. It still needs visual Webots validation
+because image-to-world calibration has not been confirmed. This is a
+simulation-only first integration, not yet validated for hardware.
 
 The original anomaly-detection objective remains separate from route planning:
 collect healthy data while line following, derive motor velocities from wheel

@@ -319,13 +319,27 @@ def _image_dimensions(map_data: dict[str, Any]) -> tuple[float | None, float | N
     return None, None
 
 
-def visualize_map(map_path: str | Path, output_path: str | Path | None = None) -> Path:
+def visualize_map(
+    map_path: str | Path,
+    output_path: str | Path | None = None,
+    output_dir: str | Path | None = None,
+) -> Path:
     map_path = Path(map_path)
     if not map_path.is_file():
         raise FileNotFoundError(f"Map file not found: {map_path}")
+    if output_path is not None and output_dir is not None:
+        raise ValueError("Specify either output_path or output_dir, not both.")
     map_data, nodes = _load_map(map_path)
     background = _find_background(map_path, map_data)
-    output_path = Path(output_path) if output_path else map_path.with_suffix(".html")
+    if output_path is None:
+        output_dir = (
+            Path(output_dir)
+            if output_dir is not None
+            else map_path.parent.parent / "visualizations"
+        )
+        output_path = output_dir / map_path.with_suffix(".html").name
+    else:
+        output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         _render_html(map_path, map_data, nodes, background),
@@ -342,12 +356,17 @@ def main() -> None:
     parser.add_argument(
         "-out",
         type=Path,
-        help="HTML output path (defaults to the map's basename with .html).",
+        help="HTML output file (defaults to maps/visualizations/<map-name>.html).",
+    )
+    parser.add_argument(
+        "-out-dir",
+        type=Path,
+        help="HTML output directory (defaults to the sibling visualizations folder).",
     )
     args = parser.parse_args()
 
     try:
-        output_path = visualize_map(args.map, args.out)
+        output_path = visualize_map(args.map, args.out, args.out_dir)
     except (OSError, ValueError) as error:
         parser.error(str(error))
 

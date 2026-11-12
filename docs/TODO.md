@@ -2,32 +2,24 @@
 
 ## Currently Doing
 
-- **Review and correct the generated track graph** in
-  `maps/paths/base track.json` using `maps/paths/base track.html`. Confirm that
-  nodes correspond to real route decision points, edges follow the track
-  centerlines, and the circular section is represented with the intended
-  connections. Rename generated node/edge IDs to stable meaningful names.
-- Keep this as an image-space draft until the image-to-Webots transform and
-  scale are calibrated. Do not treat generated pixel lengths as meters.
+- **Review and name the graph** in `maps/paths/base track.json`
+  using `maps/visualizations/base track.html`. Confirm nodes correspond to real
+  route decision points and that the circular section's connections are right.
+  Rename generated node/edge IDs to stable meaningful names.
+- Expand Webots route tests beyond the first verified two-edge mission; check
+  route selection and stopping behavior around the loop and all junctions.
 
 ## Next: Make a testable navigation loop
 
-1. **Calibrate the map to Webots world coordinates.**
-   Establish image origin, scale, axis direction, and world origin using known
-   arena dimensions or surveyed landmarks. Record the transform in the map.
-2. **Validate the graph and route output.**
+1. **Validate the graph and route output.**
    Run the planner for selected start/destination pairs, including both
    directions through the circular feature and each multi-branch junction.
    Confirm every planned edge exists and follows the intended path.
-3. **Choose and implement Webots localization.**
-   Use Supervisor ground-truth pose for the first simulation prototype, behind
-   an interface that can later be replaced with hardware localization.
-4. **Connect route execution to line following.**
-   Load the planned edge sequence, follow the selected edge geometry, detect
-   arrival at named nodes, and advance only when localization confirms progress.
-   Remove generic junction-choice heuristics from the autonomous navigation
-   path; the route should determine the branch.
-5. **Test in Webots incrementally.**
+3. **Validate and refine route execution.**
+   The initial Supervisor-based route controller is now connected. Confirm it
+   follows one edge, reaches a junction, selects the planned branch, and exits
+   the circular feature correctly.
+4. **Test in Webots incrementally.**
    Start with one edge, then one junction, then the circular feature, then
    multi-edge missions. Log the route ID, current edge/node, pose, sensor data,
    wheel targets, and odometry for each run.
