@@ -118,6 +118,15 @@ three ground IR readings. The route controller follows map geometry using
 Supervisor pose, so these runs are useful for simulation baselines but do not
 test the ESP control loop.
 
+To record a run, edit `maps\routes\mission.json`, then in Webots press
+Reset (Ctrl+Shift+T) so the controller restarts and rereads the mission, and
+run in Fast mode. Wait for `Destination reached` in the console. Webots is
+deterministic, so repeating the same route and speed produces a byte-identical
+duplicate; vary the route or speed instead. If the ground sensors lose the line
+for more than `max_line_loss_s` (default 2 s), the controller prints
+`RUN FAILED` and stops logging; do not use such runs as healthy data. Add each
+run to `data\route_runs\manifest.csv`.
+
 ### Sensor-only PD runs
 
 Select `epuck_data` as the e-puck controller in Webots, then run one simulation
@@ -132,7 +141,27 @@ sampling cadence, sensor loss, and command ranges.
 
 ## Prepare motor and IR autoencoder inputs
 
-The current pilot illustrates the preparation workflow:
+The current dataset is built from an explicit split file, which assigns each
+healthy run to train, validation, or test:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\prepare_telemetry.py `
+  --split "data\datasets\splits\route-runs-v1.json" `
+  --out "data\datasets\sim-baseline-v2" `
+  --window 20 `
+  --stride 1
+```
+
+Split files list run CSVs under `train`, `validation`, and `test`; relative
+paths resolve from the repository root, and a file may appear in only one
+split. `data\route_runs\manifest.csv` records the route, speed, and quality
+notes for each run. `route-runs-v1.json` uses the 16 healthy runs (4 two-edge
+routes x 2.0/2.5/3.0/3.5 rad/s): each route gives two speeds to train and one
+each to validation and test, rotated so the held-out splits cover every route
+and every speed.
+
+The older `--runs` form still works and splits by run-id order with
+`--validation-fraction` (no test split):
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\prepare_telemetry.py `
@@ -155,18 +184,18 @@ Replace those example paths with your healthy run files. The script:
 
 The output contains:
 
-- `windows.npz`: `motor_train`, `ir_train`, `motor_validation`, and
-  `ir_validation` arrays, with shape `[windows, time, features]`;
-- `metadata.json`: feature names, run split, sampling/sensor-quality summaries,
-  scaler parameters, exclusions, and an explicit note that there is no final
-  test split yet.
+- `windows.npz`: `motor_*` and `ir_*` arrays for `train`, `validation`, and
+  `test`, with shape `[windows, time, features]` (test arrays are empty
+  without an explicit split);
+- `metadata.json`: feature names, split method/source, per-split runs,
+  sampling/sensor-quality summaries, scaler parameters, and exclusions.
 
 At least two non-duplicate healthy runs are needed to create both training and
-validation sets. One unique run creates training windows only. Do not treat
-overlapping windows from the same run as independent train/validation data.
-The checked-in pilot uses one 2.5 rad/s run for training and one 3.0 rad/s run
-for validation on the same route. It validates the pipeline, not model quality;
-there is no trained model or controlled-fault evaluation yet.
+validation sets. Do not treat overlapping windows from the same run as
+independent train/validation/test data. `sim-baseline-v2` has 3483 training,
+1732 validation, and 1741 test windows. All of it is healthy data; there is no
+trained model or controlled-fault evaluation yet. `sim-baseline-v1` is the
+earlier two-run pilot.
 
 ## ESP32-S3 firmware and serial smoke test
 
