@@ -1,0 +1,18 @@
+file,start_node,destination_node,wheel_speed_rad_s,status,notes
+route-20261112-151844.csv,node-003,node-001,2.5,duplicate,byte-identical to route-20261112-232535.csv
+route-20261112-232535.csv,node-003,node-001,2.5,healthy,pilot run; spawned with pre-fix first-segment heading
+route-20261112-232818.csv,node-003,node-001,3.0,healthy,pilot run; spawned with pre-fix first-segment heading
+route-20261113-235332.csv,node-001,node-003,2.0,healthy,"18.8 s, 0 line-loss samples, max centerline error 0.023 m"
+route-20261113-235422.csv,node-001,node-003,2.5,healthy,"15.1 s; 1 line-loss sample at t=0.16 s (start-up, junction edge), max centerline error 0.023 m"
+route-20261113-235554.csv,node-001,node-003,3.0,healthy,"12.9 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261113-235631.csv,node-001,node-003,3.5,healthy,"11.4 s; 1 start-up line-loss sample, max centerline error 0.021 m"
+route-20261113-235707.csv,node-002,node-004,2.0,healthy,"18.8 s; 0 line-loss samples, max centerline error 0.023 m"
+route-20261113-235731.csv,node-002,node-004,2.5,healthy,"15.1 s; 1 line-loss sample, max centerline error 0.023 m"
+route-20261113-235754.csv,node-002,node-004,3.0,healthy,"12.8 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261113-235820.csv,node-002,node-004,3.5,healthy,"11.5 s; 2 consecutive start-up line-loss samples (t=0.16-0.19 s), max centerline error 0.021 m"
+route-20261113-235902.csv,node-004,node-002,2.0,healthy,"18.9 s; 0 line-loss samples, max centerline error 0.024 m"
+route-20261113-235935.csv,node-004,node-002,2.5,healthy,"15.2 s; 1 line-loss sample, max centerline error 0.023 m"
+route-20261113-235955.csv,node-004,node-002,3.0,healthy,"12.9 s; 1 start-up line-loss sample, max centerline error 0.022 m"
+route-20261114-000024.csv,node-004,node-002,3.5,healthy,"11.4 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261114-000047.csv,node-003,node-001,2.0,healthy,"18.8 s; 0 line-loss samples, max centerline error 0.023 m"
+route-20261114-000128.csv,node-003,node-001,3.5,healthy,"11.5 s; 4 non-consecutive line-loss samples in first 0.5 s (start-up wobble on circle), max centerline error 0.021 m"
