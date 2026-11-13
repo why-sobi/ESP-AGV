@@ -1,18 +1,82 @@
 file,start_node,destination_node,wheel_speed_rad_s,status,notes
 route-20261112-151844.csv,node-003,node-001,2.5,duplicate,byte-identical to route-20261112-232535.csv
-route-20261112-232535.csv,node-003,node-001,2.5,healthy,pilot run; spawned with pre-fix first-segment heading
-route-20261112-232818.csv,node-003,node-001,3.0,healthy,pilot run; spawned with pre-fix first-segment heading
-route-20261113-235332.csv,node-001,node-003,2.0,healthy,"18.8 s, 0 line-loss samples, max centerline error 0.023 m"
-route-20261113-235422.csv,node-001,node-003,2.5,healthy,"15.1 s; 1 line-loss sample at t=0.16 s (start-up, junction edge), max centerline error 0.023 m"
-route-20261113-235554.csv,node-001,node-003,3.0,healthy,"12.9 s; 1 start-up line-loss sample, max centerline error 0.023 m"
-route-20261113-235631.csv,node-001,node-003,3.5,healthy,"11.4 s; 1 start-up line-loss sample, max centerline error 0.021 m"
-route-20261113-235707.csv,node-002,node-004,2.0,healthy,"18.8 s; 0 line-loss samples, max centerline error 0.023 m"
-route-20261113-235731.csv,node-002,node-004,2.5,healthy,"15.1 s; 1 line-loss sample, max centerline error 0.023 m"
-route-20261113-235754.csv,node-002,node-004,3.0,healthy,"12.8 s; 1 start-up line-loss sample, max centerline error 0.023 m"
-route-20261113-235820.csv,node-002,node-004,3.5,healthy,"11.5 s; 2 consecutive start-up line-loss samples (t=0.16-0.19 s), max centerline error 0.021 m"
-route-20261113-235902.csv,node-004,node-002,2.0,healthy,"18.9 s; 0 line-loss samples, max centerline error 0.024 m"
-route-20261113-235935.csv,node-004,node-002,2.5,healthy,"15.2 s; 1 line-loss sample, max centerline error 0.023 m"
-route-20261113-235955.csv,node-004,node-002,3.0,healthy,"12.9 s; 1 start-up line-loss sample, max centerline error 0.022 m"
-route-20261114-000024.csv,node-004,node-002,3.5,healthy,"11.4 s; 1 start-up line-loss sample, max centerline error 0.023 m"
-route-20261114-000047.csv,node-003,node-001,2.0,healthy,"18.8 s; 0 line-loss samples, max centerline error 0.023 m"
-route-20261114-000128.csv,node-003,node-001,3.5,healthy,"11.5 s; 4 non-consecutive line-loss samples in first 0.5 s (start-up wobble on circle), max centerline error 0.021 m"
+route-20261112-232535.csv,node-003,node-001,2.5,superseded,pre-gap-fix controller (64 ms log gap at junction); pilot run; spawned with pre-fix first-segment heading
+route-20261112-232818.csv,node-003,node-001,3.0,superseded,pre-gap-fix controller (64 ms log gap at junction); pilot run; spawned with pre-fix first-segment heading
+route-20261113-235332.csv,node-001,node-003,2.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 18.8 s, 0 line-loss samples, max centerline error 0.023 m"
+route-20261113-235422.csv,node-001,node-003,2.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 15.1 s; 1 line-loss sample at t=0.16 s (start-up, junction edge), max centerline error 0.023 m"
+route-20261113-235554.csv,node-001,node-003,3.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 12.9 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261113-235631.csv,node-001,node-003,3.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 11.4 s; 1 start-up line-loss sample, max centerline error 0.021 m"
+route-20261113-235707.csv,node-002,node-004,2.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 18.8 s; 0 line-loss samples, max centerline error 0.023 m"
+route-20261113-235731.csv,node-002,node-004,2.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 15.1 s; 1 line-loss sample, max centerline error 0.023 m"
+route-20261113-235754.csv,node-002,node-004,3.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 12.8 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261113-235820.csv,node-002,node-004,3.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 11.5 s; 2 consecutive start-up line-loss samples (t=0.16-0.19 s), max centerline error 0.021 m"
+route-20261113-235902.csv,node-004,node-002,2.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 18.9 s; 0 line-loss samples, max centerline error 0.024 m"
+route-20261113-235935.csv,node-004,node-002,2.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 15.2 s; 1 line-loss sample, max centerline error 0.023 m"
+route-20261113-235955.csv,node-004,node-002,3.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 12.9 s; 1 start-up line-loss sample, max centerline error 0.022 m"
+route-20261114-000024.csv,node-004,node-002,3.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 11.4 s; 1 start-up line-loss sample, max centerline error 0.023 m"
+route-20261114-000047.csv,node-003,node-001,2.0,superseded,"pre-gap-fix controller (64 ms log gap at junction); 18.8 s; 0 line-loss samples, max centerline error 0.023 m"
+route-20261114-000128.csv,node-003,node-001,3.5,superseded,"pre-gap-fix controller (64 ms log gap at junction); 11.5 s; 4 non-consecutive line-loss samples in first 0.5 s (start-up wobble on circle), max centerline error 0.021 m"
+route-20261114-001913-A-2.csv,node-003,node-001,2.0,healthy,18.8 s; 0 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001915-A-2.5.csv,node-003,node-001,2.5,healthy,15.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-001917-A-3.csv,node-003,node-001,3.0,healthy,12.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001919-A-3.5.csv,node-003,node-001,3.5,healthy,11.4 s; 4 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-001920-B-2.csv,node-001,node-003,2.0,healthy,18.8 s; 0 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-001922-B-2.5.csv,node-001,node-003,2.5,healthy,15.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001924-B-3.csv,node-001,node-003,3.0,healthy,12.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001926-B-3.5.csv,node-001,node-003,3.5,healthy,11.3 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-001928-C-2.csv,node-002,node-004,2.0,healthy,18.8 s; 0 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-001930-C-2.5.csv,node-002,node-004,2.5,healthy,15.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-001932-C-3.csv,node-002,node-004,3.0,healthy,12.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001933-C-3.5.csv,node-002,node-004,3.5,healthy,11.4 s; 2 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-001935-D-2.csv,node-004,node-002,2.0,healthy,18.9 s; 0 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001937-D-2.5.csv,node-004,node-002,2.5,healthy,15.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-001939-D-3.csv,node-004,node-002,3.0,healthy,12.9 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-001941-D-3.5.csv,node-004,node-002,3.5,healthy,11.3 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002910-A-2.1.csv,node-003,node-001,2.1,healthy,17.9 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002912-A-2.2.csv,node-003,node-001,2.2,healthy,17.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002914-A-2.3.csv,node-003,node-001,2.3,healthy,16.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002915-A-2.4.csv,node-003,node-001,2.4,healthy,15.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002917-A-2.6.csv,node-003,node-001,2.6,healthy,14.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002919-A-2.7.csv,node-003,node-001,2.7,healthy,14.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002921-A-2.8.csv,node-003,node-001,2.8,healthy,13.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002923-A-2.9.csv,node-003,node-001,2.9,healthy,13.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002925-A-3.1.csv,node-003,node-001,3.1,healthy,12.3 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-002927-A-3.2.csv,node-003,node-001,3.2,healthy,12.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002928-A-3.3.csv,node-003,node-001,3.3,healthy,11.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002930-A-3.4.csv,node-003,node-001,3.4,healthy,11.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002932-B-2.1.csv,node-001,node-003,2.1,healthy,18.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002934-B-2.2.csv,node-001,node-003,2.2,healthy,17.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002935-B-2.3.csv,node-001,node-003,2.3,healthy,16.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002937-B-2.4.csv,node-001,node-003,2.4,healthy,15.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002939-B-2.6.csv,node-001,node-003,2.6,healthy,14.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002941-B-2.7.csv,node-001,node-003,2.7,healthy,14.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-002943-B-2.8.csv,node-001,node-003,2.8,healthy,13.6 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002944-B-2.9.csv,node-001,node-003,2.9,healthy,13.2 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002946-B-3.1.csv,node-001,node-003,3.1,healthy,12.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-002948-B-3.2.csv,node-001,node-003,3.2,healthy,12.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-002950-B-3.3.csv,node-001,node-003,3.3,healthy,11.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002951-B-3.4.csv,node-001,node-003,3.4,healthy,11.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-002953-C-2.1.csv,node-002,node-004,2.1,healthy,18.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002955-C-2.2.csv,node-002,node-004,2.2,healthy,17.2 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002957-C-2.3.csv,node-002,node-004,2.3,healthy,16.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-002958-C-2.4.csv,node-002,node-004,2.4,healthy,15.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003000-C-2.6.csv,node-002,node-004,2.6,healthy,14.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003002-C-2.7.csv,node-002,node-004,2.7,healthy,14.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003004-C-2.8.csv,node-002,node-004,2.8,healthy,13.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-003006-C-2.9.csv,node-002,node-004,2.9,healthy,13.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003008-C-3.1.csv,node-002,node-004,3.1,healthy,12.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-003010-C-3.2.csv,node-002,node-004,3.2,healthy,12.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003011-C-3.3.csv,node-002,node-004,3.3,healthy,11.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003013-C-3.4.csv,node-002,node-004,3.4,healthy,11.6 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003015-D-2.1.csv,node-004,node-002,2.1,healthy,18.0 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003016-D-2.2.csv,node-004,node-002,2.2,healthy,17.2 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003018-D-2.3.csv,node-004,node-002,2.3,healthy,16.4 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003020-D-2.4.csv,node-004,node-002,2.4,healthy,15.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003022-D-2.6.csv,node-004,node-002,2.6,healthy,14.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003024-D-2.7.csv,node-004,node-002,2.7,healthy,14.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-003025-D-2.8.csv,node-004,node-002,2.8,healthy,13.7 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003027-D-2.9.csv,node-004,node-002,2.9,healthy,13.3 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261114-003029-D-3.1.csv,node-004,node-002,3.1,healthy,12.5 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-003031-D-3.2.csv,node-004,node-002,3.2,healthy,12.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
+route-20261114-003033-D-3.3.csv,node-004,node-002,3.3,healthy,11.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
+route-20261114-003035-D-3.4.csv,node-004,node-002,3.4,healthy,11.6 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
