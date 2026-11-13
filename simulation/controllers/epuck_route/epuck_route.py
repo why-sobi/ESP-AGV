@@ -1,6 +1,8 @@
 import csv
 import json
 import math
+import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -11,9 +13,15 @@ from controller import Supervisor
 CONTROLLER_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CONTROLLER_DIR.parent.parent.parent
 MAP_PATH = ROOT_DIR / "maps" / "paths" / "base track.json"
-MISSION_PATH = ROOT_DIR / "maps" / "routes" / "mission.json"
-ROUTE_PATH = ROOT_DIR / "maps" / "routes" / "active_route.json"
-LOG_DIR = ROOT_DIR / "data" / "route_runs"
+# Environment overrides let scripts/collect_route_runs.py drive batch runs
+# without editing the committed mission or route files.
+MISSION_PATH = Path(
+    os.environ.get("AGV_MISSION_PATH", ROOT_DIR / "maps" / "routes" / "mission.json")
+)
+ROUTE_PATH = Path(
+    os.environ.get("AGV_ROUTE_PATH", ROOT_DIR / "maps" / "routes" / "active_route.json")
+)
+LOG_DIR = Path(os.environ.get("AGV_LOG_DIR", ROOT_DIR / "data" / "route_runs"))
 
 
 def _read_inputs():
@@ -220,7 +228,10 @@ def main():
 
         log_dir = LOG_DIR
         log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / f"route-{datetime.now():%Y%m%d-%H%M%S}.csv"
+        label = re.sub(r"[^A-Za-z0-9_.-]+", "-", str(mission.get("run_label", ""))).strip("-")
+        log_path = log_dir / (
+            f"route-{datetime.now():%Y%m%d-%H%M%S}" + (f"-{label}" if label else "") + ".csv"
+        )
         log_file = log_path.open("w", newline="", encoding="utf-8")
         writer = csv.writer(log_file)
         writer.writerow(
@@ -268,6 +279,19 @@ def main():
             sensor_values = [sensor.getValue() for sensor in ground_sensors]
             sensor_error = _line_error(sensor_values, line_threshold)
 
+            # Advance past every edge whose target node has been reached, then
+            # control and log this step on the new edge. Skipping the step here
+            # would leave a 2x-timestep gap in the telemetry at each junction.
+            while edge_index < len(route_paths):
+                target_node_id = route_paths[edge_index]["target_node"]
+                target_node = _pixel_to_world(
+                    [nodes[target_node_id]["x"], nodes[target_node_id]["y"]],
+                    transform,
+                )
+                if math.dist((pose_x, pose_y), target_node) > node_radius:
+                    break
+                edge_index += 1
+                progress = 0.0
             if edge_index >= len(route_paths):
                 _stop(motors)
                 completed = True
@@ -283,19 +307,6 @@ def main():
             target_point = _point_at_distance(
                 points, min(total_length, progress + lookahead)
             )
-            target_node = _pixel_to_world(
-                [nodes[edge["target_node"]]["x"], nodes[edge["target_node"]]["y"]],
-                transform,
-            )
-
-            if math.dist((pose_x, pose_y), target_node) <= node_radius:
-                edge_index += 1
-                progress = 0.0
-                if edge_index >= len(route_paths):
-                    _stop(motors)
-                    completed = True
-                    break
-                continue
 
             if sensor_error is None:
                 _stop(motors)
