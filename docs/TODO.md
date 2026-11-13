@@ -6,30 +6,30 @@ Build a repeatable, diverse Webots telemetry dataset and turn it into a
 validated anomaly-detection model. Keep Webots as the simulation environment;
 the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
-## 1. Collect and qualify healthy runs (done for the first dataset)
+## 1. Collect and qualify healthy runs (done)
 
-- Done: 16 healthy runs (4 routes x 4 speeds), qualified and logged in
-  `data/route_runs/manifest.csv`.
-- Follow-up: stop `epuck_route` from skipping a log row when it advances to the
-  next edge (one 64 ms gap per run). Optionally exercise edge-002/edge-004 by
-  adding a forced-edge route option, and add seeded start-pose variation if
-  more than one run per route/speed is needed.
+- Done: 64 healthy runs (4 routes x 16 speeds), recorded headlessly with
+  `scripts/collect_route_runs.py` after the junction log-gap fix.
+- Optional: exercise edge-002/edge-004 with a forced-edge route option, and add
+  seeded start-pose variation if more than one run per route/speed is needed.
 
-## 2. Prepare and validate the dataset (done for the first dataset)
+## 2. Prepare and validate the dataset (done)
 
-- Done: explicit split support (`--split`) and
-  `data/datasets/sim-baseline-v2` with healthy train/validation/test runs.
+- Done: explicit split support (`--split`) and `data/datasets/sim-baseline-v4`.
 - Decide the final window length/features based on model experiments.
 
 ## 3. Create and evaluate anomaly models
 
-- Implement the motor and ground-IR autoencoders and their training/evaluation
-  scripts.
-- Train only on healthy training runs; fit scaling only on those runs.
-- Compare temporal model choices and measure validation reconstruction error.
-- Set per-model thresholds using held-out healthy validation data.
-- Add controlled Webots motor and sensor faults. Measure detection delay,
-  false-positive rate on healthy test runs, and subsystem cross-coupling.
+- Done: dense and conv motor/IR autoencoders, PCA baseline, validation
+  thresholds (99.5th percentile), 3-of-5 persistence, 0.5 s warm-up, and
+  healthy-test false-alarm evaluation (`scripts/train_autoencoder.py`,
+  `models/dense-v1`, `models/conv-v1`).
+- Next: add controlled Webots motor and IR faults (a `fault` block in the
+  mission with type, target, severity and onset time). Record labelled fault
+  runs, then measure detection rate, detection delay and cross-coupling
+  (whether a motor fault also trips the IR model).
+- Then choose the deployed architecture per model using both false alarms and
+  detection, not false alarms alone.
 
 ## 4. Deploy inference to the ESP32-S3
 
