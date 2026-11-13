@@ -1,0 +1,845 @@
+{
+  "dataset": "data/datasets/sim-baseline-v4",
+  "dataset_split_source": "data/datasets/splits/route-runs-v3.json",
+  "window_size_samples": 20,
+  "architecture": {
+    "type": "conv_autoencoder",
+    "layers": "reshape [time,features]->[features,time]; Conv1d(features,16,k3,p1) ReLU Conv1d(16,16,k3,s2,p1) ReLU Flatten Linear(16*ceil(time/2),bottleneck) Linear(bottleneck,hidden) ReLU Linear(hidden,in)",
+    "hidden": 32,
+    "bottleneck": 8,
+    "input_layout": "window flattened time-major: [t0 f0, t0 f1, ..., t1 f0, ...]"
+  },
+  "training": {
+    "epochs_max": 800,
+    "patience": 60,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "seed": 0,
+    "optimizer": "Adam",
+    "loss": "MSE"
+  },
+  "threshold_rule": {
+    "score": "mean squared reconstruction error over the scaled window",
+    "threshold": "99.5 percentile of monitored validation scores",
+    "persistence": "alarm when >= 3 of the last 5 windows exceed",
+    "warmup_s": 0.5,
+    "warmup": "windows starting before warmup_s are not monitored"
+  },
+  "models": {
+    "motor": {
+      "weights": "motor.pt",
+      "features": [
+        "target_vel_left",
+        "target_vel_right",
+        "actual_vel_left",
+        "actual_vel_right"
+      ],
+      "input_size": 80,
+      "parameters": 5208,
+      "scaler_mean": [
+        2.6496706725672703,
+        2.65302073764535,
+        2.6471644850847764,
+        2.6512089986384098
+      ],
+      "scaler_scale": [
+        0.8563692752466138,
+        0.8578205625324119,
+        0.8583816687902176,
+        0.8595064402354463
+      ],
+      "threshold": 0.09258641302585602,
+      "best_epoch": 785,
+      "epochs_run": 800,
+      "final_train_loss": 0.015034347272931728,
+      "final_validation_loss": 0.013454954139888287,
+      "results": {
+        "conv_autoencoder": {
+          "threshold": 0.09258641302585602,
+          "scores": {
+            "train": {
+              "mean": 0.012959097512066364,
+              "p50": 0.008746061474084854,
+              "p95": 0.036780163645744324,
+              "p99": 0.07808013260364532,
+              "max": 0.43295764923095703
+            },
+            "validation": {
+              "mean": 0.012656297534704208,
+              "p50": 0.008634422905743122,
+              "p95": 0.03443753719329834,
+              "p99": 0.07752883434295654,
+              "max": 0.14788000285625458
+            },
+            "test": {
+              "mean": 0.012826547026634216,
+              "p50": 0.008845819160342216,
+              "p95": 0.03481156378984451,
+              "p99": 0.0726199597120285,
+              "max": 0.13665321469306946
+            }
+          },
+          "test_window_exceedance_rate": 0.0031397174254317113,
+          "test_persistent_alarm_windows": 0,
+          "test_runs_with_persistent_alarm": 0,
+          "test_runs": [
+            {
+              "run_id": "route-20261114-001924-B-3#episode-0",
+              "windows": 381,
+              "monitored_windows": 367,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                8.064
+              ]
+            },
+            {
+              "run_id": "route-20261114-001930-C-2.5#episode-0",
+              "windows": 453,
+              "monitored_windows": 439,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                4.448
+              ]
+            },
+            {
+              "run_id": "route-20261114-002914-A-2.3#episode-0",
+              "windows": 493,
+              "monitored_windows": 479,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002919-A-2.7#episode-0",
+              "windows": 418,
+              "monitored_windows": 404,
+              "windows_over_threshold": 2,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                4.096,
+                4.128
+              ]
+            },
+            {
+              "run_id": "route-20261114-002925-A-3.1#episode-0",
+              "windows": 366,
+              "monitored_windows": 352,
+              "windows_over_threshold": 4,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.008,
+                3.072,
+                3.584,
+                3.616
+              ]
+            },
+            {
+              "run_id": "route-20261114-002934-B-2.2#episode-0",
+              "windows": 516,
+              "monitored_windows": 502,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002939-B-2.6#episode-0",
+              "windows": 435,
+              "monitored_windows": 421,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002951-B-3.4#episode-0",
+              "windows": 341,
+              "monitored_windows": 327,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                7.36
+              ]
+            },
+            {
+              "run_id": "route-20261114-002953-C-2.1#episode-0",
+              "windows": 542,
+              "monitored_windows": 528,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003006-C-2.9#episode-0",
+              "windows": 391,
+              "monitored_windows": 377,
+              "windows_over_threshold": 3,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.232,
+                3.424,
+                3.84
+              ]
+            },
+            {
+              "run_id": "route-20261114-003011-C-3.3#episode-0",
+              "windows": 351,
+              "monitored_windows": 337,
+              "windows_over_threshold": 3,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                2.7840000000000003,
+                2.976,
+                3.392
+              ]
+            },
+            {
+              "run_id": "route-20261114-003020-D-2.4#episode-0",
+              "windows": 474,
+              "monitored_windows": 460,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003025-D-2.8#episode-0",
+              "windows": 408,
+              "monitored_windows": 394,
+              "windows_over_threshold": 2,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                8.736,
+                8.8
+              ]
+            },
+            {
+              "run_id": "route-20261114-003031-D-3.2#episode-0",
+              "windows": 360,
+              "monitored_windows": 346,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                7.5840000000000005
+              ]
+            }
+          ]
+        },
+        "pca_baseline": {
+          "threshold": 0.17720814049243927,
+          "scores": {
+            "train": {
+              "mean": 0.01618044450879097,
+              "p50": 0.008478516712784767,
+              "p95": 0.05624457821249962,
+              "p99": 0.16060005128383636,
+              "max": 0.4301130175590515
+            },
+            "validation": {
+              "mean": 0.01582614704966545,
+              "p50": 0.00829429179430008,
+              "p95": 0.049514926970005035,
+              "p99": 0.15493623912334442,
+              "max": 0.2441428005695343
+            },
+            "test": {
+              "mean": 0.016079694032669067,
+              "p50": 0.00848957896232605,
+              "p95": 0.04981645569205284,
+              "p99": 0.1528930813074112,
+              "max": 0.21999819576740265
+            }
+          },
+          "test_window_exceedance_rate": 0.0022675736961451248,
+          "test_persistent_alarm_windows": 12,
+          "test_runs_with_persistent_alarm": 1,
+          "test_runs": [
+            {
+              "run_id": "route-20261114-001924-B-3#episode-0",
+              "windows": 381,
+              "monitored_windows": 367,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-001930-C-2.5#episode-0",
+              "windows": 453,
+              "monitored_windows": 439,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002914-A-2.3#episode-0",
+              "windows": 493,
+              "monitored_windows": 479,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002919-A-2.7#episode-0",
+              "windows": 418,
+              "monitored_windows": 404,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002925-A-3.1#episode-0",
+              "windows": 366,
+              "monitored_windows": 352,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.584
+              ]
+            },
+            {
+              "run_id": "route-20261114-002934-B-2.2#episode-0",
+              "windows": 516,
+              "monitored_windows": 502,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002939-B-2.6#episode-0",
+              "windows": 435,
+              "monitored_windows": 421,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002951-B-3.4#episode-0",
+              "windows": 341,
+              "monitored_windows": 327,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002953-C-2.1#episode-0",
+              "windows": 542,
+              "monitored_windows": 528,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003006-C-2.9#episode-0",
+              "windows": 391,
+              "monitored_windows": 377,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.8080000000000003
+              ]
+            },
+            {
+              "run_id": "route-20261114-003011-C-3.3#episode-0",
+              "windows": 351,
+              "monitored_windows": 337,
+              "windows_over_threshold": 11,
+              "persistent_alarms": 12,
+              "first_alarm_window_start_s": 2.944,
+              "exceedance_window_start_s": [
+                2.816,
+                2.912,
+                2.944,
+                2.976,
+                3.04,
+                3.072,
+                3.104,
+                3.2,
+                3.232,
+                3.3280000000000003,
+                3.36
+              ]
+            },
+            {
+              "run_id": "route-20261114-003020-D-2.4#episode-0",
+              "windows": 474,
+              "monitored_windows": 460,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003025-D-2.8#episode-0",
+              "windows": 408,
+              "monitored_windows": 394,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003031-D-3.2#episode-0",
+              "windows": 360,
+              "monitored_windows": 346,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            }
+          ]
+        }
+      }
+    },
+    "ir": {
+      "weights": "ir.pt",
+      "features": [
+        "gs_left",
+        "gs_center",
+        "gs_right"
+      ],
+      "input_size": 60,
+      "parameters": 4500,
+      "scaler_mean": [
+        493.4467105162612,
+        314.96443858182454,
+        491.93357180776735
+      ],
+      "scaler_scale": [
+        222.17439615243146,
+        78.81993940759244,
+        219.7760937375334
+      ],
+      "threshold": 0.4030051827430725,
+      "best_epoch": 440,
+      "epochs_run": 500,
+      "final_train_loss": 0.046930923348725326,
+      "final_validation_loss": 0.043728720396757126,
+      "results": {
+        "conv_autoencoder": {
+          "threshold": 0.4030051827430725,
+          "scores": {
+            "train": {
+              "mean": 0.04530428722500801,
+              "p50": 0.011433223262429237,
+              "p95": 0.18246935307979584,
+              "p99": 0.33474045991897583,
+              "max": 1.0249282121658325
+            },
+            "validation": {
+              "mean": 0.042670734226703644,
+              "p50": 0.011255251243710518,
+              "p95": 0.16331757605075836,
+              "p99": 0.34195107221603394,
+              "max": 1.0688092708587646
+            },
+            "test": {
+              "mean": 0.04604875668883324,
+              "p50": 0.013065404258668423,
+              "p95": 0.18808813393115997,
+              "p99": 0.3410942852497101,
+              "max": 1.143252968788147
+            }
+          },
+          "test_window_exceedance_rate": 0.006279434850863423,
+          "test_persistent_alarm_windows": 30,
+          "test_runs_with_persistent_alarm": 3,
+          "test_runs": [
+            {
+              "run_id": "route-20261114-001924-B-3#episode-0",
+              "windows": 381,
+              "monitored_windows": 367,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-001930-C-2.5#episode-0",
+              "windows": 453,
+              "monitored_windows": 439,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002914-A-2.3#episode-0",
+              "windows": 493,
+              "monitored_windows": 479,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002919-A-2.7#episode-0",
+              "windows": 418,
+              "monitored_windows": 404,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.968
+              ]
+            },
+            {
+              "run_id": "route-20261114-002925-A-3.1#episode-0",
+              "windows": 366,
+              "monitored_windows": 352,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.712
+              ]
+            },
+            {
+              "run_id": "route-20261114-002934-B-2.2#episode-0",
+              "windows": 516,
+              "monitored_windows": 502,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002939-B-2.6#episode-0",
+              "windows": 435,
+              "monitored_windows": 421,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002951-B-3.4#episode-0",
+              "windows": 341,
+              "monitored_windows": 327,
+              "windows_over_threshold": 14,
+              "persistent_alarms": 12,
+              "first_alarm_window_start_s": 4.64,
+              "exceedance_window_start_s": [
+                4.5120000000000005,
+                4.6080000000000005,
+                4.64,
+                4.672,
+                4.704,
+                4.736,
+                4.768,
+                4.8,
+                4.832,
+                4.864,
+                4.896,
+                4.928,
+                8.352,
+                8.384
+              ]
+            },
+            {
+              "run_id": "route-20261114-002953-C-2.1#episode-0",
+              "windows": 542,
+              "monitored_windows": 528,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003006-C-2.9#episode-0",
+              "windows": 391,
+              "monitored_windows": 377,
+              "windows_over_threshold": 17,
+              "persistent_alarms": 17,
+              "first_alarm_window_start_s": 3.68,
+              "exceedance_window_start_s": [
+                3.616,
+                3.648,
+                3.68,
+                3.712,
+                3.744,
+                3.7760000000000002,
+                3.8080000000000003,
+                3.84,
+                3.872,
+                3.904,
+                3.936,
+                3.968,
+                4.0,
+                4.032,
+                4.064,
+                4.128,
+                4.16
+              ]
+            },
+            {
+              "run_id": "route-20261114-003011-C-3.3#episode-0",
+              "windows": 351,
+              "monitored_windows": 337,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003020-D-2.4#episode-0",
+              "windows": 474,
+              "monitored_windows": 460,
+              "windows_over_threshold": 3,
+              "persistent_alarms": 1,
+              "first_alarm_window_start_s": 10.976,
+              "exceedance_window_start_s": [
+                10.848,
+                10.944,
+                10.976
+              ]
+            },
+            {
+              "run_id": "route-20261114-003025-D-2.8#episode-0",
+              "windows": 408,
+              "monitored_windows": 394,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003031-D-3.2#episode-0",
+              "windows": 360,
+              "monitored_windows": 346,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            }
+          ]
+        },
+        "pca_baseline": {
+          "threshold": 0.7798031568527222,
+          "scores": {
+            "train": {
+              "mean": 0.08947424590587616,
+              "p50": 0.03093481808900833,
+              "p95": 0.34447595477104187,
+              "p99": 0.6365451216697693,
+              "max": 1.4704911708831787
+            },
+            "validation": {
+              "mean": 0.08538813143968582,
+              "p50": 0.019927959889173508,
+              "p95": 0.3268738389015198,
+              "p99": 0.5869061946868896,
+              "max": 1.3381990194320679
+            },
+            "test": {
+              "mean": 0.09136195480823517,
+              "p50": 0.032635413110256195,
+              "p95": 0.3661051094532013,
+              "p99": 0.6994706392288208,
+              "max": 1.130702257156372
+            }
+          },
+          "test_window_exceedance_rate": 0.006802721088435374,
+          "test_persistent_alarm_windows": 33,
+          "test_runs_with_persistent_alarm": 5,
+          "test_runs": [
+            {
+              "run_id": "route-20261114-001924-B-3#episode-0",
+              "windows": 381,
+              "monitored_windows": 367,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-001930-C-2.5#episode-0",
+              "windows": 453,
+              "monitored_windows": 439,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002914-A-2.3#episode-0",
+              "windows": 493,
+              "monitored_windows": 479,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                4.704
+              ]
+            },
+            {
+              "run_id": "route-20261114-002919-A-2.7#episode-0",
+              "windows": 418,
+              "monitored_windows": 404,
+              "windows_over_threshold": 7,
+              "persistent_alarms": 3,
+              "first_alarm_window_start_s": 3.968,
+              "exceedance_window_start_s": [
+                3.904,
+                3.936,
+                3.968,
+                4.096,
+                4.128,
+                4.256,
+                4.288
+              ]
+            },
+            {
+              "run_id": "route-20261114-002925-A-3.1#episode-0",
+              "windows": 366,
+              "monitored_windows": 352,
+              "windows_over_threshold": 1,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": [
+                3.68
+              ]
+            },
+            {
+              "run_id": "route-20261114-002934-B-2.2#episode-0",
+              "windows": 516,
+              "monitored_windows": 502,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-002939-B-2.6#episode-0",
+              "windows": 435,
+              "monitored_windows": 421,
+              "windows_over_threshold": 8,
+              "persistent_alarms": 8,
+              "first_alarm_window_start_s": 9.888,
+              "exceedance_window_start_s": [
+                9.824,
+                9.856,
+                9.888,
+                9.984,
+                10.016,
+                10.048,
+                10.176,
+                10.208
+              ]
+            },
+            {
+              "run_id": "route-20261114-002951-B-3.4#episode-0",
+              "windows": 341,
+              "monitored_windows": 327,
+              "windows_over_threshold": 11,
+              "persistent_alarms": 11,
+              "first_alarm_window_start_s": 4.736,
+              "exceedance_window_start_s": [
+                4.672,
+                4.704,
+                4.736,
+                4.768,
+                4.8,
+                4.832,
+                4.864,
+                4.896,
+                4.928,
+                4.96,
+                4.992
+              ]
+            },
+            {
+              "run_id": "route-20261114-002953-C-2.1#episode-0",
+              "windows": 542,
+              "monitored_windows": 528,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003006-C-2.9#episode-0",
+              "windows": 391,
+              "monitored_windows": 377,
+              "windows_over_threshold": 8,
+              "persistent_alarms": 8,
+              "first_alarm_window_start_s": 3.904,
+              "exceedance_window_start_s": [
+                3.84,
+                3.872,
+                3.904,
+                3.936,
+                3.968,
+                4.0,
+                4.032,
+                4.064
+              ]
+            },
+            {
+              "run_id": "route-20261114-003011-C-3.3#episode-0",
+              "windows": 351,
+              "monitored_windows": 337,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003020-D-2.4#episode-0",
+              "windows": 474,
+              "monitored_windows": 460,
+              "windows_over_threshold": 3,
+              "persistent_alarms": 3,
+              "first_alarm_window_start_s": 10.944,
+              "exceedance_window_start_s": [
+                10.88,
+                10.912,
+                10.944
+              ]
+            },
+            {
+              "run_id": "route-20261114-003025-D-2.8#episode-0",
+              "windows": 408,
+              "monitored_windows": 394,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            },
+            {
+              "run_id": "route-20261114-003031-D-3.2#episode-0",
+              "windows": 360,
+              "monitored_windows": 346,
+              "windows_over_threshold": 0,
+              "persistent_alarms": 0,
+              "first_alarm_window_start_s": null,
+              "exceedance_window_start_s": []
+            }
+          ]
+        }
+      }
+    }
+  }
+}
