@@ -6,25 +6,20 @@ Build a repeatable, diverse Webots telemetry dataset and turn it into a
 validated anomaly-detection model. Keep Webots as the simulation environment;
 the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
-## 1. Collect and qualify healthy runs
+## 1. Collect and qualify healthy runs (done for the first dataset)
 
-- Collect separate, identifiable healthy runs for each supported route and
-  speed mode. The current two unique runs cover one route at 2.5 and 3.0 rad/s
-  only and are a pipeline pilot.
-- Review sensor-loss fraction, sampling intervals, route completion, edge IDs,
-  and motor-command ranges before labeling a run healthy.
-- Use `epuck_data` when collecting sensor-only PD data, or `epuck_route` for
-  route-aware runs. Each controller writes per-session telemetry.
-- Collect additional distinct runs; exact duplicates do not create an
-  independent validation/test set.
+- Done: 16 healthy runs (4 routes x 4 speeds), qualified and logged in
+  `data/route_runs/manifest.csv`.
+- Follow-up: stop `epuck_route` from skipping a log row when it advances to the
+  next edge (one 64 ms gap per run). Optionally exercise edge-002/edge-004 by
+  adding a forced-edge route option, and add seeded start-pose variation if
+  more than one run per route/speed is needed.
 
-## 2. Prepare and validate the dataset
+## 2. Prepare and validate the dataset (done for the first dataset)
 
-- Run `scripts/prepare_telemetry.py` on healthy CSVs.
-- Inspect the per-run metadata and verify the train/validation split is by
-  independent runs, not overlapping windows.
-- Decide the final window length/features based on data and model experiments.
-- Reserve separate healthy runs for final false-positive testing.
+- Done: explicit split support (`--split`) and
+  `data/datasets/sim-baseline-v2` with healthy train/validation/test runs.
+- Decide the final window length/features based on model experiments.
 
 ## 3. Create and evaluate anomaly models
 

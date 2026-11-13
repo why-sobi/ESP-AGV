@@ -31,11 +31,23 @@ The Webots simulation remains the environment throughout this plan.
 - `scripts/prepare_telemetry.py` derives wheel velocities, creates 20-step
   motor/IR windows, splits by run before windowing, fits scalers on training
   data only, and rejects exact duplicate runs.
-- The pilot dataset under `data/datasets/sim-baseline-v1` contains 454 training
-  windows from a 2.5 rad/s run and 385 validation windows from a 3.0 rad/s run.
-  Exact-duplicate detection is implemented and unit-tested; duplicate recordings
-  are not treated as independent runs.
-- The Python script test suite passes (18 tests at last verification).
+- 16 distinct healthy `epuck_route` runs exist: 4 two-edge routes (node-003 to
+  node-001, node-001 to node-003, node-002 to node-004, node-004 to node-002)
+  at 2.0, 2.5, 3.0 and 3.5 rad/s. All reached the destination, with max
+  centerline error at most 0.024 m and line-loss samples only in the first
+  0.5 s. `data/route_runs/manifest.csv` records route, speed, and quality for
+  each file.
+- `epuck_route` now spawns facing a point one lookahead along the first edge
+  (the first skeleton pixel step at node-001 pointed the sensors off the line).
+  It also stops logging and prints `RUN FAILED` after `max_line_loss_s` of line
+  loss.
+- `prepare_telemetry.py --split` takes an explicit train/validation/test split
+  file. `data/datasets/sim-baseline-v2` (split
+  `data/datasets/splits/route-runs-v1.json`) has 3483 train windows from 8 runs
+  and 1732 validation and 1741 test windows from 4 runs each. Validation and
+  test each cover every route and every speed. `sim-baseline-v1` is the earlier
+  two-run pilot.
+- The Python script test suite passes (21 tests at last verification).
 
 ## Not yet implemented
 
@@ -48,12 +60,13 @@ The Webots simulation remains the environment throughout this plan.
 
 ## Current data/model status
 
-The current 2-run dataset proves the telemetry-preparation path, not model
-quality. It covers one route at two speeds, has no independent final test split,
-and does not cover controlled faults. The next data milestone is multiple
-distinct healthy runs across the routes/speeds we want to support, followed by
-separately labeled fault-injection runs. Train only on healthy data; use
-different healthy runs for validation and final testing.
+`sim-baseline-v2` is the healthy dataset for the first model experiments. Known
+limitations: Webots is deterministic, so each route and speed pair is one run.
+Shortest-path routing never uses the parallel edges edge-002 and edge-004.
+Single-edge routes are under the 10 s minimum at these speeds. Each run has one
+64 ms logging gap where the controller skips a row at the intermediate junction.
+There are no controlled-fault runs yet. Train only on healthy data; the held-out
+healthy test runs are for false-positive measurement.
 
 The anomaly-detection target remains simulated telemetry. ESP deployment means
 running the trained inference computation on the ESP32-S3 while Webots remains
