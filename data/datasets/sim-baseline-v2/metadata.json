@@ -1,0 +1,406 @@
+{
+  "data_origin": "Webots simulation telemetry; not physical hardware telemetry",
+  "window_size_samples": 20,
+  "stride_samples": 1,
+  "motor_features": [
+    "target_vel_left",
+    "target_vel_right",
+    "actual_vel_left",
+    "actual_vel_right"
+  ],
+  "ir_features": [
+    "gs_left",
+    "gs_center",
+    "gs_right"
+  ],
+  "scaling": {
+    "fit_on": "training runs only",
+    "motor_mean": [
+      2.6176228817251292,
+      2.63475835834298,
+      2.614633081155403,
+      2.6334212517193856
+    ],
+    "motor_scale": [
+      0.9068773686409087,
+      0.9097497755930181,
+      0.9088135617674682,
+      0.9118333016193823
+    ],
+    "ir_mean": [
+      492.0485421149653,
+      321.5479659003673,
+      495.7194311495856
+    ],
+    "ir_scale": [
+      222.24797084270512,
+      95.72903972580269,
+      220.18812443134337
+    ]
+  },
+  "split_method": "explicit",
+  "split_source": "data/datasets/splits/route-runs-v1.json",
+  "train_runs": [
+    {
+      "run_id": "route-20261112-232535#episode-0",
+      "window_start": 0,
+      "window_count": 454
+    },
+    {
+      "run_id": "route-20261113-235332#episode-0",
+      "window_start": 454,
+      "window_count": 568
+    },
+    {
+      "run_id": "route-20261113-235554#episode-0",
+      "window_start": 1022,
+      "window_count": 381
+    },
+    {
+      "run_id": "route-20261113-235731#episode-0",
+      "window_start": 1403,
+      "window_count": 452
+    },
+    {
+      "run_id": "route-20261113-235820#episode-0",
+      "window_start": 1855,
+      "window_count": 338
+    },
+    {
+      "run_id": "route-20261113-235902#episode-0",
+      "window_start": 2193,
+      "window_count": 570
+    },
+    {
+      "run_id": "route-20261113-235955#episode-0",
+      "window_start": 2763,
+      "window_count": 383
+    },
+    {
+      "run_id": "route-20261114-000128#episode-0",
+      "window_start": 3146,
+      "window_count": 337
+    }
+  ],
+  "validation_runs": [
+    {
+      "run_id": "route-20261113-235422#episode-0",
+      "window_start": 0,
+      "window_count": 452
+    },
+    {
+      "run_id": "route-20261113-235754#episode-0",
+      "window_start": 452,
+      "window_count": 379
+    },
+    {
+      "run_id": "route-20261114-000024#episode-0",
+      "window_start": 831,
+      "window_count": 334
+    },
+    {
+      "run_id": "route-20261114-000047#episode-0",
+      "window_start": 1165,
+      "window_count": 567
+    }
+  ],
+  "test_runs": [
+    {
+      "run_id": "route-20261112-232818#episode-0",
+      "window_start": 0,
+      "window_count": 385
+    },
+    {
+      "run_id": "route-20261113-235631#episode-0",
+      "window_start": 385,
+      "window_count": 334
+    },
+    {
+      "run_id": "route-20261113-235707#episode-0",
+      "window_start": 719,
+      "window_count": 568
+    },
+    {
+      "run_id": "route-20261113-235935#episode-0",
+      "window_start": 1287,
+      "window_count": 454
+    }
+  ],
+  "run_quality": {
+    "route-20261112-232535#episode-0": {
+      "rows": 474,
+      "duration_seconds": 15.168000000000001,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.4947145877378434,
+      "assigned_split": "train"
+    },
+    "route-20261112-232818#episode-0": {
+      "rows": 405,
+      "duration_seconds": 12.96,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0024752475247524753,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.9913019938863967,
+      "assigned_split": "test"
+    },
+    "route-20261113-235332#episode-0": {
+      "rows": 588,
+      "duration_seconds": 18.816,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-001",
+      "route_destination": "node-003",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.0,
+      "assigned_split": "train"
+    },
+    "route-20261113-235422#episode-0": {
+      "rows": 472,
+      "duration_seconds": 15.104000000000001,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0021231422505307855,
+      "controller": null,
+      "route_start": "node-001",
+      "route_destination": "node-003",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.494692144373673,
+      "assigned_split": "validation"
+    },
+    "route-20261113-235554#episode-0": {
+      "rows": 401,
+      "duration_seconds": 12.832,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0025,
+      "controller": null,
+      "route_start": "node-001",
+      "route_destination": "node-003",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.9887006206427533,
+      "assigned_split": "train"
+    },
+    "route-20261113-235631#episode-0": {
+      "rows": 354,
+      "duration_seconds": 11.328,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0028328611898017,
+      "controller": null,
+      "route_start": "node-001",
+      "route_destination": "node-003",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 3.4461919218988846,
+      "assigned_split": "test"
+    },
+    "route-20261113-235707#episode-0": {
+      "rows": 588,
+      "duration_seconds": 18.816,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-002",
+      "route_destination": "node-004",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.0,
+      "assigned_split": "test"
+    },
+    "route-20261113-235731#episode-0": {
+      "rows": 472,
+      "duration_seconds": 15.104000000000001,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0021231422505307855,
+      "controller": null,
+      "route_start": "node-002",
+      "route_destination": "node-004",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.494692144373673,
+      "assigned_split": "train"
+    },
+    "route-20261113-235754#episode-0": {
+      "rows": 399,
+      "duration_seconds": 12.768,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.002512562814070352,
+      "controller": null,
+      "route_start": "node-002",
+      "route_destination": "node-004",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.99185801359057,
+      "assigned_split": "validation"
+    },
+    "route-20261113-235820#episode-0": {
+      "rows": 358,
+      "duration_seconds": 11.456,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0028011204481792717,
+      "controller": null,
+      "route_start": "node-002",
+      "route_destination": "node-004",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 3.434542953895196,
+      "assigned_split": "train"
+    },
+    "route-20261113-235902#episode-0": {
+      "rows": 590,
+      "duration_seconds": 18.88,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-004",
+      "route_destination": "node-002",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.0,
+      "assigned_split": "train"
+    },
+    "route-20261113-235935#episode-0": {
+      "rows": 474,
+      "duration_seconds": 15.168000000000001,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0021141649048625794,
+      "controller": null,
+      "route_start": "node-004",
+      "route_destination": "node-002",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.4947145877378434,
+      "assigned_split": "test"
+    },
+    "route-20261113-235955#episode-0": {
+      "rows": 403,
+      "duration_seconds": 12.896,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0024875621890547263,
+      "controller": null,
+      "route_start": "node-004",
+      "route_destination": "node-002",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.985392306277791,
+      "assigned_split": "train"
+    },
+    "route-20261114-000024#episode-0": {
+      "rows": 354,
+      "duration_seconds": 11.328,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 1,
+      "all_sensors_bright_fraction": 0.0028328611898017,
+      "controller": null,
+      "route_start": "node-004",
+      "route_destination": "node-002",
+      "edge_ids": [
+        "edge-005",
+        "edge-006"
+      ],
+      "mean_target_wheel_speed_rad_s": 3.448275257570386,
+      "assigned_split": "validation"
+    },
+    "route-20261114-000047#episode-0": {
+      "rows": 587,
+      "duration_seconds": 18.784,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 0,
+      "all_sensors_bright_fraction": 0.0,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 2.0,
+      "assigned_split": "validation"
+    },
+    "route-20261114-000128#episode-0": {
+      "rows": 357,
+      "duration_seconds": 11.424,
+      "median_interval_seconds": 0.03200000000000003,
+      "irregular_intervals": 1,
+      "all_sensors_bright_samples": 2,
+      "all_sensors_bright_fraction": 0.0056179775280898875,
+      "controller": null,
+      "route_start": "node-003",
+      "route_destination": "node-001",
+      "edge_ids": [
+        "edge-001",
+        "edge-005"
+      ],
+      "mean_target_wheel_speed_rad_s": 3.4198402075910974,
+      "assigned_split": "train"
+    }
+  },
+  "excluded_episodes": [],
+  "test_split": "held-out healthy runs; see test_runs",
+  "test_split_note": "Test runs are healthy only; fault-injection runs are not included yet."
+}

@@ -1,0 +1,31 @@
+{
+  "description": "Healthy epuck_route runs on base track: 4 two-edge routes x 4 wheel speeds. Each route gives two speeds to train, one to validation and one to test, rotated so validation and test each cover every route and every speed. Route/speed per file is recorded in data/route_runs/manifest.csv.",
+  "routes": {
+    "A": "node-003 -> node-001 (edge-005, edge-001)",
+    "B": "node-001 -> node-003 (edge-001, edge-005)",
+    "C": "node-002 -> node-004 (edge-005, edge-006)",
+    "D": "node-004 -> node-002 (edge-006, edge-005)"
+  },
+  "train": [
+    "data/route_runs/route-20261112-232535.csv",
+    "data/route_runs/route-20261114-000128.csv",
+    "data/route_runs/route-20261113-235332.csv",
+    "data/route_runs/route-20261113-235554.csv",
+    "data/route_runs/route-20261113-235731.csv",
+    "data/route_runs/route-20261113-235820.csv",
+    "data/route_runs/route-20261113-235902.csv",
+    "data/route_runs/route-20261113-235955.csv"
+  ],
+  "validation": [
+    "data/route_runs/route-20261114-000047.csv",
+    "data/route_runs/route-20261113-235422.csv",
+    "data/route_runs/route-20261113-235754.csv",
+    "data/route_runs/route-20261114-000024.csv"
+  ],
+  "test": [
+    "data/route_runs/route-20261112-232818.csv",
+    "data/route_runs/route-20261113-235631.csv",
+    "data/route_runs/route-20261113-235707.csv",
+    "data/route_runs/route-20261113-235935.csv"
+  ]
+}
