@@ -17,6 +17,26 @@ MOTOR_FEATURES = (
     "actual_vel_right",
 )
 IR_FEATURES = ("gs_left", "gs_center", "gs_right")
+SPLIT_NAMES = ("train", "validation", "test")
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def load_split(path):
+    """Read an explicit run split; relative run paths resolve from the repo root."""
+    path = Path(path)
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    split = {}
+    for name in SPLIT_NAMES:
+        entries = data.get(name, [])
+        if not isinstance(entries, list) or not all(isinstance(item, str) for item in entries):
+            raise ValueError(f"{path}: '{name}' must be a list of file paths")
+        split[name] = [
+            Path(item) if Path(item).is_absolute() else REPO_ROOT / item
+            for item in entries
+        ]
+    return split
 
 
 def _column(row, *names):
@@ -192,7 +212,16 @@ def prepare_dataset(
     stride=1,
     validation_fraction=0.25,
     minimum_duration=10.0,
+    split=None,
+    split_source=None,
 ):
+    """Prepare windows from telemetry runs.
+
+    With ``split`` (a mapping of ``train``/``validation``/``test`` to file
+    lists), ``input_paths`` is ignored and runs keep their assigned split.
+    Otherwise the last ``validation_fraction`` of runs, by run id, becomes
+    validation and there is no test split.
+    """
     if window_size < 2 or stride < 1:
         raise ValueError("window_size must be at least 2 and stride must be positive")
     if not 0.0 < validation_fraction < 1.0:
@@ -200,7 +229,24 @@ def prepare_dataset(
     if minimum_duration < 0:
         raise ValueError("minimum_duration cannot be negative")
 
+    file_split = {}
+    if split is not None:
+        unknown = set(split) - set(SPLIT_NAMES)
+        if unknown:
+            raise ValueError(f"Unknown split names: {', '.join(sorted(unknown))}")
+        input_paths = []
+        for name in SPLIT_NAMES:
+            for path in split.get(name, []):
+                key = Path(path).resolve()
+                if key in file_split:
+                    raise ValueError(
+                        f"{path} is assigned to both {file_split[key]} and {name}"
+                    )
+                file_split[key] = name
+                input_paths.append(path)
+
     records = []
+    run_split = {}
     excluded = []
     for path in input_paths:
         path = Path(path)
@@ -208,6 +254,9 @@ def prepare_dataset(
         excluded.extend({"file": str(path), **item} for item in skipped)
         for run_id, rows in segments:
             motor, ir, times, summary = _features(rows, run_id, window_size)
+            if split is not None:
+                summary["assigned_split"] = file_split[path.resolve()]
+                run_split[run_id] = summary["assigned_split"]
             records.append((run_id, motor, ir, times, summary))
 
     records.sort(key=lambda record: record[0])
@@ -235,12 +284,24 @@ def prepare_dataset(
             "No usable telemetry runs remain after duration and duplicate checks."
         )
 
-    validation_count = 0
-    if len(records) >= 2:
-        validation_count = max(1, math.ceil(len(records) * validation_fraction))
-        validation_count = min(validation_count, len(records) - 1)
-    train_indices = list(range(0, len(records) - validation_count))
-    validation_indices = list(range(len(records) - validation_count, len(records)))
+    if split is not None:
+        indices = {
+            name: [i for i, record in enumerate(records) if run_split[record[0]] == name]
+            for name in SPLIT_NAMES
+        }
+        if not indices["train"]:
+            raise ValueError("The explicit split has no usable training runs.")
+        train_indices = indices["train"]
+        validation_indices = indices["validation"]
+        test_indices = indices["test"]
+    else:
+        validation_count = 0
+        if len(records) >= 2:
+            validation_count = max(1, math.ceil(len(records) * validation_fraction))
+            validation_count = min(validation_count, len(records) - 1)
+        train_indices = list(range(0, len(records) - validation_count))
+        validation_indices = list(range(len(records) - validation_count, len(records)))
+        test_indices = []
 
     motor_mean, motor_scale = _fit_scaler([records[i][1] for i in train_indices])
     ir_mean, ir_scale = _fit_scaler([records[i][2] for i in train_indices])
@@ -252,6 +313,10 @@ def prepare_dataset(
         records, validation_indices, window_size, stride,
         motor_mean, motor_scale, ir_mean, ir_scale,
     )
+    test = _make_windows(
+        records, test_indices, window_size, stride,
+        motor_mean, motor_scale, ir_mean, ir_scale,
+    )
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -261,10 +326,14 @@ def prepare_dataset(
         ir_train=train[1],
         motor_validation=validation[0],
         ir_validation=validation[1],
+        motor_test=test[0],
+        ir_test=test[1],
         motor_train_run_index=train[2],
         motor_validation_run_index=validation[2],
+        motor_test_run_index=test[2],
         train_window_start_seconds=train[3],
         validation_window_start_seconds=validation[3],
+        test_window_start_seconds=test[3],
     )
 
     metadata = {
@@ -280,15 +349,22 @@ def prepare_dataset(
             "ir_mean": ir_mean.tolist(),
             "ir_scale": ir_scale.tolist(),
         },
+        "split_method": "explicit" if split is not None else "validation_fraction",
+        "split_source": None if split_source is None else str(split_source),
         "train_runs": train[4],
         "validation_runs": validation[4],
+        "test_runs": test[4],
         "run_quality": {
             record[0]: record[4]
             for record in records
         },
         "excluded_episodes": excluded,
-        "test_split": None,
-        "test_split_note": "A separate test split needs additional diverse runs.",
+        "test_split": "held-out healthy runs; see test_runs" if test_indices else None,
+        "test_split_note": (
+            "Test runs are healthy only; fault-injection runs are not included yet."
+            if test_indices
+            else "No test split: provide one with an explicit --split file."
+        ),
     }
     (output_dir / "metadata.json").write_text(
         json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
@@ -298,7 +374,13 @@ def prepare_dataset(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--runs", nargs="+", required=True, help="Input telemetry CSV files")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--runs", nargs="+", help="Input telemetry CSV files")
+    source.add_argument(
+        "--split",
+        help="JSON file assigning run CSVs to train/validation/test "
+        "(relative paths resolve from the repository root)",
+    )
     parser.add_argument("--out", default="data/datasets/sim-baseline-v1")
     parser.add_argument("--window", type=int, default=20)
     parser.add_argument("--stride", type=int, default=1)
@@ -307,17 +389,20 @@ def main():
     args = parser.parse_args()
 
     metadata = prepare_dataset(
-        args.runs,
+        args.runs or [],
         args.out,
         window_size=args.window,
         stride=args.stride,
         validation_fraction=args.validation_fraction,
         minimum_duration=args.minimum_duration,
+        split=load_split(args.split) if args.split else None,
+        split_source=Path(args.split).as_posix() if args.split else None,
     )
     print(f"Prepared windows: {Path(args.out) / 'windows.npz'}")
     print(f"Metadata and run quality: {Path(args.out) / 'metadata.json'}")
     print(f"Training runs: {[run['run_id'] for run in metadata['train_runs']]}")
     print(f"Validation runs: {[run['run_id'] for run in metadata['validation_runs']]}")
+    print(f"Test runs: {[run['run_id'] for run in metadata['test_runs']]}")
     print(f"Excluded short or duplicate episodes: {len(metadata['excluded_episodes'])}")
     if not metadata["validation_runs"]:
         print("Validation split unavailable: only one unique run remains.")

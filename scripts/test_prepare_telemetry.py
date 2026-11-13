@@ -166,6 +166,71 @@ class PrepareTelemetryTests(unittest.TestCase):
             self.assertEqual(len(metadata["train_runs"]), 1)
             self.assertEqual(len(metadata["validation_runs"]), 1)
 
+    def test_explicit_split_keeps_assignments_and_creates_test_set(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            paths = {}
+            # Name the test run so it would sort first; the explicit split must
+            # still keep it out of training.
+            for name, offset in (("a-test", 50.0), ("b-train", 0.0), ("c-validation", 100.0)):
+                paths[name] = root / f"{name}.csv"
+                write_run(paths[name], name, offset=offset)
+
+            metadata = prepare_dataset(
+                [],
+                root / "out",
+                window_size=10,
+                stride=2,
+                minimum_duration=0,
+                split={
+                    "train": [paths["b-train"]],
+                    "validation": [paths["c-validation"]],
+                    "test": [paths["a-test"]],
+                },
+                split_source="splits/example.json",
+            )
+
+            self.assertEqual(metadata["split_method"], "explicit")
+            self.assertEqual(metadata["split_source"], "splits/example.json")
+            self.assertEqual([r["run_id"] for r in metadata["train_runs"]], ["b-train"])
+            self.assertEqual([r["run_id"] for r in metadata["validation_runs"]], ["c-validation"])
+            self.assertEqual([r["run_id"] for r in metadata["test_runs"]], ["a-test"])
+            self.assertEqual(metadata["run_quality"]["a-test"]["assigned_split"], "test")
+            self.assertIsNotNone(metadata["test_split"])
+            self.assertEqual(metadata["scaling"]["ir_mean"], [300.0, 310.0, 320.0])
+            with np.load(root / "out" / "windows.npz") as arrays:
+                self.assertEqual(arrays["motor_test"].shape, (35, 10, 4))
+                self.assertEqual(arrays["ir_test"].shape, (35, 10, 3))
+
+    def test_explicit_split_rejects_file_in_two_splits(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            run = root / "run.csv"
+            write_run(run, "run")
+            with self.assertRaisesRegex(ValueError, "assigned to both train and test"):
+                prepare_dataset(
+                    [],
+                    root / "out",
+                    window_size=5,
+                    minimum_duration=0,
+                    split={"train": [run], "test": [run]},
+                )
+
+    def test_fraction_split_writes_empty_test_arrays(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            write_run(root / "a.csv", "a")
+            write_run(root / "b.csv", "b", offset=5.0)
+            metadata = prepare_dataset(
+                [root / "a.csv", root / "b.csv"],
+                root / "out",
+                window_size=5,
+                minimum_duration=0,
+            )
+            self.assertEqual(metadata["test_runs"], [])
+            with np.load(root / "out" / "windows.npz") as arrays:
+                self.assertEqual(arrays["motor_test"].shape, (0, 5, 4))
+
 
 if __name__ == "__main__":
     unittest.main()
