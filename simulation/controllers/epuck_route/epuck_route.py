@@ -185,14 +185,22 @@ def main():
         first_node = nodes[route.start]
         start_world = _pixel_to_world([first_node["x"], first_node["y"]], transform)
         first_points = route_paths[0]["points"]
-        first_direction = next(
-            (
-                (b[0] - a[0], b[1] - a[1])
-                for a, b in zip(first_points, first_points[1:])
-                if math.hypot(b[0] - a[0], b[1] - a[1]) > 1e-8
+        # Aim at a point a lookahead distance along the edge rather than the
+        # first pixel step: skeletonised junctions often start with a short
+        # diagonal kink that would point the ground sensors off the line.
+        heading_point = _point_at_distance(
+            first_points,
+            min(
+                _polyline_length(first_points),
+                float(mission.get("lookahead_m", 0.045)),
             ),
-            None,
         )
+        first_direction = (
+            heading_point[0] - start_world[0],
+            heading_point[1] - start_world[1],
+        )
+        if math.hypot(*first_direction) <= 1e-8:
+            first_direction = None
 
         if mission.get("spawn_at_start_node", False):
             if first_direction is None:
@@ -245,9 +253,12 @@ def main():
         max_wheel_speed = 5.0
         line_threshold = float(mission.get("line_threshold", 400.0))
         sensor_heading_gain = float(mission.get("sensor_heading_gain", 0.2))
+        max_line_loss_s = float(mission.get("max_line_loss_s", 2.0))
         batch_size = 100
         buffered_rows = 0
         completed = False
+        failure = None
+        line_lost_since = None
 
         while robot.step(time_step) != -1:
             position = self_node.getPosition()
@@ -333,6 +344,19 @@ def main():
                 log_file.flush()
                 buffered_rows = 0
 
+            if sensor_error is None:
+                if line_lost_since is None:
+                    line_lost_since = robot.getTime()
+                elif robot.getTime() - line_lost_since > max_line_loss_s:
+                    _stop(motors)
+                    failure = (
+                        f"line lost for more than {max_line_loss_s:.1f} s on "
+                        f"{edge['edge_id']} at t={robot.getTime():.2f} s"
+                    )
+                    break
+            else:
+                line_lost_since = None
+
             if distance_from_path > float(mission.get("max_path_error_m", 0.12)):
                 _stop(motors)
                 raise RuntimeError(
@@ -343,10 +367,13 @@ def main():
         log_file.flush()
         log_file.close()
         print(f"Route telemetry saved to {log_path}")
-        if completed:
-            print(f"Destination reached: {route.destination}")
+        if failure is not None:
+            print(f"RUN FAILED: {failure}. Do not use this run as healthy data.")
+        if completed or failure is not None:
+            if completed:
+                print(f"Destination reached: {route.destination}")
             if mission.get("quit_webots_on_complete", False):
-                robot.simulationQuit(0)
+                robot.simulationQuit(0 if completed else 1)
             else:
                 # Keep the controller alive at the destination so Webots does
                 # not restart it and immediately repeat the same mission.
