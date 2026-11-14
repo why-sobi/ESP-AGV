@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from pathToMap import trace_path_map
+from scripts.maps.pathToMap import trace_path_map
 
 
 class PathToMapTests(unittest.TestCase):

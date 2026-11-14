@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include "driver/uart.h"
@@ -16,8 +17,8 @@ constexpr int kBaudRate = 115200;
 constexpr gpio_num_t kSerialTxPin = GPIO_NUM_43;
 constexpr gpio_num_t kSerialRxPin = GPIO_NUM_44;
 constexpr size_t kRxBufferSize = 1024;
-constexpr size_t kLineBufferSize = 128;
-constexpr size_t kMaxRouteLength = 64;
+constexpr size_t kLineBufferSize = 512;
+constexpr size_t kMaxRouteLength = 32;
 
 // These PD settings match the current Webots line follower and still need
 // tuning across the project's supported simulated routes and speeds.
@@ -36,22 +37,43 @@ constexpr unsigned kJunctionReleaseFrames = 3; // Require branch reacquisition t
 constexpr uint32_t kTurnSearchLimitMs = 750;   // Stop if a commanded turn loses the line.
 constexpr uint32_t kSensorTimeoutMs = 250;     // Stop if the host stops sending sensor data.
 
+// Odometry. Three ground sensors cannot tell a junction from a line wide
+// enough to cover all of them, so a junction pattern only counts within
+// kJunctionWindowM of the distance the host gave for that junction.
+constexpr float kWheelRadiusM = 0.02F;     // E-puck wheel radius.
+constexpr float kJunctionWindowM = 0.10F;  // Accept a junction this far either side.
+
+// U-turn: spin left in place, measuring the turn from the encoders, until at
+// least kUTurnMinRad has turned and the center sensor is back on the line.
+constexpr float kWheelBaseM = 0.052F;     // E-puck distance between the wheels.
+constexpr float kUTurnSpeed = 2.0F;       // Wheel speed while spinning, rad/s.
+constexpr float kUTurnMinRad = 2.79F;     // 160 degrees: ignore lines crossed earlier.
+constexpr float kUTurnMaxRad = 4.71F;     // 270 degrees: give up, the line was not found.
+
 enum class State {
   kNoRoute,
   kFollowing,
   kJunctionLeft,
   kJunctionStraight,
   kJunctionRight,
+  kUTurn,
   kLineLost,
   kAtDestination,
   kLinkLost,
+  kJunctionMissed,
+};
+
+struct RouteStep {
+  char action = 'D';
+  float distance_m = 0.0F;
 };
 
 struct Controller {
-  char route[kMaxRouteLength + 1]{};
+  RouteStep route[kMaxRouteLength]{};
   size_t route_length = 0;
   size_t route_index = 0;
   State state = State::kNoRoute;
+  State state_before_link_loss = State::kNoRoute;
   bool route_loaded = false;
   bool junction_latched = false;
   unsigned junction_frames = 0;
@@ -62,6 +84,11 @@ struct Controller {
   uint32_t turn_search_ms = 0;
   uint32_t last_sensor_seq = 0;
   int64_t last_sensor_us = 0;
+  bool odometry_started = false;
+  float encoder_start_left = 0.0F;
+  float encoder_start_right = 0.0F;
+  float distance_m = 0.0F;
+  float heading_rad = 0.0F;  // Left-positive turn since the route started.
 };
 
 Controller g_controller;
@@ -78,22 +105,26 @@ const char *state_name(State state) {
       return "STRAIGHT";
     case State::kJunctionRight:
       return "TURN_RIGHT";
+    case State::kUTurn:
+      return "U_TURN";
     case State::kLineLost:
       return "LINE_LOST";
     case State::kAtDestination:
       return "AT_DEST";
     case State::kLinkLost:
       return "LINK_LOST";
+    case State::kJunctionMissed:
+      return "JUNCTION_MISSED";
   }
   return "ERROR";
 }
 
 void send_response(uint32_t sequence, float left, float right) {
-  char response[96];
+  char response[112];
   const int length = std::snprintf(
-      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u\n",
+      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u,%.4f\n",
       static_cast<unsigned long>(sequence), left, right, state_name(g_controller.state),
-      static_cast<unsigned>(g_controller.route_index));
+      static_cast<unsigned>(g_controller.route_index), g_controller.distance_m);
   if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
     uart_write_bytes(kSerialPort, response, length);
   }
@@ -107,23 +138,45 @@ void send_error(const char *reason) {
   }
 }
 
-bool configure_route(const char *actions) {
-  const size_t length = std::strlen(actions);
-  if (length == 0 || length > kMaxRouteLength || actions[length - 1] != 'D') {
+// Parse "<action>@<metres>" steps separated by commas, e.g. "R@0.265,D@0.779".
+// Distances are odometry distances from the start of the route; they must not
+// decrease, and the last step must be the destination 'D'. A 'U' (U-turn in
+// place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779".
+bool configure_route(char *steps) {
+  RouteStep parsed[kMaxRouteLength];
+  size_t length = 0;
+  float previous_distance = 0.0F;
+  char *save = nullptr;
+  for (char *token = strtok_r(steps, ",", &save); token != nullptr;
+       token = strtok_r(nullptr, ",", &save)) {
+    if (length == kMaxRouteLength) {
+      return false;
+    }
+    const char action = token[0];
+    if ((action != 'L' && action != 'S' && action != 'R' && action != 'D' &&
+         action != 'U') ||
+        token[1] != '@' || (action == 'U' && length != 0)) {
+      return false;
+    }
+    char *end = nullptr;
+    const float distance = std::strtof(token + 2, &end);
+    if (end == token + 2 || *end != '\0' || !std::isfinite(distance) ||
+        distance < previous_distance) {
+      return false;
+    }
+    parsed[length++] = RouteStep{action, distance};
+    previous_distance = distance;
+  }
+  if (length == 0 || parsed[length - 1].action != 'D') {
     return false;
   }
-
-  for (size_t i = 0; i < length; ++i) {
-    const char action = actions[i];
-    if (action != 'L' && action != 'S' && action != 'R' && action != 'D') {
-      return false;
-    }
-    if (action == 'D' && i != length - 1) {
+  for (size_t i = 0; i + 1 < length; ++i) {
+    if (parsed[i].action == 'D') {
       return false;
     }
   }
 
-  std::memcpy(g_controller.route, actions, length + 1);
+  std::copy(parsed, parsed + length, g_controller.route);
   g_controller.route_length = length;
   g_controller.route_index = 0;
   g_controller.route_loaded = true;
@@ -133,27 +186,91 @@ bool configure_route(const char *actions) {
   g_controller.previous_error = 0.0F;
   g_controller.filtered_error_rate = 0.0F;
   g_controller.turn_search_ms = 0;
-  g_controller.last_sensor_us = esp_timer_get_time();
-  g_controller.state = State::kFollowing;
+  // Arm the link timeout and zero the odometry on the first sensor frame: the
+  // host may take a while to start streaming after it configures the route.
+  g_controller.last_sensor_seq = 0;
+  g_controller.last_sensor_us = 0;
+  g_controller.odometry_started = false;
+  g_controller.distance_m = 0.0F;
+  g_controller.heading_rad = 0.0F;
+  g_controller.state = parsed[0].action == 'U' ? State::kUTurn : State::kFollowing;
   uart_write_bytes(kSerialPort, "A,ROUTE_OK\n", sizeof("A,ROUTE_OK\n") - 1);
   return true;
+}
+
+void update_odometry(float encoder_left, float encoder_right) {
+  if (!g_controller.odometry_started) {
+    g_controller.encoder_start_left = encoder_left;
+    g_controller.encoder_start_right = encoder_right;
+    g_controller.odometry_started = true;
+  }
+  const float left_rad = encoder_left - g_controller.encoder_start_left;
+  const float right_rad = encoder_right - g_controller.encoder_start_right;
+  g_controller.distance_m = kWheelRadiusM * 0.5F * (left_rad + right_rad);
+  g_controller.heading_rad = kWheelRadiusM * (right_rad - left_rad) / kWheelBaseM;
+}
+
+// Spin left in place for a pending 'U' step. Returns true while still
+// turning (the response has been sent); false once the line is reacquired
+// and normal following should handle this frame.
+bool run_u_turn(uint32_t sequence, bool center_active) {
+  if (g_controller.route[g_controller.route_index].action != 'U') {
+    return false;
+  }
+  if (g_controller.heading_rad >= kUTurnMinRad && center_active) {
+    ++g_controller.route_index;
+    g_controller.state = State::kFollowing;
+    g_controller.previous_error = 0.0F;
+    g_controller.filtered_error_rate = 0.0F;
+    return false;
+  }
+  if (g_controller.heading_rad > kUTurnMaxRad) {
+    g_controller.state = State::kLineLost;
+    g_controller.route_loaded = false;
+    send_response(sequence, 0.0F, 0.0F);
+    return true;
+  }
+  g_controller.state = State::kUTurn;
+  send_response(sequence, -kUTurnSpeed, kUTurnSpeed);
+  return true;
+}
+
+// Stop at the destination distance, or if the next junction's window has
+// passed without the junction pattern being seen.
+void check_route_distance() {
+  if (g_controller.junction_latched) {
+    return;
+  }
+  const RouteStep &next = g_controller.route[g_controller.route_index];
+  if (next.action == 'D') {
+    if (g_controller.distance_m >= next.distance_m) {
+      ++g_controller.route_index;
+      g_controller.state = State::kAtDestination;
+    }
+  } else if (g_controller.distance_m > next.distance_m + kJunctionWindowM) {
+    g_controller.state = State::kJunctionMissed;
+    g_controller.route_loaded = false;
+  }
 }
 
 void maybe_enter_junction(bool left_active, bool right_active) {
   if (g_controller.junction_latched || !g_controller.route_loaded) {
     return;
   }
+  const RouteStep &next = g_controller.route[g_controller.route_index];
+  const bool in_window =
+      next.action != 'D' &&
+      std::fabs(g_controller.distance_m - next.distance_m) <= kJunctionWindowM;
 
-  if (left_active && right_active) {
+  if (in_window && left_active && right_active) {
     ++g_controller.junction_frames;
     if (g_controller.junction_frames >= kJunctionConfirmFrames) {
-      const char action = g_controller.route[g_controller.route_index];
       ++g_controller.route_index;
       g_controller.junction_latched = true;
       g_controller.junction_clear_frames = 0;
       g_controller.turn_search_ms = 0;
 
-      switch (action) {
+      switch (next.action) {
         case 'L':
           g_controller.state = State::kJunctionLeft;
           break;
@@ -163,9 +280,6 @@ void maybe_enter_junction(bool left_active, bool right_active) {
         case 'R':
           g_controller.state = State::kJunctionRight;
           break;
-        case 'D':
-          g_controller.state = State::kAtDestination;
-          break;
       }
     }
   } else {
@@ -174,7 +288,7 @@ void maybe_enter_junction(bool left_active, bool right_active) {
 }
 
 void maybe_leave_junction(bool left_active, bool right_active) {
-  if (!g_controller.junction_latched || g_controller.state == State::kAtDestination) {
+  if (!g_controller.junction_latched) {
     return;
   }
 
@@ -195,18 +309,33 @@ void process_sensor_frame(char *line) {
   unsigned sequence = 0;
   float dt_ms = 0.0F;
   float readings[3]{};
+  float encoders[2]{};
   char extra = '\0';
-  if (std::sscanf(line, "S,%u,%f,%f,%f,%f%c", &sequence, &dt_ms, &readings[0],
-                  &readings[1], &readings[2], &extra) != 5 ||
+  if (std::sscanf(line, "S,%u,%f,%f,%f,%f,%f,%f%c", &sequence, &dt_ms, &readings[0],
+                  &readings[1], &readings[2], &encoders[0], &encoders[1], &extra) != 7 ||
       !std::isfinite(dt_ms) || dt_ms <= 0.0F || dt_ms > 250.0F ||
       !std::isfinite(readings[0]) || !std::isfinite(readings[1]) ||
-      !std::isfinite(readings[2])) {
+      !std::isfinite(readings[2]) || !std::isfinite(encoders[0]) ||
+      !std::isfinite(encoders[1])) {
     send_error("BAD_SENSOR_FRAME");
     return;
   }
 
   g_controller.last_sensor_seq = sequence;
   g_controller.last_sensor_us = esp_timer_get_time();
+
+  // The simulation pauses with the host, so resume once frames arrive again.
+  // Wheel targets were zero while the link was lost.
+  if (g_controller.state == State::kLinkLost) {
+    g_controller.state = g_controller.state_before_link_loss;
+  }
+
+  if (!g_controller.route_loaded || g_controller.state == State::kAtDestination) {
+    send_response(sequence, 0.0F, 0.0F);
+    return;
+  }
+
+  update_odometry(encoders[0], encoders[1]);
   const float dt = std::clamp(dt_ms / 1000.0F, 0.005F, 0.100F);
   const float left = std::max(0.0F, kLineThreshold - readings[0]);
   const float center = std::max(0.0F, kLineThreshold - readings[1]);
@@ -215,18 +344,16 @@ void process_sensor_frame(char *line) {
   const bool left_active = left >= kMinLineStrength;
   const bool right_active = right >= kMinLineStrength;
 
-  if (!g_controller.route_loaded || g_controller.state == State::kAtDestination ||
-      g_controller.state == State::kLinkLost) {
-    send_response(sequence, 0.0F, 0.0F);
+  if (run_u_turn(sequence, center >= kMinLineStrength)) {
     return;
   }
 
   maybe_enter_junction(left_active, right_active);
-  if (g_controller.junction_latched) {
-    maybe_leave_junction(left_active, right_active);
-  }
+  maybe_leave_junction(left_active, right_active);
+  check_route_distance();
 
-  if (g_controller.state == State::kAtDestination) {
+  if (g_controller.state == State::kAtDestination ||
+      g_controller.state == State::kJunctionMissed) {
     send_response(sequence, 0.0F, 0.0F);
     return;
   }
@@ -257,8 +384,8 @@ void process_sensor_frame(char *line) {
     }
     g_controller.state = State::kFollowing;
     g_controller.turn_search_ms = 0;
-  } else if (g_controller.state == State::kJunctionLeft ||
-             g_controller.state == State::kJunctionRight) {
+  } else {
+    // Line lost: turn slowly towards where it was last seen, for a bounded time.
     g_controller.turn_search_ms += static_cast<uint32_t>(dt_ms);
     if (g_controller.turn_search_ms > kTurnSearchLimitMs) {
       g_controller.state = State::kLineLost;
@@ -271,10 +398,6 @@ void process_sensor_frame(char *line) {
     const float search_right = std::clamp(1.0F - search_steering, 0.0F, kMaxWheelSpeed);
     send_response(sequence, search_left, search_right);
     return;
-  } else {
-    g_controller.state = State::kLineLost;
-    send_response(sequence, 0.0F, 0.0F);
-    return;
   }
 
   const float turn_amount = std::min(1.0F, std::fabs(error));
@@ -284,7 +407,7 @@ void process_sensor_frame(char *line) {
   const float left_target =
       std::clamp(base_speed + steering, 0.0F, kMaxWheelSpeed);
   const float right_target =
-        std::clamp(base_speed - steering, 0.0F, kMaxWheelSpeed);
+      std::clamp(base_speed - steering, 0.0F, kMaxWheelSpeed);
   send_response(sequence, left_target, right_target);
 }
 
@@ -310,6 +433,7 @@ void check_sensor_timeout() {
 
   const int64_t age_us = esp_timer_get_time() - g_controller.last_sensor_us;
   if (age_us > static_cast<int64_t>(kSensorTimeoutMs) * 1000) {
+    g_controller.state_before_link_loss = g_controller.state;
     g_controller.state = State::kLinkLost;
     send_response(g_controller.last_sensor_seq, 0.0F, 0.0F);
   }
@@ -331,12 +455,26 @@ void initialize_serial() {
 }
 
 void serial_task(void *) {
-  char line[kLineBufferSize]{};
+  static char line[kLineBufferSize]{};
   size_t used = 0;
   uint8_t input[64];
 
   while (true) {
-    const int count = uart_read_bytes(kSerialPort, input, sizeof(input), pdMS_TO_TICKS(50));
+    // Wait for one byte, then drain what is already buffered. Asking for the
+    // whole buffer would block until 64 bytes or the timeout arrived, delaying
+    // every ~35-byte sensor frame by the full 50 ms.
+    int count = uart_read_bytes(kSerialPort, input, 1, pdMS_TO_TICKS(50));
+    if (count > 0) {
+      size_t buffered = 0;
+      uart_get_buffered_data_len(kSerialPort, &buffered);
+      buffered = std::min(buffered, sizeof(input) - 1);
+      if (buffered > 0) {
+        const int more = uart_read_bytes(kSerialPort, input + 1, buffered, 0);
+        if (more > 0) {
+          count += more;
+        }
+      }
+    }
     if (count > 0) {
       for (int i = 0; i < count; ++i) {
         const char byte = static_cast<char>(input[i]);

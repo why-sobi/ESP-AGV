@@ -15,7 +15,7 @@ import tempfile
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WORLD = ROOT / "simulation" / "worlds" / "Self Diagnosis AGV.wbt"
 DEFAULT_MISSION = ROOT / "maps" / "routes" / "mission.json"
 DEFAULT_OUT = ROOT / "data" / "route_runs"

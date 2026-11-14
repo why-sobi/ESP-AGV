@@ -24,8 +24,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from prepare_telemetry import _features
-from train_autoencoder import (
+from scripts.telemetry.prepare_telemetry import _features
+from scripts.models.train_autoencoder import (
     MODELS,
     build_model,
     fit_pca,
@@ -35,7 +35,7 @@ from train_autoencoder import (
     window_scores,
 )
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 PRIMARY = {"motor": "motor", "encoder": "motor", "ir": "ir"}
 
 

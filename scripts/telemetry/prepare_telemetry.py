@@ -18,7 +18,7 @@ MOTOR_FEATURES = (
 )
 IR_FEATURES = ("gs_left", "gs_center", "gs_right")
 SPLIT_NAMES = ("train", "validation", "test")
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def load_split(path):

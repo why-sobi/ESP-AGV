@@ -34,6 +34,7 @@ pure-eval==0.2.4
 pygments==2.21.0
 pyparsing==3.3.3
 python-dateutil==4.0.0
+pyserial==3.5
 pyzmq==27.3.0
 stack-data==0.6.3
 sympy==1.14.0

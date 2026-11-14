@@ -5,6 +5,8 @@ import os
 import random
 import re
 import sys
+import time
+import traceback
 from datetime import datetime
 from pathlib import Path
 
@@ -14,7 +16,7 @@ from controller import Supervisor
 CONTROLLER_DIR = Path(__file__).resolve().parent
 ROOT_DIR = CONTROLLER_DIR.parent.parent.parent
 MAP_PATH = ROOT_DIR / "maps" / "paths" / "base track.json"
-# Environment overrides let scripts/collect_route_runs.py drive batch runs
+# Environment overrides let scripts/telemetry/collect_route_runs.py drive batch runs
 # without editing the committed mission or route files.
 MISSION_PATH = Path(
     os.environ.get("AGV_MISSION_PATH", ROOT_DIR / "maps" / "routes" / "mission.json")
@@ -42,20 +44,31 @@ def _read_inputs():
             "simulation-only override in the mission after reviewing alignment."
         )
 
-    sys.path.insert(0, str(ROOT_DIR / "scripts"))
-    from route_planner import TrackMap, shortest_route
-
-    parsed_map = TrackMap.from_dict(track_map)
-    route = shortest_route(
-        parsed_map, mission["start_node"], mission["destination_node"]
+    route, route_paths, esp_route = _plan_leg(
+        track_map, mission, mission["start_node"], mission["destination_node"]
     )
     ROUTE_PATH.parent.mkdir(parents=True, exist_ok=True)
     ROUTE_PATH.write_text(
         json.dumps(route.to_dict(), indent=2) + "\n",
         encoding="utf-8",
     )
-    edges = {edge["id"]: edge for edge in track_map["edges"]}
     nodes = {node["id"]: node for node in track_map["nodes"]}
+    return track_map, mission, route, nodes, route_paths, transform, esp_route
+
+
+def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
+    """Plan one leg; return the route, its world-space edge paths and ESP route.
+
+    ``u_turn_first`` prefixes the ESP route with a U-turn, for a leg that
+    starts facing back along the previous leg.
+    """
+    sys.path.insert(0, str(ROOT_DIR))
+    from scripts.esp.route_actions import format_route_command, route_action_plan
+    from scripts.maps.route_planner import TrackMap, shortest_route
+
+    transform = track_map["world_transform"]
+    route = shortest_route(TrackMap.from_dict(track_map), start, destination)
+    edges = {edge["id"]: edge for edge in track_map["edges"]}
 
     route_paths = []
     for step in route.steps:
@@ -85,7 +98,17 @@ def _read_inputs():
             }
         )
 
-    return track_map, mission, route, nodes, route_paths, transform
+    # Junction and destination distances for the ESP, as expected wheel
+    # odometry: the robot cuts inside curves, so it drives less than the map
+    # centerline (about 0.92 of it on the base track's healthy runs).
+    plan = route_action_plan(
+        track_map,
+        route,
+        distance_scale=float(mission.get("esp_odometry_scale", 0.92)),
+    )
+    if u_turn_first:
+        plan = [("U", 0.0)] + plan
+    return route, route_paths, format_route_command(plan)
 
 
 def _pixel_to_world(point, transform):
@@ -248,6 +271,98 @@ def _stop(motors):
     motors[1].setVelocity(0.0)
 
 
+def _read_esp_line(link, timeout_s):
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        response = link.readline()
+        if response:
+            return response.decode("ascii", errors="replace").strip()
+    raise TimeoutError("Timed out waiting for an ESP response.")
+
+
+def _open_esp_link(port_name, baud_rate):
+    import serial
+
+    link = serial.Serial(
+        port=None,
+        baudrate=baud_rate,
+        timeout=0.05,
+        write_timeout=1.0,
+        dsrdtr=False,
+        rtscts=False,
+    )
+    link.port = port_name
+    link.dtr = False
+    link.rts = False
+    link.open()
+    time.sleep(0.5)
+    link.reset_input_buffer()
+    return link
+
+
+ESP_STATES = (
+    "FOLLOWING",
+    "TURN_LEFT",
+    "STRAIGHT",
+    "TURN_RIGHT",
+    "U_TURN",
+    "AT_DEST",
+    "LINE_LOST",
+    "LINK_LOST",
+    "JUNCTION_MISSED",
+    "NO_ROUTE",
+)
+ESP_STOP_STATES = ("AT_DEST", "LINE_LOST", "LINK_LOST", "JUNCTION_MISSED")
+
+
+def _configure_esp_route(link, esp_route):
+    link.write(f"R,{esp_route}\n".encode("ascii"))
+    response = _read_esp_line(link, 2.0)
+    if response != "A,ROUTE_OK":
+        raise RuntimeError(f"ESP rejected route {esp_route!r}: {response!r}")
+
+
+def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
+    frame = (
+        f"S,{sequence},{time_step},"
+        f"{sensor_values[0]:.3f},{sensor_values[1]:.3f},{sensor_values[2]:.3f},"
+        f"{encoder_values[0]:.6f},{encoder_values[1]:.6f}\n"
+    )
+    link.write(frame.encode("ascii"))
+    while True:
+        response = _read_esp_line(link, 0.2)
+        if response.startswith("E,"):
+            raise RuntimeError(f"ESP rejected sensor frame: {response}")
+
+        fields = response.split(",")
+        if len(fields) != 7 or fields[0] != "M":
+            raise RuntimeError(f"Malformed ESP motor response: {response!r}")
+        if int(fields[1]) >= sequence:
+            break
+        # The ESP reports a sensor timeout unprompted, repeating the last
+        # sequence number. Skip it and wait for the reply to this frame.
+        print(f"Skipped stale ESP response {response!r} while waiting for {sequence}")
+    if int(fields[1]) != sequence:
+        raise RuntimeError(
+            f"ESP response sequence mismatch: expected {sequence}, got {fields[1]!r}"
+        )
+
+    # Wheels only reverse during a U-turn, where they spin in opposite
+    # directions; the firmware caps every target at 5 rad/s either way.
+    left_target, right_target = float(fields[2]), float(fields[3])
+    if (
+        not math.isfinite(left_target)
+        or not math.isfinite(right_target)
+        or not -5.0 <= left_target <= 5.0
+        or not -5.0 <= right_target <= 5.0
+    ):
+        raise RuntimeError(f"Unsafe ESP wheel targets: {response!r}")
+    state = fields[4]
+    if state not in ESP_STATES:
+        raise RuntimeError(f"Unknown ESP controller state: {state!r}")
+    return left_target, right_target, state, int(fields[5]), float(fields[6])
+
+
 def main():
     robot = Supervisor()
     time_step = int(robot.getBasicTimeStep())
@@ -268,11 +383,36 @@ def main():
     for sensor in ground_sensors:
         sensor.enable(time_step)
 
+    log_file = None
+    esp_link = None
     try:
-        track_map, mission, route, nodes, route_paths, transform = _read_inputs()
+        track_map, mission, route, nodes, route_paths, transform, esp_route = _read_inputs()
         if not route_paths:
             print(f"Already at destination {route.destination}; stopping.")
             return
+        control_mode = os.environ.get(
+            "AGV_CONTROL_MODE", mission.get("control_mode", "supervisor")
+        ).lower()
+        if control_mode not in ("supervisor", "esp32"):
+            raise ValueError(f"Unsupported control_mode: {control_mode!r}")
+        # The return leg needs a U-turn at the destination, which only the
+        # ESP controller implements.
+        return_to_start = bool(mission.get("return_to_start", False))
+        if return_to_start and control_mode != "esp32":
+            raise ValueError("return_to_start requires control_mode 'esp32'.")
+        if control_mode == "esp32":
+            esp_port = os.environ.get(
+                "AGV_ESP_PORT", mission.get("esp_serial_port", "COM3")
+            )
+            esp_baud = int(mission.get("esp_baud", 115200))
+            esp_link = _open_esp_link(esp_port, esp_baud)
+            _configure_esp_route(esp_link, esp_route)
+            print(
+                f"ESP32 control enabled on {esp_port} at {esp_baud} baud; "
+                f"route actions: {esp_route}"
+            )
+        else:
+            print("Supervisor control enabled.")
 
         self_node = robot.getSelf()
         translation_field = self_node.getField("translation")
@@ -322,27 +462,28 @@ def main():
         )
         log_file = log_path.open("w", newline="", encoding="utf-8")
         writer = csv.writer(log_file)
-        writer.writerow(
-            [
-                "time",
-                "route_start",
-                "route_destination",
-                "edge_id",
-                "pose_x",
-                "pose_y",
-                "centerline_error_m",
-                "line_error",
-                "target_vel_left",
-                "target_vel_right",
-                "actual_pos_left",
-                "actual_pos_right",
-                "gs_left",
-                "gs_center",
-                "gs_right",
-                "fault_type",
-                "fault_active",
-            ]
-        )
+        header = [
+            "time",
+            "route_start",
+            "route_destination",
+            "edge_id",
+            "pose_x",
+            "pose_y",
+            "centerline_error_m",
+            "line_error",
+            "target_vel_left",
+            "target_vel_right",
+            "actual_pos_left",
+            "actual_pos_right",
+            "gs_left",
+            "gs_center",
+            "gs_right",
+            "fault_type",
+            "fault_active",
+        ]
+        if control_mode == "esp32":
+            header.extend(("esp_state", "esp_route_index", "esp_distance_m"))
+        writer.writerow(header)
         fault = FaultInjector(mission.get("fault"))
         if fault.spec:
             print(f"FAULT INJECTION: {fault.spec}")
@@ -363,6 +504,9 @@ def main():
         completed = False
         failure = None
         line_lost_since = None
+        esp_sequence = 0
+        on_return_leg = False
+        unloading_until = None
 
         while robot.step(time_step) != -1:
             position = self_node.getPosition()
@@ -375,10 +519,34 @@ def main():
             )
             sensor_error = _line_error(sensor_values, line_threshold)
 
+            if unloading_until is not None and now >= unloading_until:
+                # Plan the return leg from the destination and hand it to the
+                # ESP; it starts with a U-turn because the robot faces away.
+                route, route_paths, esp_route = _plan_leg(
+                    track_map,
+                    mission,
+                    route.destination,
+                    route.start,
+                    u_turn_first=True,
+                )
+                _configure_esp_route(esp_link, esp_route)
+                print(
+                    f"Return leg {route.start} -> {route.destination}: "
+                    f"{' -> '.join(route.nodes)}; route actions: {esp_route}"
+                )
+                edge_index = 0
+                progress = 0.0
+                line_lost_since = None
+                unloading_until = None
+                on_return_leg = True
+
             # Advance past every edge whose target node has been reached, then
             # control and log this step on the new edge. Skipping the step here
             # would leave a 2x-timestep gap in the telemetry at each junction.
-            while edge_index < len(route_paths):
+            # In ESP mode the ESP decides when it has arrived, so stay on the
+            # final edge and check its stop against the destination below.
+            last_edge = len(route_paths) - 1 if control_mode == "esp32" else len(route_paths)
+            while edge_index < last_edge:
                 target_node_id = route_paths[edge_index]["target_node"]
                 target_node = _pixel_to_world(
                     [nodes[target_node_id]["x"], nodes[target_node_id]["y"]],
@@ -404,7 +572,40 @@ def main():
                 points, min(total_length, progress + lookahead)
             )
 
-            if sensor_error is None:
+            encoder_left, encoder_right = fault.encoders(
+                now, (left_encoder.getValue(), right_encoder.getValue())
+            )
+
+            esp_state = ""
+            esp_route_index = -1
+            esp_distance = ""
+            if unloading_until is not None:
+                # Stopped at the destination; the ESP gets no frames until
+                # the return route is sent.
+                _stop(motors)
+                left_target = right_target = 0.0
+                esp_state = "UNLOADING"
+            elif control_mode == "esp32":
+                esp_sequence += 1
+                (
+                    left_target,
+                    right_target,
+                    esp_state,
+                    esp_route_index,
+                    esp_distance,
+                ) = _step_esp(
+                    esp_link,
+                    esp_sequence,
+                    time_step,
+                    sensor_values,
+                    (encoder_left, encoder_right),
+                )
+                applied_left, applied_right = fault.motors(
+                    now, (left_target, right_target)
+                )
+                left_motor.setVelocity(applied_left)
+                right_motor.setVelocity(applied_right)
+            elif sensor_error is None:
                 _stop(motors)
                 left_target = right_target = 0.0
             else:
@@ -430,34 +631,66 @@ def main():
                 left_motor.setVelocity(applied_left)
                 right_motor.setVelocity(applied_right)
 
-            encoder_left, encoder_right = fault.encoders(
-                now, (left_encoder.getValue(), right_encoder.getValue())
-            )
-            writer.writerow(
-                [
-                    now,
-                    route.start,
-                    route.destination,
-                    edge["edge_id"],
-                    pose_x,
-                    pose_y,
-                    distance_from_path,
-                    "" if sensor_error is None else sensor_error,
-                    left_target,
-                    right_target,
-                    encoder_left,
-                    encoder_right,
-                    *sensor_values,
-                    fault.type,
-                    int(fault.active(now)),
-                ]
-            )
+            row = [
+                now,
+                route.start,
+                route.destination,
+                edge["edge_id"],
+                pose_x,
+                pose_y,
+                distance_from_path,
+                "" if sensor_error is None else sensor_error,
+                left_target,
+                right_target,
+                encoder_left,
+                encoder_right,
+                *sensor_values,
+                fault.type,
+                int(fault.active(now)),
+            ]
+            if control_mode == "esp32":
+                row.extend((esp_state, esp_route_index, esp_distance))
+            writer.writerow(row)
             buffered_rows += 1
             if buffered_rows >= batch_size:
                 log_file.flush()
                 buffered_rows = 0
 
-            if sensor_error is None:
+            if control_mode == "esp32" and esp_state in ESP_STOP_STATES:
+                _stop(motors)
+                if esp_state == "AT_DEST":
+                    destination = _pixel_to_world(
+                        [nodes[route.destination]["x"], nodes[route.destination]["y"]],
+                        transform,
+                    )
+                    destination_tolerance = float(
+                        mission.get("esp_destination_tolerance_m", 0.05)
+                    )
+                    stop_error = math.dist((pose_x, pose_y), destination)
+                    print(
+                        f"ESP stopped {stop_error:.3f} m from {route.destination} "
+                        f"after {esp_distance:.3f} m of odometry"
+                    )
+                    if stop_error > destination_tolerance:
+                        failure = (
+                            f"ESP stopped {stop_error:.3f} m from the destination node "
+                            f"(tolerance {destination_tolerance:.3f} m)"
+                        )
+                    elif return_to_start and not on_return_leg:
+                        unloading_until = now + float(mission.get("unload_s", 1.0))
+                        print(f"Unloading at {route.destination}")
+                        continue
+                    else:
+                        completed = True
+                else:
+                    failure = f"ESP controller reported {esp_state}"
+                break
+
+            # A U-turn sweeps the sensors off the line on purpose, and the
+            # robot is stopped while unloading.
+            if esp_state in ("U_TURN", "UNLOADING"):
+                line_lost_since = None
+            elif sensor_error is None:
                 if line_lost_since is None:
                     line_lost_since = robot.getTime()
                 elif robot.getTime() - line_lost_since > max_line_loss_s:
@@ -498,7 +731,21 @@ def main():
     except Exception as error:
         _stop(motors)
         print(f"Route controller error: {error}", file=sys.stderr)
+        # Webots drops the controller's last console lines when it quits, so
+        # keep the traceback where headless runs can find it.
+        try:
+            LOG_DIR.mkdir(parents=True, exist_ok=True)
+            with (LOG_DIR / "controller-errors.log").open("a", encoding="utf-8") as error_log:
+                error_log.write(f"{datetime.now():%Y-%m-%d %H:%M:%S} t={robot.getTime():.3f}\n")
+                error_log.write(traceback.format_exc() + "\n")
+        except OSError:
+            pass
         robot.simulationQuit(1)
+    finally:
+        if log_file is not None and not log_file.closed:
+            log_file.close()
+        if esp_link is not None and esp_link.is_open:
+            esp_link.close()
 
 
 if __name__ == "__main__":

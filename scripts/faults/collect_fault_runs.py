@@ -12,7 +12,14 @@ import json
 import sys
 from pathlib import Path
 
-from collect_route_runs import DEFAULT_MISSION, DEFAULT_WORLD, ROOT, ROUTES, find_webots, run_mission
+from scripts.telemetry.collect_route_runs import (
+    DEFAULT_MISSION,
+    DEFAULT_WORLD,
+    ROOT,
+    ROUTES,
+    find_webots,
+    run_mission,
+)
 
 DEFAULT_MATRIX = ROOT / "data" / "fault_runs" / "fault-matrix-v1.json"
 MANIFEST_FIELDS = (

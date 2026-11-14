@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from visualizeMap import visualize_map
+from scripts.maps.visualizeMap import visualize_map
 
 
 class VisualizeMapTests(unittest.TestCase):

@@ -3,7 +3,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from route_planner import TrackMap, shortest_route
+from scripts.maps.route_planner import TrackMap, shortest_route
 
 
 def sample_map() -> TrackMap:

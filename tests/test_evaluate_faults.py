@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from evaluate_faults import evaluate_run, primary_model, severity_axis
+from scripts.faults.evaluate_faults import evaluate_run, primary_model, severity_axis
 
 
 def zero_reconstruct(x):

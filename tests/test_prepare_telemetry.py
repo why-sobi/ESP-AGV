@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from prepare_telemetry import prepare_dataset
+from scripts.telemetry.prepare_telemetry import prepare_dataset
 
 
 def write_run(path, run_id, start=0.0, count=80, offset=0.0):

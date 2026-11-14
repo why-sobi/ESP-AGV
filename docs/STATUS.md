@@ -23,12 +23,13 @@ The Webots simulation remains the environment throughout this plan.
   3.0 rad/s. These runs are saved in `data/route_runs`.
 - The ESP32-S3 N16R8 project builds and has been flashed over COM3 with an
   ESP32-S3/16 MB-flash configuration.
-- `scripts/esp_serial_smoke_test.py` successfully sent route and simulated
-  sensor messages over COM3 and verified PD wheel outputs, junction-action
-  handling, destination stop, and invalid-route rejection.
+- `scripts/esp/esp_serial_smoke_test.py` sends routes and simulated sensor and
+  encoder frames over COM3. It verifies PD wheel outputs, odometry,
+  distance-gated junction handling, the destination and missed-junction stops,
+  and malformed-route rejection.
 - `epuck_data` now writes a separate timestamped CSV per session under
   `data/sensor_runs` instead of appending to a shared filename.
-- `scripts/prepare_telemetry.py` derives wheel velocities, creates 20-step
+- `scripts/telemetry/prepare_telemetry.py` derives wheel velocities, creates 20-step
   motor/IR windows, splits by run before windowing, fits scalers on training
   data only, and rejects exact duplicate runs.
 - `epuck_route` changes:
@@ -40,7 +41,7 @@ The Webots simulation remains the environment throughout this plan.
     64 ms gap at each junction).
   - It accepts the `AGV_MISSION_PATH`, `AGV_ROUTE_PATH` and `AGV_LOG_DIR`
     overrides.
-- `scripts/collect_route_runs.py` records runs headlessly (about 2 s each),
+- `scripts/telemetry/collect_route_runs.py` records runs headlessly (about 2 s each),
   checks them, and updates `data/route_runs/manifest.csv`.
 - 64 healthy runs exist with the fixed controller: 4 two-edge routes (A
   node-003 to node-001, B node-001 to node-003, C node-002 to node-004, D
@@ -52,7 +53,7 @@ The Webots simulation remains the environment throughout this plan.
   file. `data/datasets/sim-baseline-v4` (split `route-runs-v3.json`) has 36
   train, 14 validation and 14 test runs (15474/5933/5929 windows). Every held-out
   speed has training runs at +/-0.1 rad/s on the same route.
-- `scripts/train_autoencoder.py` trains dense or conv motor/IR autoencoders,
+- `scripts/models/train_autoencoder.py` trains dense or conv motor/IR autoencoders,
   sets thresholds from validation, and evaluates false alarms on the healthy
   test runs against a PCA baseline. `models/dense-v1` and `models/conv-v1` are
   trained:
@@ -76,15 +77,48 @@ The Webots simulation remains the environment throughout this plan.
     30% loss.
   - Right IR noise is reliable only at std 200 (8/8); std 100 is detected in
     4/8.
-- The Python script test suite passes (29 tests at last verification).
+- The Python script test suite passes (36 tests at last verification).
+- **ESP closed-loop control (2026-11-14).** With `control_mode: esp32`,
+  `epuck_route` acts as the Webots-to-ESP bridge over COM3. All four two-edge
+  routes (A-D) complete headlessly with the ESP computing every wheel command:
+  - The ESP takes each turn 2.5-3.6 cm before the junction node.
+  - It stops 1.0-1.4 cm from the destination node.
+  - Maximum path error is 2.4-2.5 cm, the same as the Supervisor controller.
+  - The updated smoke test passes on the flashed firmware.
+  - Supervisor-mode runs are unchanged: a new route A 2.5 rad/s run matches
+    the committed healthy run byte-for-byte in the original 15 columns.
+  - **Round trips** (`return_to_start: true`) also complete on all four
+    routes. After a 1 s unload, the ESP U-turns in place (encoder-measured,
+    at least 160 degrees then back on the line) and follows the return route.
+    It stops 0.2-1.3 cm from the start node, with return-leg path error at
+    most 2.4 cm.
+- How ESP routing works:
+  - `scripts/esp/route_actions.py` converts the planned route into junction
+    actions with expected odometry distances, e.g. `R@0.265,D@0.779`.
+  - The ESP measures distance from the wheel encoders and only takes a
+    junction pattern within +/-0.10 m of its distance.
+  - It stops at the destination distance.
+  - The Supervisor checks that the stop is within 0.05 m of the node.
+- Firmware fixes:
+  - **Line loss:** a bounded line search replaces the immediate `LINE_LOST`
+    stop that failed the first ESP run at 0.16 s.
+  - **Serial delay:** the UART read no longer waits 50 ms for a full buffer,
+    so the round trip fell from 50 ms to about 8 ms.
+  - **Link timeout:** it starts at the first sensor frame of a route, and the
+    ESP resumes after `LINK_LOST` once frames return. Webots pauses in
+    wall-clock time at startup, which used to latch `LINK_LOST`.
 
 ## Not yet implemented
 
-- The Python Webots-to-ESP bridge. Webots still runs its own controller; the
-  smoke test is a separate host script and does not drive Webots.
-- A graph-route-to-relative-junction-action converter for the ESP.
-- ESP model inference (weights export to C) and Python-vs-ESP score agreement.
-- End-to-end testing where the ESP computes the commands that Webots applies.
+- ESP model inference (weights export to C), anomaly scores in the serial
+  protocol, and Python-vs-ESP score agreement.
+- A check of the Supervisor-trained models on ESP-controlled runs, and a
+  healthy dataset recorded under ESP control if they raise false alarms.
+- ESP-mode runs through the parallel edges (edge-002, edge-004) and with
+  injected faults. Round trips are ESP-only; the Supervisor controller has
+  no U-turn. The ESP ignores the mission's
+  `wheel_speed_rad_s` (its PD loop runs at 2.5-3.5 rad/s), so ESP runs do not
+  yet cover a speed grid.
 
 ## Current data/model status
 

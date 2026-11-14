@@ -16,9 +16,11 @@ for line control and anomaly inference.
 ```
 data/          Logged sensor data (CSV)
 docs/          Design notes, status, TODO, and usage guide
-esp32-s3/      ESP-IDF firmware and serial controller prototype
+firmware/      ESP-IDF firmware and serial controller prototype
 maps/          Track image and generated graph maps
-scripts/       Map tools, route planner, telemetry preparation, and tests
+scripts/       Automation tools grouped by purpose
+tests/         Python regression tests
+notebooks/     Exploratory analysis notebooks
 simulation/    Webots world and robot controllers
 ```
 
@@ -43,36 +45,41 @@ To run the simulation, open `simulation/worlds/Self Diagnosis AGV.wbt` in Webots
 Convert a track image to a draft graph map:
 
 ```powershell
-python scripts\pathToMap.py -img "maps\image\base track.png" -out "maps\paths"
+python -m scripts.maps.pathToMap -img "maps\image\base track.png" -out "maps\paths"
 ```
 
 Preview the map in a browser:
 
 ```powershell
-python scripts\visualizeMap.py -map "maps\paths\base track.json"
+python -m scripts.maps.visualizeMap -map "maps\paths\base track.json"
 ```
 
 Plan a route between two nodes:
 
 ```powershell
-python scripts\route_planner.py "maps\paths\base track.json" node-001 node-004
+python -m scripts.maps.route_planner "maps\paths\base track.json" node-001 node-004
 ```
 
 Run the tests:
 
 ```powershell
-python -m unittest discover -s scripts -p "test_*.py" -v
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-See [docs/USAGE.md](docs/USAGE.md) for more detail.
+See [scripts/README.md](scripts/README.md) for a quick script/test reference
+and [docs/USAGE.md](docs/USAGE.md) for the full workflows.
 
 ## Status
 
-The map planner is connected to the Webots route controller, and the configured
-two-edge mission has been visually and headlessly tested. The ESP32-S3 firmware
-has been flashed and its serial controller smoke-tested. Telemetry preparation
-works, but the current dataset is a small pipeline pilot: model training,
-inference deployment, and the Webots-to-ESP bridge are not yet implemented.
+- **Navigation:** the map planner drives the Webots route controller.
+- **Anomaly models:** 64 healthy runs (4 routes x 16 speeds) train motor and
+  IR autoencoders. They are evaluated on 184 labelled fault runs, including a
+  severity sweep.
+- **ESP control:** with `control_mode: esp32`, the ESP32-S3 runs the PD
+  line-following loop over COM3. Junctions are identified with wheel odometry,
+  and Webots applies the ESP's wheel commands. All four two-edge routes
+  complete, stopping within 1.4 cm of the destination.
+- **Not yet implemented:** anomaly inference on the ESP.
 
 See [docs/USAGE.md](docs/USAGE.md) for commands and project-file workflows,
 [docs/STATUS.md](docs/STATUS.md) for verified scope, and

@@ -1,0 +1,232 @@
+"""Exercise the ESP32-S3 line-control protocol over its USB serial port."""
+
+import argparse
+import math
+import time
+
+import serial
+
+WHEEL_RADIUS_M = 0.02  # Must match kWheelRadiusM in the firmware.
+WHEEL_BASE_M = 0.052  # Must match kWheelBaseM in the firmware.
+ALL_LIGHT = (700, 700, 700)
+CENTERED = (700, 300, 700)
+LEFT_OF_ROBOT = (300, 700, 700)
+ALL_DARK = (300, 300, 300)
+
+
+def read_line(port, timeout_seconds):
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        line = port.readline()
+        if line:
+            return line.decode("ascii", errors="replace").strip()
+    raise TimeoutError("Timed out waiting for an ESP response")
+
+
+class Session:
+    """Send sensor frames for a robot that has driven ``distance_m``."""
+
+    def __init__(self, port):
+        self.port = port
+        self.sequence = 0
+
+    def route(self, payload):
+        self.port.write(f"R,{payload}\n".encode("ascii"))
+        return read_line(self.port, 2.0)
+
+    def frame(self, sensors, distance_m, turned_rad=0.0):
+        """``turned_rad`` is a left spin in place on top of ``distance_m``."""
+        self.sequence += 1
+        forward = distance_m / WHEEL_RADIUS_M
+        spin = turned_rad * WHEEL_BASE_M / (2.0 * WHEEL_RADIUS_M)
+        left, center, right = sensors
+        frame = (
+            f"S,{self.sequence},32,{left},{center},{right},"
+            f"{forward - spin:.6f},{forward + spin:.6f}\n"
+        )
+        self.port.write(frame.encode("ascii"))
+        response = read_line(self.port, 2.0)
+        if not response.startswith(f"M,{self.sequence},"):
+            raise AssertionError(
+                f"Unexpected response for sequence {self.sequence}: {response!r}"
+            )
+
+        fields = response.split(",")
+        if len(fields) != 7:
+            raise AssertionError(f"Malformed motor response: {response!r}")
+        return {
+            "left_speed": float(fields[2]),
+            "right_speed": float(fields[3]),
+            "state": fields[4],
+            "route_index": int(fields[5]),
+            "distance_m": float(fields[6]),
+            "raw": response,
+        }
+
+
+def check(condition, passed, failed):
+    if not condition:
+        raise AssertionError(failed)
+    print(f"PASS {passed}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Check ESP serial commands, PD response, distance-gated junction "
+            "routing, destination stop, and missed-junction stop."
+        )
+    )
+    parser.add_argument("--port", default="COM3", help="ESP USB serial port (default: COM3)")
+    parser.add_argument("--baud", type=int, default=115200, help="Serial baud rate")
+    args = parser.parse_args()
+
+    port = serial.Serial(
+        port=None,
+        baudrate=args.baud,
+        timeout=0.1,
+        write_timeout=1.0,
+        dsrdtr=False,
+        rtscts=False,
+    )
+    port.port = args.port
+    port.dtr = False
+    port.rts = False
+    port.open()
+    try:
+        time.sleep(0.5)
+        port.reset_input_buffer()
+        esp = Session(port)
+
+        # Turn left at 0.30 m (accepted within +/-0.10 m), stop at 0.60 m.
+        ack = esp.route("L@0.30,D@0.60")
+        check(ack == "A,ROUTE_OK", f"route accepted: {ack}", f"Route was not accepted: {ack!r}")
+
+        centered = esp.frame(CENTERED, 0.0)
+        check(
+            centered["state"] == "FOLLOWING"
+            and abs(centered["left_speed"] - 3.5) <= 0.05
+            and abs(centered["right_speed"] - 3.5) <= 0.05,
+            f"centered-line PD output: {centered['raw']}",
+            f"Centered-line PD output incorrect: {centered['raw']}",
+        )
+
+        left_offset = esp.frame(LEFT_OF_ROBOT, 0.02)
+        check(
+            left_offset["left_speed"] < left_offset["right_speed"],
+            f"PD steers toward left-side line: {left_offset['raw']}",
+            f"PD steering direction incorrect: {left_offset['raw']}",
+        )
+        check(
+            abs(left_offset["distance_m"] - 0.02) <= 0.001,
+            f"odometry distance reported: {left_offset['raw']}",
+            f"Odometry distance incorrect: {left_offset['raw']}",
+        )
+
+        esp.frame(ALL_DARK, 0.05)
+        early = esp.frame(ALL_DARK, 0.06)
+        check(
+            early["state"] == "FOLLOWING" and early["route_index"] == 0,
+            f"junction pattern ignored outside its window: {early['raw']}",
+            f"Junction taken outside its distance window: {early['raw']}",
+        )
+
+        esp.frame(CENTERED, 0.10)
+        esp.frame(ALL_DARK, 0.28)
+        junction = esp.frame(ALL_DARK, 0.29)
+        check(
+            junction["state"] == "TURN_LEFT"
+            and junction["route_index"] == 1
+            and junction["left_speed"] < junction["right_speed"],
+            f"junction action consumed inside its window: {junction['raw']}",
+            f"Left-junction action incorrect: {junction['raw']}",
+        )
+
+        for distance in (0.31, 0.32, 0.33):
+            cleared = esp.frame(CENTERED, distance)
+        check(
+            cleared["state"] == "FOLLOWING",
+            f"junction clears before next action: {cleared['raw']}",
+            f"Controller did not clear junction latch: {cleared['raw']}",
+        )
+
+        before = esp.frame(ALL_DARK, 0.55)
+        check(
+            before["state"] == "FOLLOWING",
+            f"destination not reached early: {before['raw']}",
+            f"Destination reported before its distance: {before['raw']}",
+        )
+        destination = esp.frame(CENTERED, 0.605)
+        check(
+            destination["state"] == "AT_DEST"
+            and destination["route_index"] == 2
+            and destination["left_speed"] == 0.0
+            and destination["right_speed"] == 0.0,
+            f"destination distance stops motors: {destination['raw']}",
+            f"Destination did not stop safely: {destination['raw']}",
+        )
+
+        ack = esp.route("R@0.30,D@0.60")
+        esp.frame(CENTERED, 0.0)
+        esp.frame(CENTERED, 0.39)
+        missed = esp.frame(CENTERED, 0.41)
+        check(
+            ack == "A,ROUTE_OK"
+            and missed["state"] == "JUNCTION_MISSED"
+            and missed["left_speed"] == 0.0
+            and missed["right_speed"] == 0.0,
+            f"missed junction stops motors: {missed['raw']}",
+            f"Missed junction did not stop: {missed['raw']}",
+        )
+
+        # Odometry (and the turn angle) is zeroed on a route's first frame.
+        ack = esp.route("U@0.000,D@0.30")
+        esp.frame(CENTERED, 0.0)
+        spinning = esp.frame(CENTERED, 0.0, math.radians(90))
+        check(
+            ack == "A,ROUTE_OK"
+            and spinning["state"] == "U_TURN"
+            and spinning["left_speed"] < 0.0 < spinning["right_speed"],
+            f"U-turn spins left in place and ignores early lines: {spinning['raw']}",
+            f"U-turn did not spin: {spinning['raw']}",
+        )
+        turned = esp.frame(CENTERED, 0.0, math.radians(170))
+        check(
+            turned["state"] == "FOLLOWING" and turned["route_index"] == 1,
+            f"U-turn ends on the line after 160 degrees: {turned['raw']}",
+            f"U-turn did not hand over to line following: {turned['raw']}",
+        )
+
+        esp.route("U@0.000,D@0.30")
+        esp.frame(ALL_LIGHT, 0.0)
+        lost = esp.frame(ALL_LIGHT, 0.0, math.radians(280))
+        check(
+            lost["state"] == "LINE_LOST"
+            and lost["left_speed"] == 0.0
+            and lost["right_speed"] == 0.0,
+            f"U-turn without a line stops after 270 degrees: {lost['raw']}",
+            f"U-turn did not give up: {lost['raw']}",
+        )
+
+        for payload in (
+            "XD",
+            "RD",
+            "R@0.3",
+            "R@0.5,D@0.4",
+            "D@0.2,D@0.4",
+            "R@0.1,U@0.2,D@0.3",
+        ):
+            error = esp.route(payload)
+            check(
+                error == "E,BAD_ROUTE",
+                f"malformed route {payload!r} rejected: {error}",
+                f"Invalid route {payload!r} was not rejected: {error!r}",
+            )
+    finally:
+        port.close()
+
+    print("ESP serial smoke test passed.")
+
+
+if __name__ == "__main__":
+    main()

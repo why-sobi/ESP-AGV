@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from train_autoencoder import persistence_alarms, train_all
+from scripts.models.train_autoencoder import persistence_alarms, train_all
 
 
 def write_dataset(root, windows=40, window_size=5):
@@ -75,7 +75,7 @@ class TrainAutoencoderTests(unittest.TestCase):
     def test_conv_architecture_trains_and_reconstructs_window_shape(self):
         import torch
 
-        from train_autoencoder import ConvAutoencoder
+        from scripts.models.train_autoencoder import ConvAutoencoder
 
         model = ConvAutoencoder(window_size=5, features=4, hidden=8, bottleneck=2)
         self.assertEqual(tuple(model(torch.zeros(3, 20)).shape), (3, 20))

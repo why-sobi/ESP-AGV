@@ -2,14 +2,15 @@
 
 ## Currently Doing
 
-Build a repeatable, diverse Webots telemetry dataset and turn it into a
-validated anomaly-detection model. Keep Webots as the simulation environment;
-the ESP32-S3 is the external compute target, not a move to a physical AGV.
+The ESP32-S3 now runs the PD line-following loop for Webots over COM3 (routes
+A-D complete). Next: check the anomaly models on ESP-controlled runs, then put
+inference on the ESP. Keep Webots as the simulation environment; the ESP32-S3
+is the external compute target, not a move to a physical AGV.
 
 ## 1. Collect and qualify healthy runs (done)
 
 - Done: 64 healthy runs (4 routes x 16 speeds), recorded headlessly with
-  `scripts/collect_route_runs.py` after the junction log-gap fix.
+  `scripts/telemetry/collect_route_runs.py` after the junction log-gap fix.
 - Optional: exercise edge-002/edge-004 with a forced-edge route option, and add
   seeded start-pose variation if more than one run per route/speed is needed.
 
@@ -22,10 +23,10 @@ the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
 - Done: dense and conv motor/IR autoencoders, PCA baseline, validation
   thresholds (99.5th percentile), 3-of-5 persistence, 0.5 s warm-up, and
-  healthy-test false-alarm evaluation (`scripts/train_autoencoder.py`,
+  healthy-test false-alarm evaluation (`scripts/models/train_autoencoder.py`,
   `models/dense-v1`, `models/conv-v1`).
 - Done: fault injection (9 types), 80 labelled fault runs, and detection
-  evaluation (`scripts/evaluate_faults.py`, `reports/fault-eval-v1`).
+  evaluation (`scripts/faults/evaluate_faults.py`, `reports/fault-eval-v1`).
 - Done: severity sweep for right-motor power loss (5-50%) and right IR noise
   (std 25-200) in `reports/severity-sweep-v1`.
 - Optional: per-sensor max scoring or a sample-difference feature for
@@ -36,6 +37,11 @@ the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
 ## 4. Deploy inference to the ESP32-S3
 
+- First, score ESP-controlled healthy runs with `conv-v1`. The models were
+  trained on Supervisor-controlled runs, and the ESP's PD loop commands
+  different wheel targets. If they raise false alarms, record a healthy
+  dataset under ESP control and retrain before exporting.
+
 - Select a model representation/runtime supported by ESP-IDF and verify
   operator coverage, RAM/flash use, and inference latency.
 - Port preprocessing and the exact training scaler parameters; test ESP scores
@@ -44,18 +50,24 @@ the ESP32-S3 is the external compute target, not a move to a physical AGV.
 
 ## 5. Connect Webots, Python, and the ESP
 
-- Implement the Python bridge: send route actions once, then stream sensor,
-  timing, and required motor/odometry features; receive wheel commands and
-  anomaly results.
-- Extend the serial protocol to carry the motor telemetry needed by the motor
-  autoencoder; the current protocol sends only three IR readings and returns
-  wheel targets.
-- Keep one process responsible for COM3. Add framing, sequence checking,
-  timeouts, safe-stop behavior, and reconnect/error handling.
-- Convert graph routes to the ESP's relative junction-action sequence and
-  verify the return leg is planned from destination back to dock.
-- Run Webots with the ESP in the control loop. Check timing, command
-  application, route state, anomaly scores, and safe stop on communication loss.
+- Done: `epuck_route` in `esp32` mode is the bridge. It sends the route once
+  as junction actions with odometry distances, streams the three IR readings
+  and both encoder positions, and applies the returned wheel commands.
+- Done: graph routes are converted to distance-tagged junction actions
+  (`scripts/esp/route_actions.py`). The ESP gates junctions by odometry.
+- Done: sequence checking, timeouts, safe stop on line loss, missed junction
+  and destination, and recovery after a host stall (`LINK_LOST`).
+- Done: routes A-D complete with the ESP in the loop (see `docs/STATUS.md`).
+- Add anomaly scores and alarm decisions to the motor frame once inference
+  runs on the ESP.
+- Done: return leg. With `return_to_start`, the Supervisor plans destination
+  to start and sends it with a leading U-turn; round trips A-D complete.
+- Run ESP-mode fault scenarios. A fault that changes the driven path can push
+  a junction out of its +/-0.10 m window and stop the run with
+  `JUNCTION_MISSED`; decide whether that is the desired safe behavior.
+- Decide whether the ESP should take the mission speed, so ESP runs can cover
+  the same speed grid as the healthy dataset.
+- Reconnect handling if COM3 disappears mid-run (currently the run fails).
 
 ## Navigation follow-up
 
