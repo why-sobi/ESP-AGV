@@ -380,6 +380,45 @@ Results (`conv-v1`; `dense-v1` is similar):
   (8/8). The robot's motion couples the subsystems: drifting off the line
   changes the IR readings, and losing the line stops the wheels.
 
+### Severity sweep
+
+`data\fault_runs\sweep-v1\fault-matrix.json` tests right-motor power loss from
+5% to 50% and right ground-sensor noise from std 25 to 200 on the same 8
+route/speeds (104 runs). When a fault type was tested at several severities,
+the evaluator also plots detection rate and median delay against severity:
+
+```powershell
+cd scripts
+..\.venv\Scripts\python.exe collect_fault_runs.py --matrix ..\data\fault_runs\sweep-v1\fault-matrix.json
+..\.venv\Scripts\python.exe evaluate_faults.py --manifest ..\data\fault_runs\sweep-v1\manifest.csv --out ..\reports\severity-sweep-v1
+```
+
+Detection limits (`reports\severity-sweep-v1`, conv-v1 / dense-v1):
+
+| Right-motor power loss | 5% | 10% | 15% | 20% | 30% | 40% | 50% |
+|---|---|---|---|---|---|---|---|
+| Autoencoders detected | 0-1/8 | 1-2/8 | 4/8 | 7/8 | 8/8 | 8/8 | 8/8 |
+| PCA baseline detected | 1/8 | 2/8 | 2/8 | 3/8 | 7/8 | 8/8 | 8/8 |
+| Median delay (conv) | - | 3.2 s | 3.0 s | 1.1 s | 0.45 s | 0.26 s | 0.18 s |
+
+| Right IR noise std | 25 | 50 | 75 | 100 | 150 | 200 |
+|---|---|---|---|---|---|---|
+| Autoencoders detected | 1-2/8 | 2/8 | 1/8 | 4/8 | 6-7/8 | 8/8 |
+| PCA baseline detected | 2/8 | 2/8 | 2/8 | 3/8 | 3/8 | 6/8 |
+
+- **Motor:** a power loss of 20% or more is reliably detected. The
+  autoencoders beat PCA most clearly between 15% and 30% loss.
+- **IR noise:** detection is only reliable at std 200, about 0.9 of the
+  side-sensor scaler std. The window score averages squared error over all
+  three sensors and 20 samples, which dilutes noise on one sensor. The threshold
+  is also set by rare healthy junction crossings.
+- **Low severities:** the 1-2/8 detections and their delays come from a few
+  runs where the fault coincides with a near-threshold healthy moment. Treat
+  them as the noise floor, not as reliable detection.
+- **Possible improvements for single-sensor noise:** score each sensor
+  separately and take the maximum, or add a high-frequency feature such as the
+  sample-to-sample difference.
+
 ## Deployment and integration status
 
 The next step is ESP-compatible inference (exporting the weights to C).

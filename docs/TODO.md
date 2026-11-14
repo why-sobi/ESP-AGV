@@ -26,9 +26,11 @@ the ESP32-S3 is the external compute target, not a move to a physical AGV.
   `models/dense-v1`, `models/conv-v1`).
 - Done: fault injection (9 types), 80 labelled fault runs, and detection
   evaluation (`scripts/evaluate_faults.py`, `reports/fault-eval-v1`).
-- Optional: severity sweeps (e.g. IR noise 50-200, motor gain 0.9-0.5) to find
-  detection limits, and a longer window or per-sensor features for stuck-sensor
-  faults.
+- Done: severity sweep for right-motor power loss (5-50%) and right IR noise
+  (std 25-200) in `reports/severity-sweep-v1`.
+- Optional: per-sensor max scoring or a sample-difference feature for
+  single-sensor noise, a longer window for stuck-sensor faults, and sweeps for
+  other fault types and onset times.
 - Choose the deployed architecture. conv-v1 currently has no pre-onset false
   alarms and detects as well as dense-v1.
 

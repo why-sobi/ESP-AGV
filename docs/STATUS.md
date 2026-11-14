@@ -70,7 +70,13 @@ The Webots simulation remains the environment throughout this plan.
   - IR stuck-centre (1/8) and IR noise std 50 (2/8) are mostly missed.
   - No pre-onset false alarms.
   - The PCA baseline misses most IR faults.
-- The Python script test suite passes (28 tests at last verification).
+- Severity sweep (`reports/severity-sweep-v1`, 104 runs):
+  - Right-motor power loss of 20% or more is detected in 7-8/8 runs; 15% in
+    4/8; 10% or less essentially not. The autoencoders beat PCA between 15% and
+    30% loss.
+  - Right IR noise is reliable only at std 200 (8/8); std 100 is detected in
+    4/8.
+- The Python script test suite passes (29 tests at last verification).
 
 ## Not yet implemented
 
@@ -92,9 +98,11 @@ The Webots simulation remains the environment throughout this plan.
 - The motor PCA baseline is nearly as good as the autoencoders. The IR
   autoencoders clearly beat it.
 - A stuck sensor frozen at a plausible value (the centre sensor on the line) is
-  hard to detect from a 0.64 s window. Mild IR noise (about 0.2 of the scaler
-  std) is mostly missed. Severity sweeps have not been run yet.
-- Each fault severity was tested at one level and one onset time (5 s).
+  hard to detect from a 0.64 s window.
+- IR noise on a single sensor is diluted by the window-mean score. It is
+  reliably detected only at about 0.9 of the scaler std.
+- Faults use one onset time (5 s). Only motor gain and IR noise have been swept
+  over severity.
 
 Train only on healthy data; the held-out healthy test runs are for
 false-positive measurement.
