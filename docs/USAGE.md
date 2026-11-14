@@ -24,6 +24,10 @@ workflow.
 | `scripts/collect_route_runs.py` | Records route x speed runs headlessly in Webots and updates the run manifest |
 | `scripts/train_autoencoder.py` | Trains/evaluates motor and IR autoencoders (dense or conv) against a PCA baseline |
 | `models/` | Trained weights, thresholds, scalers and evaluation results |
+| `scripts/collect_fault_runs.py` | Records labelled fault-injection runs headlessly from a fault matrix |
+| `scripts/evaluate_faults.py` | Measures detection rate, delay, pre-onset false alarms and cross-coupling |
+| `data/fault_runs/` | Fault matrix, fault-run CSVs and their manifest |
+| `reports/` | Fault-evaluation summaries, results and plots |
 | `scripts/esp_serial_smoke_test.py` | Tests the flashed ESP controller over COM3 with simulated sensor frames |
 | `esp32-s3/` | ESP-IDF project, serial protocol, and prototype PD/junction firmware |
 | `data/route_runs/` | Per-run telemetry from the map-based Webots controller |
@@ -308,10 +312,77 @@ The remaining IR alarms are short and occur at fixed places, such as C at
 healthy behaviour that occurs at only a few speeds. No fault runs exist yet, so
 detection rate and delay are not measured.
 
+## Fault injection and detection evaluation
+
+`epuck_route` applies an optional `fault` block from the mission, starting at
+`onset_s`. Every CSV row has `fault_type` and `fault_active` columns; healthy
+runs have an empty type and 0. Fault types:
+
+| Type | Target | Effect | `severity` |
+|---|---|---|---|
+| `motor_gain` | `left`/`right` | Applied wheel speed = command x severity | fraction, e.g. 0.7 |
+| `motor_stall` | `left`/`right` | Wheel receives 0 | unused |
+| `motor_intermittent` | `left`/`right` | Wheel receives 0 for `burst_s` every `period_s` | unused |
+| `encoder_stuck` | `left`/`right` | Logged position freezes at its onset value | unused |
+| `encoder_noise` | `left`/`right` | Gaussian noise added to the logged position | std (rad) |
+| `ir_stuck` | `gs_left`/`gs_center`/`gs_right` | Reading freezes at its onset value | unused |
+| `ir_dead` | ground sensor | Reading becomes a constant | the constant |
+| `ir_noise` | ground sensor | Gaussian noise added to the reading | std |
+| `ir_drift` | ground sensor | Offset that grows over time | units per second |
+
+Motor faults change what the wheel does; the logged target is still the
+controller's command. Encoder faults change only the log. IR faults change the
+value the controller and the log both see. Without a `fault` block, runs are
+identical to before: a regression run matched a committed healthy run
+byte-for-byte in the original 15 columns.
+
+Record the fault matrix (10 faults x 8 held-out test route/speeds, onset at 5 s)
+and evaluate:
+
+```powershell
+cd scripts
+..\.venv\Scripts\python.exe collect_fault_runs.py
+..\.venv\Scripts\python.exe evaluate_faults.py
+```
+
+`data\fault_runs\fault-matrix-v1.json` defines the faults.
+`data\fault_runs\manifest.csv` lists each run with its fault and outcome;
+`stopped_early` means a line-loss or path safety stop, which is expected for
+some faults. `evaluate_faults.py` scores every run with each model directory
+and the PCA baseline, using the same threshold, 3-of-5 persistence and 0.5 s
+warm-up. It writes `reports\fault-eval-v1\summary.md`, `results.json` and
+per-model score plots. Motor and encoder faults count as detected by the motor
+model and IR faults by the IR model; alarms from the other model are reported as
+cross-coupling.
+
+Results (`conv-v1`; `dense-v1` is similar):
+
+| Fault | Detected | Median delay |
+|---|---|---|
+| Weak motor (70% / 50%) | 8/8, 8/8 | 0.45 s, 0.16 s |
+| Stalled motor | 8/8 | 0.10 s |
+| Intermittent motor | 8/8 | 0.11 s |
+| Encoder stuck / noisy | 8/8, 8/8 | 0.10 s, 0.29 s |
+| IR dead (reads 0) | 8/8 | 0.34 s |
+| IR drift (+100/s) | 8/8 | 1.01 s |
+| IR stuck (centre) | 1/8 | - |
+| IR noise (std 50) | 2/8 | - |
+
+- `conv-v1` had no pre-onset false alarms. `dense-v1` had one pre-onset false
+  alarm on one route/speed.
+- The PCA baseline matches the autoencoders on motor faults but detects IR dead
+  in only 2/8 runs and IR drift in only 1/8.
+- A stuck centre sensor freezes near its on-line value, which looks healthy
+  except at corners and junctions.
+- Noise with std 50 is about 0.2 of the side-sensor scale, so only spikes cross
+  the threshold.
+- A weak left motor, a stalled motor and IR drift also trip the other model
+  (8/8). The robot's motion couples the subsystems: drifting off the line
+  changes the IR readings, and losing the line stops the wheels.
+
 ## Deployment and integration status
 
-The next steps are controlled fault runs, detection evaluation, and then
-ESP-compatible inference (exporting the weights to C).
+The next step is ESP-compatible inference (exporting the weights to C).
 
 After that, implement the Python Webots bridge. It must stream the needed
 telemetry to the ESP, send the route/action sequence, read wheel commands and

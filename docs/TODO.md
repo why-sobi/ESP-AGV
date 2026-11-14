@@ -24,12 +24,13 @@ the ESP32-S3 is the external compute target, not a move to a physical AGV.
   thresholds (99.5th percentile), 3-of-5 persistence, 0.5 s warm-up, and
   healthy-test false-alarm evaluation (`scripts/train_autoencoder.py`,
   `models/dense-v1`, `models/conv-v1`).
-- Next: add controlled Webots motor and IR faults (a `fault` block in the
-  mission with type, target, severity and onset time). Record labelled fault
-  runs, then measure detection rate, detection delay and cross-coupling
-  (whether a motor fault also trips the IR model).
-- Then choose the deployed architecture per model using both false alarms and
-  detection, not false alarms alone.
+- Done: fault injection (9 types), 80 labelled fault runs, and detection
+  evaluation (`scripts/evaluate_faults.py`, `reports/fault-eval-v1`).
+- Optional: severity sweeps (e.g. IR noise 50-200, motor gain 0.9-0.5) to find
+  detection limits, and a longer window or per-sensor features for stuck-sensor
+  faults.
+- Choose the deployed architecture. conv-v1 currently has no pre-onset false
+  alarms and detects as well as dense-v1.
 
 ## 4. Deploy inference to the ESP32-S3
 

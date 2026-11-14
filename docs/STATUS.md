@@ -59,15 +59,25 @@ The Webots simulation remains the environment throughout this plan.
   - Motor conv: 0/14 test runs alarm (0.31% of windows over threshold).
   - IR dense: 2/14 runs alarm (0.59% of windows).
   - IR PCA baseline: 5/14 runs alarm (0.68% of windows).
-- The Python script test suite passes (26 tests at last verification).
+- Fault injection: `epuck_route` supports 9 fault types via a mission `fault`
+  block and labels rows with `fault_active`. Healthy runs are byte-identical to
+  before. 80 fault runs exist (10 faults x 8 held-out test route/speeds) in
+  `data/fault_runs`.
+- Fault detection (`reports/fault-eval-v1`, conv-v1):
+  - All motor and encoder faults are detected in 8/8 runs, with median delay
+    0.10-0.45 s.
+  - IR dead and IR drift are detected in 8/8 runs.
+  - IR stuck-centre (1/8) and IR noise std 50 (2/8) are mostly missed.
+  - No pre-onset false alarms.
+  - The PCA baseline misses most IR faults.
+- The Python script test suite passes (28 tests at last verification).
 
 ## Not yet implemented
 
 - The Python Webots-to-ESP bridge. Webots still runs its own controller; the
   smoke test is a separate host script and does not drive Webots.
 - A graph-route-to-relative-junction-action converter for the ESP.
-- Fault-injection harness, fault runs, detection rate/delay evaluation, and ESP
-  model inference (weights export to C).
+- ESP model inference (weights export to C) and Python-vs-ESP score agreement.
 - End-to-end testing where the ESP computes the commands that Webots applies.
 
 ## Current data/model status
@@ -81,8 +91,10 @@ The Webots simulation remains the environment throughout this plan.
 - Shortest-path routing never uses the parallel edges edge-002 and edge-004.
 - The motor PCA baseline is nearly as good as the autoencoders. The IR
   autoencoders clearly beat it.
-- There are no controlled-fault runs yet, so detection rate and delay are
-  unmeasured.
+- A stuck sensor frozen at a plausible value (the centre sensor on the line) is
+  hard to detect from a 0.64 s window. Mild IR noise (about 0.2 of the scaler
+  std) is mostly missed. Severity sweeps have not been run yet.
+- Each fault severity was tested at one level and one onset time (5 s).
 
 Train only on healthy data; the held-out healthy test runs are for
 false-positive measurement.
