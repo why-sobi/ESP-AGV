@@ -1,0 +1,6769 @@
+{
+  "settings": {
+    "models": [
+      "models/dense-v1",
+      "models/conv-v1"
+    ],
+    "persist_k": 3,
+    "persist_n": 5,
+    "warmup_s": 0.5,
+    "manifest": "data\\fault_runs\\sweep-v1\\manifest.csv"
+  },
+  "summary": {
+    "dense-v1 (dense)": {
+      "motor-right-95": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.95",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 1,
+        "median_delay_s": 3.104,
+        "max_delay_s": 3.104,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-90": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.9",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 1,
+        "median_delay_s": 2.944,
+        "max_delay_s": 2.944,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-85": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.85",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 4,
+        "median_delay_s": 1.6320000000000001,
+        "max_delay_s": 3.4880000000000004,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-80": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.8",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 7,
+        "median_delay_s": 1.1520000000000001,
+        "max_delay_s": 8.192,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-70": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.7",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.49600000000000044,
+        "max_delay_s": 1.5360000000000005,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-60": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.6",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.3200000000000003,
+        "max_delay_s": 1.024,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-50": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.5",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.20800000000000018,
+        "max_delay_s": 0.41600000000000037,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-25": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "25.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 1,
+        "median_delay_s": 0.28800000000000026,
+        "max_delay_s": 0.28800000000000026,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-50": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 0.3360000000000003,
+        "max_delay_s": 0.38400000000000034,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-75": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "75.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 1,
+        "median_delay_s": 0.28800000000000026,
+        "max_delay_s": 0.28800000000000026,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 4,
+        "median_delay_s": 2.4160000000000004,
+        "max_delay_s": 7.232,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-150": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "150.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 7,
+        "median_delay_s": 3.5200000000000005,
+        "max_delay_s": 7.392,
+        "cross_model_detected": 5,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-200": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "200.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 8,
+        "median_delay_s": 1.2159999999999997,
+        "max_delay_s": 4.160000000000001,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      }
+    },
+    "conv-v1 (conv)": {
+      "motor-right-95": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.95",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-90": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.9",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 2,
+        "median_delay_s": 3.2,
+        "max_delay_s": 3.3920000000000003,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-85": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.85",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 4,
+        "median_delay_s": 2.9920000000000004,
+        "max_delay_s": 6.303999999999999,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-80": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.8",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 7,
+        "median_delay_s": 1.12,
+        "max_delay_s": 8.064,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-70": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.7",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.4480000000000004,
+        "max_delay_s": 1.6000000000000005,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-60": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.6",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.2560000000000002,
+        "max_delay_s": 0.96,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "motor-right-50": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.5",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.17600000000000016,
+        "max_delay_s": 0.7359999999999998,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-25": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "25.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 3.392,
+        "max_delay_s": 6.56,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-50": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 0.30400000000000027,
+        "max_delay_s": 0.38400000000000034,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-75": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "75.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 1,
+        "median_delay_s": 0.19200000000000017,
+        "max_delay_s": 0.19200000000000017,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 4,
+        "median_delay_s": 2.4160000000000004,
+        "max_delay_s": 7.2,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-150": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "150.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 6,
+        "median_delay_s": 2.128,
+        "max_delay_s": 7.36,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-200": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "200.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 8,
+        "median_delay_s": 1.2639999999999998,
+        "max_delay_s": 4.8,
+        "cross_model_detected": 6,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      }
+    },
+    "pca_baseline": {
+      "motor-right-95": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.95",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 1,
+        "median_delay_s": 3.2,
+        "max_delay_s": 3.2,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-90": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.9",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 2,
+        "median_delay_s": 3.2640000000000002,
+        "max_delay_s": 3.4560000000000004,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-85": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.85",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 2,
+        "median_delay_s": 3.2960000000000003,
+        "max_delay_s": 3.4880000000000004,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-80": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.8",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 3,
+        "median_delay_s": 2.976,
+        "max_delay_s": 3.5840000000000005,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-70": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.7",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 7,
+        "median_delay_s": 0.6079999999999997,
+        "max_delay_s": 6.848,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-60": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.6",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.49600000000000044,
+        "max_delay_s": 1.5360000000000005,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "motor-right-50": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.5",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.38400000000000034,
+        "max_delay_s": 1.088,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-25": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "25.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 3.424,
+        "max_delay_s": 6.528,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-50": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 0.3360000000000003,
+        "max_delay_s": 0.3520000000000003,
+        "cross_model_detected": 2,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-75": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "75.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 0.41600000000000037,
+        "max_delay_s": 0.5120000000000005,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 3,
+        "median_delay_s": 3.968000000000001,
+        "max_delay_s": 7.36,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-150": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "150.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 3,
+        "median_delay_s": 0.3200000000000003,
+        "max_delay_s": 6.048000000000001,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-200": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "200.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 6,
+        "median_delay_s": 2.6559999999999997,
+        "max_delay_s": 7.008,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 1,
+        "stopped_early_runs": 0
+      }
+    }
+  },
+  "runs": [
+    {
+      "file": "route-20261114-163124-A-2.3-motor-right-95.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.608",
+      "faulty_samples": "364",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163126-A-3.1-motor-right-95.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.48",
+      "faulty_samples": "235",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163128-B-2.2-motor-right-95.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.472",
+      "faulty_samples": "391",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.752
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.7199999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163130-B-3.4-motor-right-95.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.584",
+      "faulty_samples": "207",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.104
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163132-C-2.1-motor-right-95.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.368",
+      "faulty_samples": "419",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163134-C-3.3-motor-right-95.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.968",
+      "faulty_samples": "219",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163135-D-2.4-motor-right-95.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.032",
+      "faulty_samples": "346",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163137-D-3.2-motor-right-95.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-95",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.95",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.288",
+      "faulty_samples": "229",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163139-A-2.3-motor-right-90.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.896",
+      "faulty_samples": "373",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163141-A-3.1-motor-right-90.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.64",
+      "faulty_samples": "240",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163143-B-2.2-motor-right-90.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.856",
+      "faulty_samples": "403",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6879999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6879999999999997
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.88
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163145-B-3.4-motor-right-90.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.68",
+      "faulty_samples": "210",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.944
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.008
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.072
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163147-C-2.1-motor-right-90.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.816",
+      "faulty_samples": "433",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163149-C-3.3-motor-right-90.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.128",
+      "faulty_samples": "224",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163150-D-2.4-motor-right-90.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.32",
+      "faulty_samples": "355",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163152-D-3.2-motor-right-90.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-90",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.9",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.512",
+      "faulty_samples": "236",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3920000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4560000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163154-A-2.3-motor-right-85.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.184",
+      "faulty_samples": "382",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163156-A-3.1-motor-right-85.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.832",
+      "faulty_samples": "246",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163157-B-2.2-motor-right-85.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.24",
+      "faulty_samples": "415",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.04
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.04
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163159-B-3.4-motor-right-85.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.776",
+      "faulty_samples": "213",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.104
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163201-C-2.1-motor-right-85.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "19.328",
+      "faulty_samples": "449",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7679999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163202-C-3.3-motor-right-85.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.384",
+      "faulty_samples": "232",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 2.4960000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.4960000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163204-D-2.4-motor-right-85.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.672",
+      "faulty_samples": "366",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.303999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163206-D-3.2-motor-right-85.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-85",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.85",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.768",
+      "faulty_samples": "244",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4880000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4880000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4880000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163208-A-2.3-motor-right-80.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.504",
+      "faulty_samples": "392",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163209-A-3.1-motor-right-80.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.056",
+      "faulty_samples": "253",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.1520000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.12
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163211-B-2.2-motor-right-80.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.72",
+      "faulty_samples": "430",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.192
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2640000000000002
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.064
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2640000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163213-B-3.4-motor-right-80.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.0",
+      "faulty_samples": "220",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6079999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163215-C-2.1-motor-right-80.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "19.936",
+      "faulty_samples": "468",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7039999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163216-C-3.3-motor-right-80.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.704",
+      "faulty_samples": "242",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 0.6079999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6399999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": true,
+            "delay_s": 2.976
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163218-D-2.4-motor-right-80.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.056",
+      "faulty_samples": "378",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.4639999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.4639999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163220-D-3.2-motor-right-80.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.024",
+      "faulty_samples": "252",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.4640000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.4640000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.5840000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163222-A-2.3-motor-right-70.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.336",
+      "faulty_samples": "418",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.5360000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.6000000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163223-A-3.1-motor-right-70.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.6",
+      "faulty_samples": "270",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6079999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163225-B-2.2-motor-right-70.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "19.904",
+      "faulty_samples": "467",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5920000000000005
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6559999999999997
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6879999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.064000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163227-B-3.4-motor-right-70.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.576",
+      "faulty_samples": "238",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163228-C-2.1-motor-right-70.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "21.344",
+      "faulty_samples": "512",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6399999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6079999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163230-C-3.3-motor-right-70.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.44",
+      "faulty_samples": "265",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163232-D-2.4-motor-right-70.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "18.016",
+      "faulty_samples": "408",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.848
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163234-D-3.2-motor-right-70.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.568",
+      "faulty_samples": "269",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7039999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.7919999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163236-A-2.3-motor-right-60.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "19.456",
+      "faulty_samples": "453",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.024
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.96
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.5360000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163237-A-3.1-motor-right-60.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "14.336",
+      "faulty_samples": "293",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163239-B-2.2-motor-right-60.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "21.472",
+      "faulty_samples": "516",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5280000000000005
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.4960000000000004
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163241-B-3.4-motor-right-60.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "13.376",
+      "faulty_samples": "263",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163243-C-2.1-motor-right-60.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "23.232",
+      "faulty_samples": "571",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7999999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163244-C-3.3-motor-right-60.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "14.432",
+      "faulty_samples": "296",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5280000000000005
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5280000000000005
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163246-D-2.4-motor-right-60.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "19.232",
+      "faulty_samples": "446",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.840000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 9.728000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 12.864
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163248-D-3.2-motor-right-60.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-60",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.6",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "14.432",
+      "faulty_samples": "296",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.080000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7679999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.303999999999999
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163250-A-2.3-motor-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "21.024",
+      "faulty_samples": "502",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.088
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163251-A-3.1-motor-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.392",
+      "faulty_samples": "326",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163253-B-2.2-motor-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "23.648",
+      "faulty_samples": "584",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.648000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.648000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163255-B-3.4-motor-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "14.496",
+      "faulty_samples": "298",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.09600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.09600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163257-C-2.1-motor-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "25.856",
+      "faulty_samples": "653",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.38400000000000034
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.38400000000000034
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8959999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.136
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163259-C-3.3-motor-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.808",
+      "faulty_samples": "339",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4080000000000004
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4720000000000004
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.8239999999999998
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163300-D-2.4-motor-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "20.896",
+      "faulty_samples": "498",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 10.240000000000002
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 10.208000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 11.392
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163302-D-3.2-motor-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "motor-right-50",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.5",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.584",
+      "faulty_samples": "332",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.896
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.992
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.712000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163304-A-2.3-ir-noise-right-25.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.384",
+      "faulty_samples": "357",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163306-A-3.1-ir-noise-right-25.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.32",
+      "faulty_samples": "230",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163307-B-2.2-ir-noise-right-25.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.12",
+      "faulty_samples": "380",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163309-B-3.4-ir-noise-right-25.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.52",
+      "faulty_samples": "205",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163311-C-2.1-ir-noise-right-25.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163313-C-3.3-ir-noise-right-25.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163314-D-2.4-ir-noise-right-25.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.776",
+      "faulty_samples": "338",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.56
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.528
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163316-D-3.2-ir-noise-right-25.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-25",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "25.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.128",
+      "faulty_samples": "224",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163318-A-2.3-ir-noise-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.384",
+      "faulty_samples": "357",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.38400000000000034
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.38400000000000034
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163319-A-3.1-ir-noise-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.32",
+      "faulty_samples": "230",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163321-B-2.2-ir-noise-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.152",
+      "faulty_samples": "381",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163323-B-3.4-ir-noise-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.52",
+      "faulty_samples": "205",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163325-C-2.1-ir-noise-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163327-C-3.3-ir-noise-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163328-D-2.4-ir-noise-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.968",
+      "faulty_samples": "344",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163330-D-3.2-ir-noise-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.064",
+      "faulty_samples": "222",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7760000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7760000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7760000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163332-A-2.3-ir-noise-right-75.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.416",
+      "faulty_samples": "358",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2560000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2560000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2560000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163333-A-3.1-ir-noise-right-75.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.32",
+      "faulty_samples": "230",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163335-B-2.2-ir-noise-right-75.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.152",
+      "faulty_samples": "381",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163337-B-3.4-ir-noise-right-75.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.52",
+      "faulty_samples": "205",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163338-C-2.1-ir-noise-right-75.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163340-C-3.3-ir-noise-right-75.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 3.936000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.968000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163342-D-2.4-ir-noise-right-75.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "15.84",
+      "faulty_samples": "340",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.239999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.239999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.239999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163343-D-3.2-ir-noise-right-75.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-75",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "75.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.096",
+      "faulty_samples": "223",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.232
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.232
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2960000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163345-A-2.3-ir-noise-right-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.384",
+      "faulty_samples": "357",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163347-A-3.1-ir-noise-right-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.352",
+      "faulty_samples": "231",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163349-B-2.2-ir-noise-right-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.152",
+      "faulty_samples": "381",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.232
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.2
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.36
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163350-B-3.4-ir-noise-right-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.552",
+      "faulty_samples": "206",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.816
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2240000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.944
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163352-C-2.1-ir-noise-right-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8959999999999999
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8959999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163354-C-3.3-ir-noise-right-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 5.6000000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.512
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163355-D-2.4-ir-noise-right-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.16",
+      "faulty_samples": "350",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.920000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.920000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.176000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163357-D-3.2-ir-noise-right-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.576",
+      "faulty_samples": "238",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3920000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.936000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.6480000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.936000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.6800000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.968000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163359-A-2.3-ir-noise-right-150.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.48",
+      "faulty_samples": "360",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.2560000000000002
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163401-A-3.1-ir-noise-right-150.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.32",
+      "faulty_samples": "230",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.632000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163402-B-2.2-ir-noise-right-150.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.152",
+      "faulty_samples": "381",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.392
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.36
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163404-B-3.4-ir-noise-right-150.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.552",
+      "faulty_samples": "206",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.072
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.008
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163406-C-2.1-ir-noise-right-150.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7679999999999998
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163407-C-3.3-ir-noise-right-150.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 3.6160000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.824000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.6480000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": true,
+            "delay_s": 5.5360000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163409-D-2.4-ir-noise-right-150.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.256",
+      "faulty_samples": "353",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.016000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.984000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.016000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163411-D-3.2-ir-noise-right-150.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-150",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "150.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.16",
+      "faulty_samples": "225",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.232
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.5200000000000005
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.232
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.5200000000000005
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.232
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163412-A-2.3-ir-noise-right-200.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.3",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.64",
+      "faulty_samples": "365",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163414-A-3.1-ir-noise-right-200.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.32",
+      "faulty_samples": "230",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.351999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.160000000000001
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.4479999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.8
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163416-B-2.2-ir-noise-right-200.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.2",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.152",
+      "faulty_samples": "381",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.6959999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.7919999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.008
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163418-B-3.4-ir-noise-right-200.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.52",
+      "faulty_samples": "205",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.816
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.944
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.944
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163419-C-2.1-ir-noise-right-200.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "17.952",
+      "faulty_samples": "406",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7359999999999998
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8319999999999999
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163421-C-3.3-ir-noise-right-200.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.3",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "11.84",
+      "faulty_samples": "215",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 3,
+            "detected": true,
+            "delay_s": 4.608
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2960000000000003
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.672
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7760000000000007
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": true,
+            "pre_onset_alarm_windows": 12,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163423-D-2.4-ir-noise-right-200.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "16.064",
+      "faulty_samples": "347",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.920000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.920000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5440000000000005
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.144000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261114-163424-D-3.2-ir-noise-right-200.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.2",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "5.0",
+      "outcome": "completed",
+      "duration_s": "12.224",
+      "faulty_samples": "227",
+      "onset": 5.024,
+      "results": {
+        "dense-v1 (dense)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4560000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6879999999999997
+          }
+        },
+        "conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4560000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.752
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.4560000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.4799999999999995
+          }
+        }
+      }
+    }
+  ]
+}
