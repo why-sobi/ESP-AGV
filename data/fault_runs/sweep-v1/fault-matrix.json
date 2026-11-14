@@ -1,0 +1,29 @@
+{
+  "description": "Severity sweep to find detection limits: right-motor power (motor_gain, fraction of commanded speed applied) from 0.95 to 0.5, and right ground-sensor Gaussian noise (ir_noise, std in sensor units) from 25 to 200. Same 8 held-out test route/speeds and 5 s onset as fault-matrix-v1. Healthy ground-sensor readings are about 300 on the line and 760 off it; the IR scaler std for the side sensors is about 220.",
+  "onset_s": 5.0,
+  "runs": [
+    {"route": "A", "speed": 2.3},
+    {"route": "A", "speed": 3.1},
+    {"route": "B", "speed": 2.2},
+    {"route": "B", "speed": 3.4},
+    {"route": "C", "speed": 2.1},
+    {"route": "C", "speed": 3.3},
+    {"route": "D", "speed": 2.4},
+    {"route": "D", "speed": 3.2}
+  ],
+  "faults": [
+    {"name": "motor-right-95", "type": "motor_gain", "target": "right", "severity": 0.95},
+    {"name": "motor-right-90", "type": "motor_gain", "target": "right", "severity": 0.9},
+    {"name": "motor-right-85", "type": "motor_gain", "target": "right", "severity": 0.85},
+    {"name": "motor-right-80", "type": "motor_gain", "target": "right", "severity": 0.8},
+    {"name": "motor-right-70", "type": "motor_gain", "target": "right", "severity": 0.7},
+    {"name": "motor-right-60", "type": "motor_gain", "target": "right", "severity": 0.6},
+    {"name": "motor-right-50", "type": "motor_gain", "target": "right", "severity": 0.5},
+    {"name": "ir-noise-right-25", "type": "ir_noise", "target": "gs_right", "severity": 25.0},
+    {"name": "ir-noise-right-50", "type": "ir_noise", "target": "gs_right", "severity": 50.0},
+    {"name": "ir-noise-right-75", "type": "ir_noise", "target": "gs_right", "severity": 75.0},
+    {"name": "ir-noise-right-100", "type": "ir_noise", "target": "gs_right", "severity": 100.0},
+    {"name": "ir-noise-right-150", "type": "ir_noise", "target": "gs_right", "severity": 150.0},
+    {"name": "ir-noise-right-200", "type": "ir_noise", "target": "gs_right", "severity": 200.0}
+  ]
+}
