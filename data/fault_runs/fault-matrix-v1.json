@@ -1,0 +1,26 @@
+{
+  "description": "Controlled fault runs for detection evaluation. Each fault starts at onset_s on two held-out test speeds per route (from data/datasets/splits/route-runs-v3.json), so the pre-onset part is unseen healthy data. Severity units: motor_gain = fraction of commanded speed applied; encoder_noise = position noise std (rad); ir_dead = constant reading; ir_noise = reading noise std; ir_drift = offset growth per second. Healthy ground-sensor readings are about 300 on the line and 760 off it.",
+  "onset_s": 5.0,
+  "runs": [
+    {"route": "A", "speed": 2.3},
+    {"route": "A", "speed": 3.1},
+    {"route": "B", "speed": 2.2},
+    {"route": "B", "speed": 3.4},
+    {"route": "C", "speed": 2.1},
+    {"route": "C", "speed": 3.3},
+    {"route": "D", "speed": 2.4},
+    {"route": "D", "speed": 3.2}
+  ],
+  "faults": [
+    {"name": "motor-weak-right-70", "type": "motor_gain", "target": "right", "severity": 0.7},
+    {"name": "motor-weak-left-50", "type": "motor_gain", "target": "left", "severity": 0.5},
+    {"name": "motor-stall-left", "type": "motor_stall", "target": "left"},
+    {"name": "motor-intermittent-right", "type": "motor_intermittent", "target": "right", "period_s": 1.0, "burst_s": 0.15},
+    {"name": "encoder-stuck-left", "type": "encoder_stuck", "target": "left"},
+    {"name": "encoder-noise-right", "type": "encoder_noise", "target": "right", "severity": 0.02},
+    {"name": "ir-stuck-center", "type": "ir_stuck", "target": "gs_center"},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0},
+    {"name": "ir-noise-right", "type": "ir_noise", "target": "gs_right", "severity": 50.0},
+    {"name": "ir-drift-center", "type": "ir_drift", "target": "gs_center", "severity": 100.0}
+  ]
+}
