@@ -133,6 +133,9 @@ def summarize(records, methods, faults):
             delays = [r["results"][method][primary]["delay_s"] for r in rows
                       if r["results"][method][primary]["detected"]]
             summary[method][fault] = {
+                "fault_type": rows[0]["fault_type"],
+                "target": rows[0].get("target", ""),
+                "severity": rows[0].get("severity", ""),
                 "runs": len(rows),
                 "primary_model": primary,
                 "detected": sum(r["results"][method][primary]["detected"] for r in rows),
@@ -166,6 +169,59 @@ def markdown_table(summary):
             )
         lines.append("")
     return "\n".join(lines)
+
+
+def severity_axis(fault_type, severity):
+    """Map a severity to an x value where larger always means a worse fault."""
+    if fault_type == "motor_gain":
+        return 100.0 * (1.0 - severity), "power loss (% of commanded speed)"
+    return severity, f"{fault_type} severity"
+
+
+def plot_sweeps(out_dir, summary):
+    """For each fault type/target tested at several severities, plot detection
+    rate and median delay against severity for every method."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    groups = defaultdict(set)
+    for faults in summary.values():
+        for s in faults.values():
+            if s["severity"] not in ("", None):
+                groups[(s["fault_type"], s["target"])].add(float(s["severity"]))
+    written = []
+    for (fault_type, target), severities in groups.items():
+        if len(severities) < 2:
+            continue
+        figure, (rate_axis, delay_axis) = plt.subplots(1, 2, figsize=(11, 4))
+        for method, faults in summary.items():
+            points = sorted(
+                (severity_axis(fault_type, float(s["severity"]))[0],
+                 s["detected"] / s["runs"], s["median_delay_s"])
+                for s in faults.values()
+                if s["fault_type"] == fault_type and s["target"] == target
+            )
+            x = [p[0] for p in points]
+            rate_axis.plot(x, [100 * p[1] for p in points], marker="o", label=method)
+            delay_axis.plot([p[0] for p in points if p[2] is not None],
+                            [p[2] for p in points if p[2] is not None], marker="o", label=method)
+        label = severity_axis(fault_type, 1.0)[1]
+        rate_axis.set_xlabel(label)
+        rate_axis.set_ylabel("runs detected (%)")
+        rate_axis.set_ylim(-5, 105)
+        rate_axis.set_title(f"{fault_type} on {target}: detection rate")
+        rate_axis.legend(fontsize=8)
+        delay_axis.set_xlabel(label)
+        delay_axis.set_ylabel("median detection delay (s)")
+        delay_axis.set_title(f"{fault_type} on {target}: delay (detected runs)")
+        figure.tight_layout()
+        path = out_dir / f"sweep_{fault_type}_{target}.png"
+        figure.savefig(path, dpi=120)
+        plt.close(figure)
+        written.append(path)
+    return written
 
 
 def plot_faults(path, records, method, detectors, faults):
@@ -209,6 +265,8 @@ def main():
     parser.add_argument("--persist-n", type=int, default=5)
     parser.add_argument("--warmup-s", type=float, default=0.5)
     args = parser.parse_args()
+    args.manifest = args.manifest.resolve()
+    args.out = args.out.resolve()
 
     detectors, window_size = load_detectors([ROOT / m for m in args.models])
     with args.manifest.open(newline="", encoding="utf-8") as file:
@@ -247,6 +305,8 @@ def main():
     for method in detectors:
         safe = method.split(" ")[0]
         plot_faults(args.out / f"{safe}_fault_scores.png", records, method, detectors, faults)
+    for path in plot_sweeps(args.out, summary):
+        print(f"Severity sweep plot: {path}")
     print(table)
     print(f"Saved to {args.out}")
 

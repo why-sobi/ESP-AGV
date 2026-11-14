@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from evaluate_faults import evaluate_run, primary_model
+from evaluate_faults import evaluate_run, primary_model, severity_axis
 
 
 def zero_reconstruct(x):
@@ -14,6 +14,14 @@ class EvaluateFaultsTests(unittest.TestCase):
         self.assertEqual(primary_model("motor_gain"), "motor")
         self.assertEqual(primary_model("encoder_stuck"), "motor")
         self.assertEqual(primary_model("ir_drift"), "ir")
+
+    def test_severity_axis_grows_with_fault_strength(self):
+        mild, _ = severity_axis("motor_gain", 0.9)
+        strong, label = severity_axis("motor_gain", 0.5)
+        self.assertLess(mild, strong)
+        self.assertAlmostEqual(strong, 50.0)
+        self.assertIn("power loss", label)
+        self.assertEqual(severity_axis("ir_noise", 75.0)[0], 75.0)
 
     def test_detection_delay_and_pre_onset_alarm(self):
         window_size, count = 2, 20
