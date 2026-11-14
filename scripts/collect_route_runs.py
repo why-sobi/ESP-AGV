@@ -78,18 +78,13 @@ def summarize_run(path, max_irregular=0):
     return healthy, notes
 
 
-def run_one(webots, world, base_mission, route, speed, out_dir, timeout):
-    start, destination = ROUTES[route]
-    label = f"{route}-{speed:g}"
-    mission = dict(base_mission)
-    mission.update(
-        start_node=start,
-        destination_node=destination,
-        wheel_speed_rad_s=speed,
-        spawn_at_start_node=True,
-        quit_webots_on_complete=True,
-        run_label=label,
-    )
+def run_mission(webots, world, mission, out_dir, timeout):
+    """Run one headless Webots session with ``mission``.
+
+    Returns (new CSV path or None, completed, console output, wall seconds).
+    ``completed`` is True only when the controller quit with status 0.
+    """
+    mission = dict(mission, spawn_at_start_node=True, quit_webots_on_complete=True)
     with tempfile.TemporaryDirectory() as temporary:
         mission_path = Path(temporary) / "mission.json"
         mission_path.write_text(json.dumps(mission, indent=2), encoding="utf-8")
@@ -126,16 +121,30 @@ def run_one(webots, world, base_mission, route, speed, out_dir, timeout):
         elapsed = time.monotonic() - started
 
     new_files = sorted(set(out_dir.glob("route-*.csv")) - before)
-    if len(new_files) != 1:
+    return (new_files[0] if len(new_files) == 1 else None), reached, output, elapsed
+
+
+def run_one(webots, world, base_mission, route, speed, out_dir, timeout):
+    start, destination = ROUTES[route]
+    mission = dict(
+        base_mission,
+        start_node=start,
+        destination_node=destination,
+        wheel_speed_rad_s=speed,
+        run_label=f"{route}-{speed:g}",
+    )
+    mission.pop("fault", None)
+    path, reached, output, elapsed = run_mission(webots, world, mission, out_dir, timeout)
+    if path is None:
         return None, start, destination, speed, False, (
-            f"expected one new CSV, found {len(new_files)}; output tail: "
+            "expected one new CSV; output tail: "
             + " | ".join(output.strip().splitlines()[-3:])
         ), elapsed
-    healthy, notes = summarize_run(new_files[0])
+    healthy, notes = summarize_run(path)
     if not reached:
         healthy = False
         notes = "controller did not report completion (non-zero exit or timeout); " + notes
-    return new_files[0], start, destination, speed, healthy, notes, elapsed
+    return path, start, destination, speed, healthy, notes, elapsed
 
 
 def main():
