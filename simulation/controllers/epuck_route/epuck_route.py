@@ -2,6 +2,7 @@ import csv
 import json
 import math
 import os
+import random
 import re
 import sys
 from datetime import datetime
@@ -155,6 +156,93 @@ def _line_error(values, threshold):
     return (right - left) / strength
 
 
+MOTOR_FAULTS = ("motor_gain", "motor_stall", "motor_intermittent")
+ENCODER_FAULTS = ("encoder_stuck", "encoder_noise")
+IR_FAULTS = ("ir_stuck", "ir_dead", "ir_noise", "ir_drift")
+IR_TARGETS = ("gs_left", "gs_center", "gs_right")
+
+
+class FaultInjector:
+    """Apply one optional mission ``fault`` from ``onset_s`` onwards.
+
+    Motor faults change the velocity applied to a wheel (the logged target is
+    the controller's command). Encoder faults change only the logged wheel
+    position. IR faults change the ground-sensor value seen by both the
+    controller and the log, like a real faulty sensor.
+
+    Spec keys: ``type``, ``target`` (``left``/``right`` or a ground sensor
+    name), ``onset_s``, ``severity`` and ``seed``; ``motor_intermittent`` also
+    takes ``period_s`` and ``burst_s``.
+    """
+
+    def __init__(self, spec):
+        self.spec = spec or None
+        self.type = ""
+        if not self.spec:
+            return
+        self.type = spec.get("type", "")
+        self.target = spec.get("target")
+        self.onset = float(spec.get("onset_s", 0.0))
+        self.severity = float(spec.get("severity", 0.0))
+        self.period = float(spec.get("period_s", 1.0))
+        self.burst = float(spec.get("burst_s", 0.15))
+        self.rng = random.Random(int(spec.get("seed", 0)))
+        self.frozen = None
+        if self.type in MOTOR_FAULTS + ENCODER_FAULTS:
+            if self.target not in ("left", "right"):
+                raise ValueError(f"{self.type} needs target 'left' or 'right'")
+            self.index = 0 if self.target == "left" else 1
+        elif self.type in IR_FAULTS:
+            if self.target not in IR_TARGETS:
+                raise ValueError(f"{self.type} needs target in {IR_TARGETS}")
+            self.index = IR_TARGETS.index(self.target)
+        else:
+            raise ValueError(f"Unknown fault type: {self.type!r}")
+
+    def active(self, time):
+        return self.spec is not None and time >= self.onset
+
+    def motors(self, time, commands):
+        commands = list(commands)
+        if self.type not in MOTOR_FAULTS or not self.active(time):
+            return commands
+        if self.type == "motor_gain":
+            commands[self.index] *= self.severity
+        elif self.type == "motor_stall":
+            commands[self.index] = 0.0
+        elif (time - self.onset) % self.period < self.burst:  # motor_intermittent
+            commands[self.index] = 0.0
+        return commands
+
+    def encoders(self, time, positions):
+        positions = list(positions)
+        if self.type not in ENCODER_FAULTS or not self.active(time):
+            return positions
+        if self.type == "encoder_stuck":
+            if self.frozen is None:
+                self.frozen = positions[self.index]
+            positions[self.index] = self.frozen
+        else:  # encoder_noise
+            positions[self.index] += self.rng.gauss(0.0, self.severity)
+        return positions
+
+    def sensors(self, time, values):
+        values = list(values)
+        if self.type not in IR_FAULTS or not self.active(time):
+            return values
+        if self.type == "ir_stuck":
+            if self.frozen is None:
+                self.frozen = values[self.index]
+            values[self.index] = self.frozen
+        elif self.type == "ir_dead":
+            values[self.index] = self.severity
+        elif self.type == "ir_noise":
+            values[self.index] += self.rng.gauss(0.0, self.severity)
+        else:  # ir_drift: severity is sensor units per second
+            values[self.index] += self.severity * (time - self.onset)
+        return values
+
+
 def _stop(motors):
     motors[0].setVelocity(0.0)
     motors[1].setVelocity(0.0)
@@ -251,8 +339,13 @@ def main():
                 "gs_left",
                 "gs_center",
                 "gs_right",
+                "fault_type",
+                "fault_active",
             ]
         )
+        fault = FaultInjector(mission.get("fault"))
+        if fault.spec:
+            print(f"FAULT INJECTION: {fault.spec}")
 
         edge_index = 0
         progress = 0.0
@@ -276,7 +369,10 @@ def main():
             pose_x, pose_y = position[0], position[1]
             pose_matrix = self_node.getOrientation()
             heading = math.atan2(pose_matrix[3], pose_matrix[0])
-            sensor_values = [sensor.getValue() for sensor in ground_sensors]
+            now = robot.getTime()
+            sensor_values = fault.sensors(
+                now, [sensor.getValue() for sensor in ground_sensors]
+            )
             sensor_error = _line_error(sensor_values, line_threshold)
 
             # Advance past every edge whose target node has been reached, then
@@ -330,12 +426,16 @@ def main():
                 right_target = (linear_speed + angular_speed * wheel_base * 0.5) / wheel_radius
                 left_target = max(0.0, min(max_wheel_speed, left_target))
                 right_target = max(0.0, min(max_wheel_speed, right_target))
-                left_motor.setVelocity(left_target)
-                right_motor.setVelocity(right_target)
+                applied_left, applied_right = fault.motors(now, (left_target, right_target))
+                left_motor.setVelocity(applied_left)
+                right_motor.setVelocity(applied_right)
 
+            encoder_left, encoder_right = fault.encoders(
+                now, (left_encoder.getValue(), right_encoder.getValue())
+            )
             writer.writerow(
                 [
-                    robot.getTime(),
+                    now,
                     route.start,
                     route.destination,
                     edge["edge_id"],
@@ -345,9 +445,11 @@ def main():
                     "" if sensor_error is None else sensor_error,
                     left_target,
                     right_target,
-                    left_encoder.getValue(),
-                    right_encoder.getValue(),
+                    encoder_left,
+                    encoder_right,
                     *sensor_values,
+                    fault.type,
+                    int(fault.active(now)),
                 ]
             )
             buffered_rows += 1
@@ -369,11 +471,14 @@ def main():
                 line_lost_since = None
 
             if distance_from_path > float(mission.get("max_path_error_m", 0.12)):
+                # Stop and close the log normally so the telemetry up to the
+                # safety stop is kept (fault runs often end this way).
                 _stop(motors)
-                raise RuntimeError(
-                    f"Robot is {distance_from_path:.3f} m from planned edge "
-                    f"{edge['edge_id']}; stopped for safety."
+                failure = (
+                    f"robot {distance_from_path:.3f} m from planned edge "
+                    f"{edge['edge_id']} at t={now:.2f} s; stopped for safety"
                 )
+                break
 
         log_file.flush()
         log_file.close()
