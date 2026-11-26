@@ -151,8 +151,9 @@ route's map length. The firmware's protocol and behavior are described in
 The Supervisor no longer ends an ESP run itself when the robot reaches the
 destination node. It waits for the ESP's `AT_DEST` and marks the run completed
 only if the robot stopped within `esp_destination_tolerance_m` (default
-0.05 m) of the node. ESP-reported `LINE_LOST`, `JUNCTION_MISSED`, a serial
-timeout, or a malformed response stops the motors and fails the run.
+0.05 m) of the node. ESP-reported `LINE_LOST`, `JUNCTION_MISSED`,
+`FAULT_STOP` (see "Fault stop and phone notifications"), a serial timeout, or
+a malformed response stops the motors and fails the run.
 ESP-controlled runs add `esp_state`, `esp_route_index` and `esp_distance_m`
 to their telemetry CSVs.
 
@@ -377,16 +378,113 @@ The script sends short distance-tagged routes and synthetic IR and encoder
 frames, then checks PD wheel-speed outputs, reported odometry, that a junction
 pattern is ignored outside its distance window and taken inside it, junction
 clearing, the destination stop, the missed-junction stop, the U-turn (spin,
-handover to line following, and giving up when no line is found), and
+handover to line following, and giving up when no line is found), the route
+speed, anomaly scores and inference timing, the fault stop (pull-over, stop,
+and the time limit for a drive that cannot turn), the WiFi status, and
 malformed-route rejection. It does **not** launch Webots; the data is synthetic and the
-returned wheel commands are not applied to the simulated robot.
+returned wheel commands are not applied to the simulated robot. If WiFi is
+configured, its two fault stops each send a phone notification.
 
 See `firmware\README.md` for the serial frame format and firmware limitations.
-The firmware consumes the route, three IR readings and both encoder positions
-and returns wheel speeds. The sensor frame therefore already carries the inputs
-the motor autoencoder needs (targets are the ESP's own outputs; actual wheel
-speeds come from encoder differences), but inference is not implemented on the
-ESP yet.
+
+### Fault stop and phone notifications
+
+When `esp_fault_stop_s` is set in `maps\routes\mission.json` (2.0 by default),
+the ESP acts on a persistent anomaly alarm:
+
+1. Either model's alarm (3 of the last 5 windows over threshold) has stayed on
+   for `esp_fault_stop_s` seconds. Shorter alarms are only reported.
+2. The ESP spins right about 90 degrees in place, drives 8 cm forward off the
+   line (`FAULT_PULLOVER`), and stops (`FAULT_STOP`). If the turn and drive
+   are not finished within 6 s, for example because a motor is stalled, it
+   stops where it is.
+3. The ESP itself sends a push notification over WiFi through
+   [ntfy](https://ntfy.sh), in plain words, e.g. "AGV stopped: motor
+   problem / The robot found a motor problem, moved off the track and
+   stopped. It is next to the track between Junction 3 and Junction 2." If
+   it could not finish moving off, it says it may be blocking the track.
+4. A `LINE_LOST` or `JUNCTION_MISSED` stop also sends a notification ("AGV
+   stopped: lost the track" or "missed a turn"), naming a motor or line
+   sensor problem if an alarm was raised in the last 10 s. Motor faults often
+   end this way: a stalled or weak wheel drags the robot off the line before
+   the alarm has lasted 2 s, and the ESP's line-loss stop (750 ms) comes
+   first.
+
+The junctions come from the map's node names: the Supervisor sends one
+label per route step with the route (`E@`, see `firmware\README.md`).
+
+**Live check** (`data\esp_runs\fault-stop-v1` and `-v2`, the live-v1 round
+trips with `esp_fault_stop_s` 2.0; v2 repeats the motor faults with the final
+firmware):
+
+| Fault (4 runs each) | Ends in | Notified |
+|---|---|---|
+| None (`healthy`, motor gain 1.0) | `AT_DEST` 4/4, no alarm | - |
+| IR dead left | `FAULT_STOP` 4/4, pulled over 8-18 cm off the line in about 3 s | 4/4 |
+| IR noise std 200 | `FAULT_STOP` 4/4, 7-8 cm off the line | 4/4 |
+| Motor weak left 50% | `FAULT_STOP` 2/4 (pull-over about 4.1 s), `LINE_LOST` 2/4 | 4/4 |
+| Motor stall left | `LINE_LOST` 3/4, `FAULT_STOP` 1/4 (time limit) | 4/4 |
+
+- With a stalled wheel the robot can only pivot, so it stops near the line.
+  With a weak wheel the forward drive curves back towards the line (2.7-5 cm
+  off).
+- Every `LINE_LOST` stop came with a motor alarm in the preceding second.
+- Re-run the check with
+  `.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs --matrix data\esp_runs\fault-stop-v1\fault-matrix.json --out <dir> --timeout 300`.
+
+Remove `esp_fault_stop_s` (or set it to `null`) to only report alarms. The
+route command carries it as `F@<seconds>`. The data collectors
+(`collect_route_runs`, `collect_fault_runs`) remove it, so dataset runs are
+not cut short; a fault matrix can set it in its `mission` block.
+
+**On the phone.** Install the ntfy app (Android: Play Store or F-Droid; iOS:
+App Store) and subscribe to the topic in `firmware\wifi.csv` on the default
+server `ntfy.sh`. No account is needed. Anyone who knows the topic name can
+read and post to it, so use a hard-to-guess name. The phone can be on any
+network; the ESP only needs WiFi with internet access.
+
+**WiFi settings, without recompiling.** The network and topic live in their
+own flash partition (`wificfg`, see `firmware\partitions.csv`), not in the
+firmware. Copy `firmware\wifi.example.csv` to `firmware\wifi.csv` (gitignored)
+and edit it:
+
+```csv
+key,type,encoding,value
+wifi,namespace,,
+ssid,data,string,YourNetwork
+password,data,string,YourPassword
+ntfy_topic,data,string,agv-yourname-abc123
+```
+
+An optional `ntfy_server` row points at a self-hosted ntfy server instead of
+`https://ntfy.sh`. Then, with COM3 free (close Webots), write only that
+partition; it takes a few seconds and leaves the firmware untouched:
+
+```powershell
+.\scripts\esp\flash_wifi.ps1            # -Port COM3 -Config firmware\wifi.csv
+```
+
+The ESP restarts and connects. Reflashing the firmware (`idf.py flash`) keeps
+the WiFi settings. The partition table itself only changes with a full flash,
+which was needed once when `wificfg` was added.
+
+- WPA2/WPA3-Personal or open networks work; WPA2-Enterprise (eduroam) does
+  not. A phone hotspot is the easiest option on campus.
+- Without a `wificfg` partition, WiFi stays off and the robot behaves as
+  before; fault stops still happen but send nothing.
+- WiFi runs on core 0 and the control loop on core 1, so sending never delays
+  a control step.
+- Check the connection, and send a test notification with `--test` (COM3
+  must be free):
+
+  ```powershell
+  .\.venv\Scripts\python.exe -m scripts.esp.wifi_status --port COM3 --test
+  ```
+
+  It prints `W,<OFF|CONNECTING|CONNECTED>,<ip>,<last send result>,heap=<bytes>`.
+  The send result is `SENDING_<attempt>`, then `HTTP_200`, or an error such as
+  `ESP_ERR_HTTP_CONNECT/<esp-tls error>/<mbedTLS error>`. The ESP tries 6
+  times.
 
 ## Train and evaluate the autoencoders
 

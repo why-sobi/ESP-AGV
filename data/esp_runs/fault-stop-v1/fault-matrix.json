@@ -1,0 +1,19 @@
+{
+  "description": "Live check of the ESP fault stop: the ESP drives the round trip and, once an anomaly alarm has lasted 2 s, pulls over (90 degrees right, 8 cm forward), stops with FAULT_STOP and sends an ntfy notification. 'healthy' is motor_gain 1.0 (no change) as the false-stop control. Same routes, speeds and seeds as live-v1.",
+  "onset_s": 8.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true, "esp_fault_stop_s": 2.0},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 2.7, "seed": 20, "onset_s": 6.0},
+    {"route": "B", "speed": 3.3, "seed": 21, "onset_s": 9.0},
+    {"route": "C", "speed": 2.4, "seed": 22, "onset_s": 15.0},
+    {"route": "D", "speed": 3.8, "seed": 23, "onset_s": 12.0}
+  ],
+  "faults": [
+    {"name": "healthy", "type": "motor_gain", "target": "left", "severity": 1.0},
+    {"name": "motor-weak-left-50", "type": "motor_gain", "target": "left", "severity": 0.5},
+    {"name": "motor-stall-left", "type": "motor_stall", "target": "left"},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0},
+    {"name": "ir-noise-right-200", "type": "ir_noise", "target": "gs_right", "severity": 200.0}
+  ]
+}

@@ -19,11 +19,12 @@ MOTOR_FEATURES = (
 IR_FEATURES = ("gs_left", "gs_center", "gs_right")
 SPLIT_NAMES = ("train", "validation", "test")
 # ESP states in which the robot executes a commanded manoeuvre (stopping at the
-# destination, unloading, turning around). Windows that overlap them are used
-# for training but not monitored: the ESP knows its own state, so it can
+# destination, unloading, turning around, pulling over after a fault). Windows
+# that overlap them are used for training but not monitored: the ESP knows its
+# own state, so it can
 # suppress anomaly decisions there, like during the start-up warm-up. The
 # first 0.5 s after a U-turn is unmonitored too (see unmonitored_samples).
-UNMONITORED_STATES = ("AT_DEST", "UNLOADING", "U_TURN")
+UNMONITORED_STATES = ("AT_DEST", "UNLOADING", "U_TURN", "FAULT_PULLOVER", "FAULT_STOP")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 

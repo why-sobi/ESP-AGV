@@ -69,9 +69,11 @@ def main():
     if args.faults and len(faults) != len(set(args.faults)):
         parser.error("unknown fault name in --faults")
     webots = find_webots(args.webots)
-    base_mission = dict(
-        json.loads(args.mission.read_text(encoding="utf-8-sig")), **matrix.get("mission", {})
-    )
+    base_mission = json.loads(args.mission.read_text(encoding="utf-8-sig"))
+    # Fault runs only report alarms unless the matrix's mission block sets
+    # esp_fault_stop_s: a fault stop ends the run at the first long alarm.
+    base_mission.pop("esp_fault_stop_s", None)
+    base_mission.update(matrix.get("mission", {}))
     out_dir = (args.out or args.matrix.parent).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = out_dir / "manifest.csv"

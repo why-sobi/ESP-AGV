@@ -16,6 +16,8 @@ project virtual environment in PowerShell.
 | `faults/collect_fault_runs.py` | Runs Webots fault scenarios from a fault matrix and records labelled telemetry. | Collecting fault-evaluation data. |
 | `faults/evaluate_faults.py` | Scores fault runs and summarizes detection, delay, false alarms, and cross-coupling. | Evaluating trained models on fault data. |
 | `esp/esp_serial_smoke_test.py` | Sends synthetic sensor frames to the ESP over serial and checks its responses. | Checking the flashed firmware; requires the ESP, a COM port, and `pyserial`. |
+| `esp/flash_wifi.ps1` | Writes `firmware/wifi.csv` (WiFi network, ntfy topic) to the ESP's `wificfg` partition without rebuilding the firmware. | Changing the WiFi network or notification topic; requires ESP-IDF and a free COM port. |
+| `esp/wifi_status.py` | Shows the ESP's WiFi status and, with `--test`, sends a test notification. | Checking phone notifications; requires the ESP and a free COM port. |
 | `esp/replay_scores.py` | Replays recorded ESP runs through the ESP and compares its wheel targets, anomaly scores and alarms with Python. | Verifying on-ESP inference after a firmware or model change; requires the ESP. |
 
 Example:

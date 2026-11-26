@@ -12,6 +12,7 @@ ALL_LIGHT = (700, 700, 700)
 CENTERED = (700, 300, 700)
 LEFT_OF_ROBOT = (300, 700, 700)
 ALL_DARK = (300, 300, 300)
+STEP_M = 3.5 * 0.032 * WHEEL_RADIUS_M  # One 32 ms frame at 3.5 rad/s.
 
 
 def read_line(port, timeout_seconds):
@@ -256,7 +257,96 @@ def main():
             f"Inference timing missing or too slow: {timing!r}",
         )
 
+        # Fault stop: without F@ an alarm is only reported; with F@<s> an alarm
+        # lasting that long makes the robot spin right about 90 degrees, drive
+        # forward off the line and stop. Alternating IR readings trip the IR
+        # model once the 0.5 s warm-up has passed.
+        def drive_with_ir_noise(payload):
+            ack = esp.route(payload)
+            if ack != "A,ROUTE_OK":
+                raise AssertionError(f"Route {payload!r} was not accepted: {ack!r}")
+            frames, distance = [], 0.0
+            for i in range(120):
+                if i < 40:
+                    sensors = CENTERED
+                else:
+                    sensors = (100, 900, 100) if i % 2 else (900, 100, 900)
+                frames.append(esp.frame(sensors, distance))
+                distance += STEP_M
+                if frames[-1]["state"] == "FAULT_PULLOVER":
+                    break
+            return frames, distance
+
+        frames, _ = drive_with_ir_noise("D@5.0")
+        check(
+            any(f["ir_alarm"] or f["motor_alarm"] for f in frames)
+            and all(f["state"] == "FOLLOWING" for f in frames),
+            f"without F@ an alarm is only reported: {frames[-1]['raw']}",
+            f"Alarm without F@ changed the behaviour: {frames[-1]['raw']}",
+        )
+
+        # E@ names the robot's place per step for the notification.
+        frames, distance = drive_with_ir_noise(
+            "E@between Junction 1 and Junction 2,F@0.3,D@5.0"
+        )
+        first_alarm = next(
+            (i for i, f in enumerate(frames) if f["ir_alarm"] or f["motor_alarm"]), None
+        )
+        pulling = frames[-1]
+        check(
+            first_alarm is not None
+            and pulling["state"] == "FAULT_PULLOVER"
+            and (len(frames) - 1 - first_alarm) * 0.032 >= 0.3
+            and pulling["left_speed"] > 0.0 > pulling["right_speed"],
+            f"alarm held 0.3 s starts the pull-over (right spin): {pulling['raw']}",
+            f"Fault stop did not start as expected: {pulling['raw']}",
+        )
+        turned = esp.frame(ALL_LIGHT, distance, math.radians(-95))
+        forward = esp.frame(ALL_LIGHT, distance + 0.04, math.radians(-95))
+        check(
+            turned["state"] == "FAULT_PULLOVER"
+            and forward["left_speed"] > 0.0
+            and forward["left_speed"] == forward["right_speed"],
+            f"after 90 degrees it drives forward off the line: {forward['raw']}",
+            f"Pull-over did not drive forward: {forward['raw']}",
+        )
+        stopped = esp.frame(ALL_LIGHT, distance + 0.09, math.radians(-95))
+        after = esp.frame(CENTERED, distance + 0.09, math.radians(-95))
+        check(
+            stopped["state"] == "FAULT_STOP"
+            and stopped["left_speed"] == stopped["right_speed"] == 0.0
+            and after["state"] == "FAULT_STOP"
+            and after["left_speed"] == after["right_speed"] == 0.0,
+            f"pull-over ends in FAULT_STOP with the wheels stopped: {after['raw']}",
+            f"Pull-over did not stop: {stopped['raw']} / {after['raw']}",
+        )
+
+        # A drive that cannot turn (e.g. stalled) still stops after 6 s.
+        frames, distance = drive_with_ir_noise("F@0.3,D@5.0")
+        for _ in range(195):
+            stuck = esp.frame(ALL_LIGHT, distance)
+            if stuck["state"] != "FAULT_PULLOVER":
+                break
+        check(
+            stuck["state"] == "FAULT_STOP" and stuck["left_speed"] == 0.0,
+            f"pull-over that cannot turn stops after its time limit: {stuck['raw']}",
+            f"Stuck pull-over did not stop: {stuck['raw']}",
+        )
+
+        # WiFi is optional; each FAULT_STOP above queued a notification.
+        port.write(b"W\n")
+        wifi = read_line(port, 2.0)
+        check(
+            wifi.startswith("W,"),
+            f"WiFi status (state, IP, last notification): {wifi}",
+            f"WiFi status missing: {wifi!r}",
+        )
+
         for payload in (
+            "E@edge-001|edge-002,D@0.3",
+            "F@0.0,D@0.3",
+            "F@20,D@0.3",
+            "R@0.1,F@1.0,D@0.3",
             "XD",
             "V@9.0,D@0.3",
             "V@0.5,D@0.3",

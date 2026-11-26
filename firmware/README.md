@@ -64,9 +64,16 @@ own COM3 at a time.
   `R,R@0.265,D@0.779\n`. An optional first step `U@0.000` makes the robot
   U-turn in place before following, e.g. `R,U@0.000,L@0.514,D@0.779\n` for a
   return leg. An optional leading `V@<rad/s>` sets the straight-line wheel
-  speed for the route (1.0-4.5, default 3.5), e.g. `R,V@2.750,R@0.265,D@0.779\n`;
-  it must come before every other step. The controller replies `A,ROUTE_OK\n`,
-  or `E,BAD_ROUTE\n`. At most 32 steps.
+  speed for the route (1.0-4.5, default 3.5), e.g. `R,V@2.750,R@0.265,D@0.779\n`.
+  An optional leading `F@<seconds>` (0.1-10) enables the fault stop with that
+  alarm hold, e.g. `R,F@2.000,V@2.750,R@0.265,D@0.779\n`; without it alarms
+  are only reported. An optional leading `E@<place>|<place>|...` gives one
+  label per step: where the robot is while heading for that step, e.g.
+  `E@between Junction 3 and Junction 2|between Junction 2 and Junction 1`.
+  Notifications name it; labels are at most 63 characters, without `,` or
+  `|`, and their count must match the steps. `epuck_route` always sends
+  them. `E@`, `V@` and `F@` must come before every other step, in any order. The controller replies `A,ROUTE_OK\n`, or `E,BAD_ROUTE\n`. At
+  most 32 steps.
 - Supply sensor frames:
   `S,<sequence>,<dt_ms>,<left>,<center>,<right>,<enc_left_rad>,<enc_right_rad>\n`.
   Lower ground-sensor values mean darker track, matching the Webots sensors.
@@ -80,12 +87,20 @@ own COM3 at a time.
   `esp_motor_alarm` and `esp_ir_alarm`.
 - Inference timing: `Q\n` replies
   `I,<motor_last_us>,<motor_max_us>,<ir_last_us>,<ir_max_us>\n`.
+- WiFi status: `W\n` replies
+  `W,<OFF|CONNECTING|CONNECTED>,<ip or ->,<last send result>,heap=<bytes>\n`.
+  The send result is `NONE`, `SENDING_<attempt>`, `HTTP_<status>`, `NO_WIFI`
+  or `<http error>/<esp-tls error>/<mbedTLS error>`.
+- Test notification: `N\n` queues one and replies `A,NOTIFY_QUEUED\n`, or
+  `E,NOTIFY_OFF\n` when WiFi is not configured.
 - Errors are returned as `E,<reason>\n`.
 
 States: `FOLLOWING`, `TURN_LEFT`, `STRAIGHT`, `TURN_RIGHT`, `U_TURN`,
-`AT_DEST`, `LINE_LOST`, `LINK_LOST`, `JUNCTION_MISSED`, `NO_ROUTE`.
+`AT_DEST`, `LINE_LOST`, `LINK_LOST`, `JUNCTION_MISSED`, `FAULT_PULLOVER`,
+`FAULT_STOP`, `NO_ROUTE`.
 
-Wheel targets are within +/-5 rad/s. They are only negative during a U-turn.
+Wheel targets are within +/-5 rad/s. They are only negative during a U-turn
+or the spin of a fault pull-over.
 
 ## Behavior
 
@@ -115,6 +130,16 @@ Wheel targets are within +/-5 rad/s. They are only negative during a U-turn.
   `LINK_LOST` frame (repeating the last sequence number) and outputs zero
   wheel targets; when frames resume it continues the route where it stopped.
   The simulation pauses with the host, so this is not a hazard in Webots.
+- **Fault stop** (routes with `F@<s>` only): when either anomaly alarm has
+  stayed on for `<s>` seconds, the controller spins right in place at 2 rad/s
+  until the encoders show 90 degrees, drives 0.08 m forward off the line
+  (`FAULT_PULLOVER`), then stops with `FAULT_STOP` and queues a notification.
+  If that takes longer than 6 s (e.g. a stalled motor or a stuck encoder), it
+  stops where it is and the notification says the pull-over was not finished.
+  `FAULT_STOP` ends the route like `LINE_LOST`. On these routes a
+  `LINE_LOST` or `JUNCTION_MISSED` stop also sends a notification, naming any
+  anomaly alarm in the last 10 s, including one before the return leg reset
+  the detectors.
 - After unloading, send a new route command for the return leg (planned from
   destination back to dock, starting with `U`); it resets the route state and
   odometry. `epuck_route` does this when the mission sets `return_to_start`.
@@ -142,8 +167,7 @@ every sensor frame, as `scripts/models/train_autoencoder.py` defines them.
   windows exceed the model's threshold.
 - **Reset:** a new route command clears the windows and alarm history.
 - **Cost:** about 2.3 ms (motor) + 2.0 ms (IR) per frame with `-O2`
-  (`CONFIG_COMPILER_OPTIMIZATION_PERF`). Image size is 0x336b0 bytes, with 80%
-  of the app partition free.
+  (`CONFIG_COMPILER_OPTIMIZATION_PERF`), unchanged with WiFi running.
 - **Agreement:** `scripts/esp/replay_scores.py` replays recorded runs and
   compares the ESP's scores and alarms with Python (see `docs/USAGE.md`).
 
@@ -152,11 +176,35 @@ on the wide horizontal lines as well as at junctions, so the sensor pattern
 alone cannot identify a junction or the destination. See
 `docs/DECISIONS.md`.
 
+## WiFi notifications
+
+`main/notify.{h,cpp}` joins a WiFi network and posts a notification to
+[ntfy](https://ntfy.sh) on every `FAULT_STOP`, on `LINE_LOST` and
+`JUNCTION_MISSED` for routes with `F@`, and for `N`. The network and
+topic are read at boot from the `wificfg` NVS partition (`partitions.csv`,
+12 KB at 0x310000), not compiled in. Write it from `wifi.csv` (copy
+`wifi.example.csv`; `wifi.csv` is gitignored) without rebuilding:
+
+```powershell
+.\scripts\esp\flash_wifi.ps1   # -Port COM3 -Config firmware\wifi.csv
+```
+
+Keys in namespace `wifi`: `ssid`, `password` (may be empty), `ntfy_topic`,
+and optionally `ntfy_server` (default `https://ntfy.sh`). Without them WiFi
+stays off. Sending runs in its own task on core 0 and never blocks the
+control loop, which is pinned to core 1. A message waits up to 120 s for
+WiFi and is tried up to 6 times. Each retry clears lwIP's DNS cache:
+ntfy.sh rotates between three servers, and on 2026-11-26 one of them
+(129.212.146.227) reset every TLS handshake, so a cached address could fail
+every attempt. HTTPS uses the ESP-IDF certificate bundle. With WiFi and TLS
+the image is about 0xe4000 bytes, in a 3 MB app partition.
+Setup and the phone side are in `docs/USAGE.md`.
+
 ## Important limitations
 
-- The anomaly alarms are reported, not acted on: the firmware keeps driving
-  and the host logs them. What the robot should do on an alarm (slow down,
-  stop, request service) is not decided yet.
+- The fault stop's 90-degree right turn does not look at the track: next to a
+  parallel line it may end up on that line. With a faulty drive or encoder
+  the turn and drive are only approximate, which the 6 s limit bounds.
 - Junction distances come from the map scaled by the mission's
   `esp_odometry_scale` (0.92, measured on the base track). A track with
   different curvature may need a re-measured scale, and junctions closer than

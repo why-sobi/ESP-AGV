@@ -1,0 +1,5 @@
+key,type,encoding,value
+wifi,namespace,,
+ssid,data,string,YourNetwork
+password,data,string,YourPassword
+ntfy_topic,data,string,agv-yourname-abc123

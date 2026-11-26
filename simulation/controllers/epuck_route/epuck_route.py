@@ -112,7 +112,33 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
     # 3.5 rad/s); it must come before every other step.
     if mission.get("esp_speed_rad_s") is not None:
         plan = [("V", float(mission["esp_speed_rad_s"]))] + plan
-    return route, route_paths, format_route_command(plan)
+    # Optional fault stop: pull over and stop once an anomaly alarm has lasted
+    # this many seconds. Without it the ESP only reports alarms.
+    if mission.get("esp_fault_stop_s") is not None:
+        plan = [("F", float(mission["esp_fault_stop_s"]))] + plan
+    esp_route = _place_labels(track_map, route, u_turn_first) + format_route_command(plan)
+    return route, route_paths, esp_route
+
+
+def _place_labels(track_map, route, u_turn_first):
+    """ESP 'E@' option: where the robot is while heading for each route step.
+
+    The ESP names it in its notifications, e.g. "between Junction 1 and
+    Junction 4". Step i of the plan ends edge i; a leading U-turn happens on
+    the first edge.
+    """
+    names = {node["id"]: node.get("name") or node["id"] for node in track_map["nodes"]}
+
+    def clean(text):
+        return text.replace(",", " ").replace("|", " ")
+
+    labels = [
+        clean(f"between {names[step.source]} and {names[step.target]}")
+        for step in route.steps
+    ]
+    if u_turn_first:
+        labels = labels[:1] + labels
+    return "E@" + "|".join(labels) + ","
 
 
 def _pixel_to_world(point, transform):
@@ -314,9 +340,11 @@ ESP_STATES = (
     "LINE_LOST",
     "LINK_LOST",
     "JUNCTION_MISSED",
+    "FAULT_PULLOVER",
+    "FAULT_STOP",
     "NO_ROUTE",
 )
-ESP_STOP_STATES = ("AT_DEST", "LINE_LOST", "LINK_LOST", "JUNCTION_MISSED")
+ESP_STOP_STATES = ("AT_DEST", "LINE_LOST", "LINK_LOST", "JUNCTION_MISSED", "FAULT_STOP")
 
 
 def _configure_esp_route(link, esp_route):
@@ -707,13 +735,20 @@ def main():
                         continue
                     else:
                         completed = True
+                elif esp_state == "FAULT_STOP":
+                    # The alarm columns of the preceding rows say which model
+                    # fired; the ESP also sends a notification.
+                    failure = (
+                        f"ESP fault stop: pulled over and stopped at t={now:.2f} s "
+                        f"after {esp_distance:.3f} m of odometry"
+                    )
                 else:
                     failure = f"ESP controller reported {esp_state}"
                 break
 
-            # A U-turn sweeps the sensors off the line on purpose, and the
-            # robot is stopped while unloading.
-            if esp_state in ("U_TURN", "UNLOADING"):
+            # A U-turn and a fault pull-over sweep the sensors off the line
+            # on purpose, and the robot is stopped while unloading.
+            if esp_state in ("U_TURN", "UNLOADING", "FAULT_PULLOVER"):
                 line_lost_since = None
             elif sensor_error is None:
                 if line_lost_since is None:
@@ -728,7 +763,10 @@ def main():
             else:
                 line_lost_since = None
 
-            if distance_from_path > float(mission.get("max_path_error_m", 0.12)):
+            # A fault pull-over leaves the path on purpose.
+            if esp_state != "FAULT_PULLOVER" and distance_from_path > float(
+                mission.get("max_path_error_m", 0.12)
+            ):
                 # Stop and close the log normally so the telemetry up to the
                 # safety stop is kept (fault runs often end this way).
                 _stop(motors)

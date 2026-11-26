@@ -1,0 +1,9 @@
+file,route,start_node,destination_node,wheel_speed_rad_s,fault_name,fault_type,target,severity,onset_s,outcome,duration_s,faulty_samples,control_mode,seed
+route-20261126-212038-A-2.7-motor-weak-left-50.csv,A,node-003,node-001,2.7,motor-weak-left-50,motor_gain,left,0.5,6.0,stopped_early,12.576,207,esp32,20
+route-20261126-212056-B-3.3-motor-weak-left-50.csv,B,node-001,node-003,3.3,motor-weak-left-50,motor_gain,left,0.5,9.0,stopped_early,15.936,218,esp32,21
+route-20261126-212116-C-2.4-motor-weak-left-50.csv,C,node-002,node-004,2.4,motor-weak-left-50,motor_gain,left,0.5,15.0,stopped_early,20.0,158,esp32,22
+route-20261126-212138-D-3.8-motor-weak-left-50.csv,D,node-004,node-002,3.8,motor-weak-left-50,motor_gain,left,0.5,12.0,stopped_early,17.472,173,esp32,23
+route-20261126-212157-A-2.7-motor-stall-left.csv,A,node-003,node-001,2.7,motor-stall-left,motor_stall,left,,6.0,stopped_early,7.648,53,esp32,20
+route-20261126-212210-B-3.3-motor-stall-left.csv,B,node-001,node-003,3.3,motor-stall-left,motor_stall,left,,9.0,stopped_early,10.912,61,esp32,21
+route-20261126-212225-C-2.4-motor-stall-left.csv,C,node-002,node-004,2.4,motor-stall-left,motor_stall,left,,15.0,stopped_early,23.264,260,esp32,22
+route-20261126-212249-D-3.8-motor-stall-left.csv,D,node-004,node-002,3.8,motor-stall-left,motor_stall,left,,12.0,stopped_early,21.728,306,esp32,23

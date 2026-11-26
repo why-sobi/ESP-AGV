@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "anomaly.h"
+#include "notify.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
@@ -18,8 +19,9 @@ constexpr int kBaudRate = 115200;
 constexpr gpio_num_t kSerialTxPin = GPIO_NUM_43;
 constexpr gpio_num_t kSerialRxPin = GPIO_NUM_44;
 constexpr size_t kRxBufferSize = 1024;
-constexpr size_t kLineBufferSize = 512;
+constexpr size_t kLineBufferSize = 1024;  // Routes with place labels are a few hundred bytes.
 constexpr size_t kMaxRouteLength = 32;
+constexpr size_t kMaxPlaceLength = 64;  // Per-step place label for notifications.
 
 // These PD settings match the current Webots line follower and still need
 // tuning across the project's supported simulated routes and speeds.
@@ -53,6 +55,16 @@ constexpr float kUTurnSpeed = 2.0F;       // Wheel speed while spinning, rad/s.
 constexpr float kUTurnMinRad = 2.79F;     // 160 degrees: ignore lines crossed earlier.
 constexpr float kUTurnMaxRad = 4.71F;     // 270 degrees: give up, the line was not found.
 
+// Fault stop, only for routes with 'F@<s>': once an anomaly alarm has been
+// raised continuously for that long, spin right about 90 degrees in place,
+// drive forward off the line, stop with FAULT_STOP and send a notification.
+constexpr float kLowestFaultHoldS = 0.1F;    // Accepted range for a route's 'F' hold.
+constexpr float kHighestFaultHoldS = 10.0F;
+constexpr float kPullOverSpeed = 2.0F;       // Wheel speed while pulling over, rad/s.
+constexpr float kPullOverTurnRad = 1.571F;   // 90 degrees right.
+constexpr float kPullOverDriveM = 0.08F;     // Then this far forward.
+constexpr uint32_t kPullOverLimitMs = 6000;  // Healthy ~2.8 s, 50% weak motor ~4.1 s; then stop anyway.
+
 enum class State {
   kNoRoute,
   kFollowing,
@@ -64,6 +76,8 @@ enum class State {
   kAtDestination,
   kLinkLost,
   kJunctionMissed,
+  kFaultPullOver,
+  kFaultStop,
 };
 
 struct RouteStep {
@@ -93,6 +107,18 @@ struct Controller {
   float encoder_start_right = 0.0F;
   float distance_m = 0.0F;
   float heading_rad = 0.0F;  // Left-positive turn since the route started.
+  uint32_t fault_hold_ms = 0;  // 0: alarms are only reported.
+  float pull_over_heading_rad = 0.0F;
+  float pull_over_distance_m = 0.0F;
+  uint32_t pull_over_ms = 0;
+  bool pull_over_turned = false;
+  // The alarm that started the pull-over, for the notification.
+  bool fault_motor_alarm = false;
+  bool fault_ir_alarm = false;
+  // Optional 'E@' labels: where the robot is while heading for each step,
+  // e.g. "between Junction 1 and Junction 4".
+  char places[kMaxRouteLength][kMaxPlaceLength]{};
+  size_t place_count = 0;
 };
 
 Controller g_controller;
@@ -116,10 +142,24 @@ struct DetectionTiming {
   float previous_encoders[2]{};
   bool u_turn_seen = false;
   uint32_t last_u_turn_ms = 0;
+  bool alarm_on = false;  // Either model's alarm, raised since alarm_since_ms.
+  uint32_t alarm_since_ms = 0;
 };
 
 FrameInputs g_frame;
 DetectionTiming g_detection;
+
+// Recent alarms for the LINE_LOST/JUNCTION_MISSED notification. Unlike
+// g_detection these survive a new route (e.g. the return leg's U-turn).
+struct AlarmMemory {
+  uint32_t clock_ms = 0;  // Sensor-frame time, never reset.
+  bool motor_seen = false;
+  bool ir_seen = false;
+  uint32_t last_motor_ms = 0;
+  uint32_t last_ir_ms = 0;
+};
+AlarmMemory g_alarms;
+constexpr uint32_t kRecentAlarmMs = 10000;
 
 const char *state_name(State state) {
   switch (state) {
@@ -143,6 +183,10 @@ const char *state_name(State state) {
       return "LINK_LOST";
     case State::kJunctionMissed:
       return "JUNCTION_MISSED";
+    case State::kFaultPullOver:
+      return "FAULT_PULLOVER";
+    case State::kFaultStop:
+      return "FAULT_STOP";
   }
   return "ERROR";
 }
@@ -165,8 +209,9 @@ void update_detectors(float left, float right) {
   // not monitored (scripts/telemetry/prepare_telemetry.py).
   const bool settling = timing.u_turn_seen &&
       timing.elapsed_ms - timing.last_u_turn_ms < static_cast<uint32_t>(anomaly_model::kSettleMs);
-  const bool monitored =
-      state != State::kAtDestination && state != State::kUTurn && !settling;
+  const bool monitored = state != State::kAtDestination && state != State::kUTurn &&
+                         state != State::kFaultPullOver && state != State::kFaultStop &&
+                         !settling;
 
   // A sample needs a wheel speed, i.e. a previous frame; the IR window starts
   // with the same frame so both cover the same rows as in training.
@@ -180,6 +225,20 @@ void update_detectors(float left, float right) {
         (g_frame.encoders[1] - timing.previous_encoders[1]) / dt,
     };
     g_motor_detector.add_sample(motor, timing.elapsed_ms, monitored);
+  }
+  const bool alarm = g_motor_detector.alarm() || g_ir_detector.alarm();
+  if (alarm && !timing.alarm_on) {
+    timing.alarm_since_ms = timing.elapsed_ms;
+  }
+  timing.alarm_on = alarm;
+  g_alarms.clock_ms += static_cast<uint32_t>(std::lround(g_frame.dt_ms));
+  if (g_motor_detector.alarm()) {
+    g_alarms.motor_seen = true;
+    g_alarms.last_motor_ms = g_alarms.clock_ms;
+  }
+  if (g_ir_detector.alarm()) {
+    g_alarms.ir_seen = true;
+    g_alarms.last_ir_ms = g_alarms.clock_ms;
   }
   timing.previous_encoders[0] = g_frame.encoders[0];
   timing.previous_encoders[1] = g_frame.encoders[1];
@@ -224,27 +283,53 @@ void send_error(const char *reason) {
 // Distances are odometry distances from the start of the route; they must not
 // decrease, and the last step must be the destination 'D'. A 'U' (U-turn in
 // place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779". An
-// optional leading "V@<rad/s>" sets the straight-line speed for the route.
+// optional leading "V@<rad/s>" sets the straight-line speed for the route, an
+// optional leading "F@<seconds>" enables the fault stop with that alarm hold,
+// and an optional leading "E@<place>|<place>|..." names where the robot is
+// while heading for each step (one per step, for notifications).
 bool configure_route(char *steps) {
+  static char places[kMaxRouteLength][kMaxPlaceLength];
   RouteStep parsed[kMaxRouteLength];
   size_t length = 0;
+  size_t place_count = 0;
   float previous_distance = 0.0F;
   float max_speed = kDefaultMaxSpeed;
-  bool first_token = true;
+  float fault_hold_s = 0.0F;
+  bool options_allowed = true;
   char *save = nullptr;
   for (char *token = strtok_r(steps, ",", &save); token != nullptr;
        token = strtok_r(nullptr, ",", &save)) {
-    if (first_token && token[0] == 'V' && token[1] == '@') {
-      first_token = false;
-      char *end = nullptr;
-      max_speed = std::strtof(token + 2, &end);
-      if (end == token + 2 || *end != '\0' || !(max_speed >= kLowestMaxSpeed) ||
-          max_speed > kHighestMaxSpeed) {
-        return false;
+    if (options_allowed && token[0] == 'E' && token[1] == '@') {
+      char *place_save = nullptr;
+      for (char *place = strtok_r(token + 2, "|", &place_save); place != nullptr;
+           place = strtok_r(nullptr, "|", &place_save)) {
+        if (place_count == kMaxRouteLength || std::strlen(place) >= kMaxPlaceLength) {
+          return false;
+        }
+        std::strcpy(places[place_count++], place);
       }
       continue;
     }
-    first_token = false;
+    if (options_allowed && (token[0] == 'V' || token[0] == 'F') && token[1] == '@') {
+      char *end = nullptr;
+      const float value = std::strtof(token + 2, &end);
+      if (end == token + 2 || *end != '\0') {
+        return false;
+      }
+      if (token[0] == 'V') {
+        if (!(value >= kLowestMaxSpeed) || value > kHighestMaxSpeed) {
+          return false;
+        }
+        max_speed = value;
+      } else {
+        if (!(value >= kLowestFaultHoldS) || value > kHighestFaultHoldS) {
+          return false;
+        }
+        fault_hold_s = value;
+      }
+      continue;
+    }
+    options_allowed = false;
     if (length == kMaxRouteLength) {
       return false;
     }
@@ -271,10 +356,18 @@ bool configure_route(char *steps) {
       return false;
     }
   }
+  if (place_count != 0 && place_count != length) {
+    return false;
+  }
 
   std::copy(parsed, parsed + length, g_controller.route);
+  for (size_t i = 0; i < place_count; ++i) {
+    std::strcpy(g_controller.places[i], places[i]);
+  }
+  g_controller.place_count = place_count;
   g_controller.route_length = length;
   g_controller.max_speed = max_speed;
+  g_controller.fault_hold_ms = static_cast<uint32_t>(std::lround(fault_hold_s * 1000.0F));
   g_controller.route_index = 0;
   g_controller.route_loaded = true;
   g_controller.junction_latched = false;
@@ -308,6 +401,53 @@ void update_odometry(float encoder_left, float encoder_right) {
   g_controller.heading_rad = kWheelRadiusM * (right_rad - left_rad) / kWheelBaseM;
 }
 
+// Notifications are for whoever has to go and fetch the robot: what went
+// wrong in plain words, and where it is (from the route's 'E@' labels).
+
+const char *problem_name(bool motor, bool ir) {
+  if (motor && ir) {
+    return "motor and line sensor problem";
+  }
+  return ir ? "line sensor problem" : "motor problem";
+}
+
+// Where the robot is: the label of the step it was heading for, or nullptr.
+const char *current_place() {
+  const Controller &c = g_controller;
+  if (c.place_count == 0) {
+    return nullptr;
+  }
+  return c.places[std::min(c.route_index, c.place_count - 1)];
+}
+
+// LINE_LOST and JUNCTION_MISSED also leave the robot stopped mid-route; a
+// motor fault often ends that way before its alarm has lasted the fault hold.
+// Like the fault stop, only on routes with 'F@'.
+void notify_safety_stop() {
+  if (g_controller.fault_hold_ms == 0) {
+    return;
+  }
+  const AlarmMemory &a = g_alarms;
+  const bool motor = a.motor_seen && a.clock_ms - a.last_motor_ms <= kRecentAlarmMs;
+  const bool ir = a.ir_seen && a.clock_ms - a.last_ir_ms <= kRecentAlarmMs;
+  const bool missed = g_controller.state == State::kJunctionMissed;
+  char cause[64] = "";
+  if (motor || ir) {
+    std::snprintf(cause, sizeof(cause), ", probably because of a %s,", problem_name(motor, ir));
+  }
+  const char *place = current_place();
+  char where[96] = "";
+  if (place != nullptr) {
+    std::snprintf(where, sizeof(where), " %s", place);
+  }
+  char message[256];
+  std::snprintf(message, sizeof(message),
+                "The robot %s%s and stopped%s. It could not move off the track and may be "
+                "blocking it.",
+                missed ? "missed a turn" : "lost the track", cause, where);
+  notify_send(missed ? "AGV stopped: missed a turn" : "AGV stopped: lost the track", message);
+}
+
 // Spin left in place for a pending 'U' step. Returns true while still
 // turning (the response has been sent); false once the line is reacquired
 // and normal following should handle this frame.
@@ -325,11 +465,73 @@ bool run_u_turn(uint32_t sequence, bool center_active) {
   if (g_controller.heading_rad > kUTurnMaxRad) {
     g_controller.state = State::kLineLost;
     g_controller.route_loaded = false;
+    notify_safety_stop();
     send_response(sequence, 0.0F, 0.0F);
     return true;
   }
   g_controller.state = State::kUTurn;
   send_response(sequence, -kUTurnSpeed, kUTurnSpeed);
+  return true;
+}
+
+void notify_fault_stop(bool completed) {
+  const Controller &c = g_controller;
+  const char *problem = problem_name(c.fault_motor_alarm, c.fault_ir_alarm);
+  const char *place = current_place();
+  char message[256];
+  if (completed) {
+    std::snprintf(message, sizeof(message),
+                  "The robot found a %s, moved off the track and stopped. It is next to the "
+                  "track%s%s.",
+                  problem, place != nullptr ? " " : "", place != nullptr ? place : "");
+  } else {
+    std::snprintf(message, sizeof(message),
+                  "The robot found a %s and stopped, but could not move fully off the track. "
+                  "It may be blocking the track%s%s.",
+                  problem, place != nullptr ? " " : "", place != nullptr ? place : "");
+  }
+  char title[64];
+  std::snprintf(title, sizeof(title), "AGV stopped: %s", problem);
+  notify_send(title, message);
+}
+
+// Pull over once an alarm has lasted the route's fault hold: spin right in
+// place, drive forward off the line, then stop. Returns true while pulling
+// over or once stopped (the response has been sent).
+bool run_fault_stop(uint32_t sequence, float dt_ms) {
+  Controller &c = g_controller;
+  if (c.state != State::kFaultPullOver) {
+    const DetectionTiming &timing = g_detection;
+    if (c.fault_hold_ms == 0 || !timing.alarm_on ||
+        timing.elapsed_ms - timing.alarm_since_ms < c.fault_hold_ms) {
+      return false;
+    }
+    c.state = State::kFaultPullOver;
+    c.junction_latched = false;
+    c.pull_over_heading_rad = c.heading_rad;
+    c.pull_over_distance_m = c.distance_m;
+    c.pull_over_ms = 0;
+    c.pull_over_turned = false;
+    c.fault_motor_alarm = g_motor_detector.alarm();
+    c.fault_ir_alarm = g_ir_detector.alarm();
+  }
+  c.pull_over_ms += static_cast<uint32_t>(dt_ms);
+  if (!c.pull_over_turned && c.pull_over_heading_rad - c.heading_rad >= kPullOverTurnRad) {
+    c.pull_over_turned = true;
+    c.pull_over_distance_m = c.distance_m;
+  }
+  const bool completed =
+      c.pull_over_turned && c.distance_m - c.pull_over_distance_m >= kPullOverDriveM;
+  if (completed || c.pull_over_ms > kPullOverLimitMs) {
+    c.state = State::kFaultStop;
+    c.route_loaded = false;
+    notify_fault_stop(completed);
+    send_response(sequence, 0.0F, 0.0F);
+  } else if (c.pull_over_turned) {
+    send_response(sequence, kPullOverSpeed, kPullOverSpeed);
+  } else {
+    send_response(sequence, kPullOverSpeed, -kPullOverSpeed);
+  }
   return true;
 }
 
@@ -348,6 +550,7 @@ void check_route_distance() {
   } else if (g_controller.distance_m > next.distance_m + kJunctionWindowM) {
     g_controller.state = State::kJunctionMissed;
     g_controller.route_loaded = false;
+    notify_safety_stop();
   }
 }
 
@@ -446,7 +649,7 @@ void process_sensor_frame(char *line) {
   const bool left_active = left >= kMinLineStrength;
   const bool right_active = right >= kMinLineStrength;
 
-  if (run_u_turn(sequence, center >= kMinLineStrength)) {
+  if (run_u_turn(sequence, center >= kMinLineStrength) || run_fault_stop(sequence, dt_ms)) {
     return;
   }
 
@@ -492,6 +695,7 @@ void process_sensor_frame(char *line) {
     if (g_controller.turn_search_ms > kTurnSearchLimitMs) {
       g_controller.state = State::kLineLost;
       g_controller.route_loaded = false;
+      notify_safety_stop();
       send_response(sequence, 0.0F, 0.0F);
       return;
     }
@@ -536,6 +740,25 @@ void process_command(char *line) {
         static_cast<unsigned long>(g_ir_detector.max_inference_us()));
     if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
       uart_write_bytes(kSerialPort, response, length);
+    }
+    return;
+  }
+  if (line[0] == 'W' && line[1] == '\0') {
+    // WiFi and notification status.
+    char status[96];
+    notify_status(status, sizeof(status));
+    char response[112];
+    const int length = std::snprintf(response, sizeof(response), "W,%s\n", status);
+    if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
+      uart_write_bytes(kSerialPort, response, length);
+    }
+    return;
+  }
+  if (line[0] == 'N' && line[1] == '\0') {
+    if (notify_send("AGV test", "Test notification from the ESP32-S3.")) {
+      uart_write_bytes(kSerialPort, "A,NOTIFY_QUEUED\n", sizeof("A,NOTIFY_QUEUED\n") - 1);
+    } else {
+      send_error("NOTIFY_OFF");
     }
     return;
   }
@@ -618,6 +841,8 @@ void serial_task(void *) {
 
 extern "C" void app_main() {
   initialize_serial();
-  // The anomaly forward pass keeps ~3 KB of activations on the stack.
-  xTaskCreate(serial_task, "serial_control", 12288, nullptr, 5, nullptr);
+  notify_start();
+  // The anomaly forward pass keeps ~3 KB of activations on the stack. Core 1
+  // keeps the control loop away from WiFi, which runs on core 0.
+  xTaskCreatePinnedToCore(serial_task, "serial_control", 12288, nullptr, 5, nullptr, 1);
 }

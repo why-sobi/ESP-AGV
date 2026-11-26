@@ -2,3 +2,10 @@
 .vscode/
 
 build/
+firmware/build/
+
+*.pyc
+__pycache__/
+
+# Local WiFi credentials (see firmware/wifi.example.csv).
+firmware/wifi.csv

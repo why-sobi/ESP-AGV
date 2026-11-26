@@ -230,6 +230,8 @@ def main():
         parser.error(f"unknown routes: {''.join(sorted(unknown))}")
     webots = find_webots(args.webots)
     base_mission = json.loads(args.mission.read_text(encoding="utf-8-sig"))
+    # Dataset runs only report alarms: a fault stop would end them early.
+    base_mission.pop("esp_fault_stop_s", None)
     if args.control_mode:
         base_mission["control_mode"] = args.control_mode
     base_mission["return_to_start"] = args.round_trip
