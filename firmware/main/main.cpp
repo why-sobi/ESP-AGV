@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "anomaly.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
@@ -26,8 +27,10 @@ constexpr float kLineThreshold = 400.0F;       // Below this, a sensor sees dark
 constexpr float kMinLineStrength = 30.0F;      // Reject weak threshold crossings/noise.
 constexpr float kKp = 1.2F;                    // Steering response to line offset.
 constexpr float kKd = 0.015F;                  // Damping response to changing line offset.
-constexpr float kMaxSpeed = 3.5F;              // Straight-line wheel speed, rad/s.
-constexpr float kMinSpeed = 2.5F;              // Slow speed for sharp corrections, rad/s.
+constexpr float kDefaultMaxSpeed = 3.5F;       // Straight-line wheel speed, rad/s.
+constexpr float kMinSpeedRatio = 2.5F / 3.5F;  // Sharp-correction speed / straight speed.
+constexpr float kLowestMaxSpeed = 1.0F;        // Accepted range for a route's 'V' speed.
+constexpr float kHighestMaxSpeed = 4.5F;
 constexpr float kMaxWheelSpeed = 5.0F;         // E-puck-compatible output cap, rad/s.
 constexpr float kMaxSteering = 1.5F;           // Bound differential wheel correction.
 constexpr float kDerivativeLimit = 5.0F;       // Limit noise amplification in derivative.
@@ -71,6 +74,7 @@ struct RouteStep {
 struct Controller {
   RouteStep route[kMaxRouteLength]{};
   size_t route_length = 0;
+  float max_speed = kDefaultMaxSpeed;  // Straight-line speed for this route.
   size_t route_index = 0;
   State state = State::kNoRoute;
   State state_before_link_loss = State::kNoRoute;
@@ -92,6 +96,30 @@ struct Controller {
 };
 
 Controller g_controller;
+
+// Anomaly detection runs on every sensor frame of a route. The motor sample is
+// (left target, right target, left speed, right speed) and the IR sample the
+// three ground sensors, exactly as logged by epuck_route and used in training.
+AnomalyDetector g_motor_detector(anomaly_model::kMotor);
+AnomalyDetector g_ir_detector(anomaly_model::kIr);
+
+struct FrameInputs {
+  bool pending = false;  // A sensor frame awaits its response (and samples).
+  float dt_ms = 0.0F;
+  float readings[3]{};
+  float encoders[2]{};
+};
+
+struct DetectionTiming {
+  uint32_t elapsed_ms = 0;  // Since the route was configured.
+  bool has_previous_encoders = false;
+  float previous_encoders[2]{};
+  bool u_turn_seen = false;
+  uint32_t last_u_turn_ms = 0;
+};
+
+FrameInputs g_frame;
+DetectionTiming g_detection;
 
 const char *state_name(State state) {
   switch (state) {
@@ -119,12 +147,66 @@ const char *state_name(State state) {
   return "ERROR";
 }
 
+float round_to_thousandths(float value) {
+  return std::round(value * 1000.0F) / 1000.0F;
+}
+
+// Add this frame's motor and IR samples. The wheel targets are rounded as
+// they are sent, so the ESP scores exactly what the host logs.
+void update_detectors(float left, float right) {
+  DetectionTiming &timing = g_detection;
+  timing.elapsed_ms += static_cast<uint32_t>(std::lround(g_frame.dt_ms));
+  const State state = g_controller.state;
+  if (state == State::kUTurn) {
+    timing.u_turn_seen = true;
+    timing.last_u_turn_ms = timing.elapsed_ms;
+  }
+  // Commanded manoeuvres, and the line follower settling after a U-turn, are
+  // not monitored (scripts/telemetry/prepare_telemetry.py).
+  const bool settling = timing.u_turn_seen &&
+      timing.elapsed_ms - timing.last_u_turn_ms < static_cast<uint32_t>(anomaly_model::kSettleMs);
+  const bool monitored =
+      state != State::kAtDestination && state != State::kUTurn && !settling;
+
+  // A sample needs a wheel speed, i.e. a previous frame; the IR window starts
+  // with the same frame so both cover the same rows as in training.
+  if (timing.has_previous_encoders) {
+    g_ir_detector.add_sample(g_frame.readings, timing.elapsed_ms, monitored);
+    const float dt = g_frame.dt_ms / 1000.0F;
+    const float motor[4] = {
+        round_to_thousandths(left),
+        round_to_thousandths(right),
+        (g_frame.encoders[0] - timing.previous_encoders[0]) / dt,
+        (g_frame.encoders[1] - timing.previous_encoders[1]) / dt,
+    };
+    g_motor_detector.add_sample(motor, timing.elapsed_ms, monitored);
+  }
+  timing.previous_encoders[0] = g_frame.encoders[0];
+  timing.previous_encoders[1] = g_frame.encoders[1];
+  timing.has_previous_encoders = true;
+}
+
+void reset_detectors() {
+  g_motor_detector.reset();
+  g_ir_detector.reset();
+  g_detection = DetectionTiming{};
+}
+
+// Motor frame: wheel targets, controller state, then the motor and IR anomaly
+// scores (-1 until a full window exists) and their persistent-alarm flags.
 void send_response(uint32_t sequence, float left, float right) {
-  char response[112];
+  if (g_frame.pending) {
+    g_frame.pending = false;
+    update_detectors(left, right);
+  }
+  const float motor_score = g_motor_detector.has_score() ? g_motor_detector.score() : -1.0F;
+  const float ir_score = g_ir_detector.has_score() ? g_ir_detector.score() : -1.0F;
+  char response[160];
   const int length = std::snprintf(
-      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u,%.4f\n",
+      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u,%.4f,%.5f,%.5f,%d,%d\n",
       static_cast<unsigned long>(sequence), left, right, state_name(g_controller.state),
-      static_cast<unsigned>(g_controller.route_index), g_controller.distance_m);
+      static_cast<unsigned>(g_controller.route_index), g_controller.distance_m, motor_score,
+      ir_score, g_motor_detector.alarm() ? 1 : 0, g_ir_detector.alarm() ? 1 : 0);
   if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
     uart_write_bytes(kSerialPort, response, length);
   }
@@ -141,14 +223,28 @@ void send_error(const char *reason) {
 // Parse "<action>@<metres>" steps separated by commas, e.g. "R@0.265,D@0.779".
 // Distances are odometry distances from the start of the route; they must not
 // decrease, and the last step must be the destination 'D'. A 'U' (U-turn in
-// place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779".
+// place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779". An
+// optional leading "V@<rad/s>" sets the straight-line speed for the route.
 bool configure_route(char *steps) {
   RouteStep parsed[kMaxRouteLength];
   size_t length = 0;
   float previous_distance = 0.0F;
+  float max_speed = kDefaultMaxSpeed;
+  bool first_token = true;
   char *save = nullptr;
   for (char *token = strtok_r(steps, ",", &save); token != nullptr;
        token = strtok_r(nullptr, ",", &save)) {
+    if (first_token && token[0] == 'V' && token[1] == '@') {
+      first_token = false;
+      char *end = nullptr;
+      max_speed = std::strtof(token + 2, &end);
+      if (end == token + 2 || *end != '\0' || !(max_speed >= kLowestMaxSpeed) ||
+          max_speed > kHighestMaxSpeed) {
+        return false;
+      }
+      continue;
+    }
+    first_token = false;
     if (length == kMaxRouteLength) {
       return false;
     }
@@ -178,6 +274,7 @@ bool configure_route(char *steps) {
 
   std::copy(parsed, parsed + length, g_controller.route);
   g_controller.route_length = length;
+  g_controller.max_speed = max_speed;
   g_controller.route_index = 0;
   g_controller.route_loaded = true;
   g_controller.junction_latched = false;
@@ -194,6 +291,7 @@ bool configure_route(char *steps) {
   g_controller.distance_m = 0.0F;
   g_controller.heading_rad = 0.0F;
   g_controller.state = parsed[0].action == 'U' ? State::kUTurn : State::kFollowing;
+  reset_detectors();
   uart_write_bytes(kSerialPort, "A,ROUTE_OK\n", sizeof("A,ROUTE_OK\n") - 1);
   return true;
 }
@@ -323,6 +421,10 @@ void process_sensor_frame(char *line) {
 
   g_controller.last_sensor_seq = sequence;
   g_controller.last_sensor_us = esp_timer_get_time();
+  g_frame.pending = true;
+  g_frame.dt_ms = dt_ms;
+  std::copy(readings, readings + 3, g_frame.readings);
+  std::copy(encoders, encoders + 2, g_frame.encoders);
 
   // The simulation pauses with the host, so resume once frames arrive again.
   // Wheel targets were zero while the link was lost.
@@ -401,7 +503,8 @@ void process_sensor_frame(char *line) {
   }
 
   const float turn_amount = std::min(1.0F, std::fabs(error));
-  const float base_speed = kMaxSpeed - (kMaxSpeed - kMinSpeed) * turn_amount;
+  const float max_speed = g_controller.max_speed;
+  const float base_speed = max_speed - max_speed * (1.0F - kMinSpeedRatio) * turn_amount;
   float steering = kKp * error + kKd * g_controller.filtered_error_rate;
   steering = std::clamp(steering, -kMaxSteering, kMaxSteering);
   const float left_target =
@@ -420,6 +523,20 @@ void process_command(char *line) {
   }
   if (line[0] == 'S' && line[1] == ',') {
     process_sensor_frame(line);
+    return;
+  }
+  if (line[0] == 'Q' && line[1] == '\0') {
+    // Inference timing: last and maximum microseconds per window, per model.
+    char response[80];
+    const int length = std::snprintf(
+        response, sizeof(response), "I,%lu,%lu,%lu,%lu\n",
+        static_cast<unsigned long>(g_motor_detector.last_inference_us()),
+        static_cast<unsigned long>(g_motor_detector.max_inference_us()),
+        static_cast<unsigned long>(g_ir_detector.last_inference_us()),
+        static_cast<unsigned long>(g_ir_detector.max_inference_us()));
+    if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
+      uart_write_bytes(kSerialPort, response, length);
+    }
     return;
   }
   send_error("UNKNOWN_COMMAND");
@@ -501,5 +618,6 @@ void serial_task(void *) {
 
 extern "C" void app_main() {
   initialize_serial();
-  xTaskCreate(serial_task, "serial_control", 4096, nullptr, 5, nullptr);
+  // The anomaly forward pass keeps ~3 KB of activations on the stack.
+  xTaskCreate(serial_task, "serial_control", 12288, nullptr, 5, nullptr);
 }

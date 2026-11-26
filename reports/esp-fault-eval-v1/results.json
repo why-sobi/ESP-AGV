@@ -1,0 +1,6169 @@
+{
+  "settings": {
+    "models": [
+      "models/esp-conv-v1"
+    ],
+    "persist_k": 3,
+    "persist_n": 5,
+    "warmup_s": 0.5,
+    "manifest": "data\\esp_runs\\faults\\manifest.csv"
+  },
+  "summary": {
+    "esp-conv-v1 (conv)": {
+      "motor-weak-right-80": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.8",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 3,
+        "median_delay_s": 4.128,
+        "max_delay_s": 7.584000000000001,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 1
+      },
+      "motor-weak-right-70": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.7",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 6,
+        "median_delay_s": 1.7760000000000007,
+        "max_delay_s": 4.224,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 3
+      },
+      "motor-weak-left-50": {
+        "fault_type": "motor_gain",
+        "target": "left",
+        "severity": "0.5",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 2.224,
+        "max_delay_s": 6.336,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 5
+      },
+      "motor-stall-left": {
+        "fault_type": "motor_stall",
+        "target": "left",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.38400000000000034,
+        "max_delay_s": 7.744,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "motor-intermittent-right": {
+        "fault_type": "motor_intermittent",
+        "target": "right",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.6720000000000002,
+        "max_delay_s": 3.136000000000001,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "encoder-stuck-left": {
+        "fault_type": "encoder_stuck",
+        "target": "left",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.5600000000000005,
+        "max_delay_s": 5.119999999999997,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "encoder-noise-right": {
+        "fault_type": "encoder_noise",
+        "target": "right",
+        "severity": "0.02",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 1.056,
+        "max_delay_s": 3.7439999999999998,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-stuck-center": {
+        "fault_type": "ir_stuck",
+        "target": "gs_center",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 1,
+        "median_delay_s": 1.088000000000001,
+        "max_delay_s": 1.088000000000001,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 7
+      },
+      "ir-dead-left": {
+        "fault_type": "ir_dead",
+        "target": "gs_left",
+        "severity": "0.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 8,
+        "median_delay_s": 0.5280000000000005,
+        "max_delay_s": 2.879999999999999,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "ir-noise-right-50": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 5,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 3,
+        "median_delay_s": 8.0,
+        "max_delay_s": 10.559999999999999,
+        "cross_model_detected": 7,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-200": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "200.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 8,
+        "median_delay_s": 2.1599999999999993,
+        "max_delay_s": 3.904,
+        "cross_model_detected": 8,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 1
+      },
+      "ir-noise-left-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_left",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 3,
+        "median_delay_s": 13.952000000000002,
+        "max_delay_s": 18.208000000000002,
+        "cross_model_detected": 7,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-drift-center": {
+        "fault_type": "ir_drift",
+        "target": "gs_center",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 4,
+        "median_delay_s": 5.6160000000000005,
+        "max_delay_s": 7.552,
+        "cross_model_detected": 5,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "ir-drift-right": {
+        "fault_type": "ir_drift",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 6,
+        "median_delay_s": 4.352,
+        "max_delay_s": 8.672,
+        "cross_model_detected": 7,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      }
+    },
+    "pca_baseline": {
+      "motor-weak-right-80": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.8",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 2,
+        "median_delay_s": 4.640000000000001,
+        "max_delay_s": 7.776000000000002,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 1
+      },
+      "motor-weak-right-70": {
+        "fault_type": "motor_gain",
+        "target": "right",
+        "severity": "0.7",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 5,
+        "median_delay_s": 1.3759999999999994,
+        "max_delay_s": 8.160000000000002,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 3
+      },
+      "motor-weak-left-50": {
+        "fault_type": "motor_gain",
+        "target": "left",
+        "severity": "0.5",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 3.5520000000000005,
+        "max_delay_s": 9.28,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 5
+      },
+      "motor-stall-left": {
+        "fault_type": "motor_stall",
+        "target": "left",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.4480000000000004,
+        "max_delay_s": 7.744,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "motor-intermittent-right": {
+        "fault_type": "motor_intermittent",
+        "target": "right",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.6880000000000002,
+        "max_delay_s": 3.1679999999999993,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "encoder-stuck-left": {
+        "fault_type": "encoder_stuck",
+        "target": "left",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 0.6400000000000006,
+        "max_delay_s": 5.119999999999997,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "encoder-noise-right": {
+        "fault_type": "encoder_noise",
+        "target": "right",
+        "severity": "0.02",
+        "runs": 8,
+        "primary_model": "motor",
+        "detected": 8,
+        "median_delay_s": 1.056,
+        "max_delay_s": 3.7439999999999998,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-stuck-center": {
+        "fault_type": "ir_stuck",
+        "target": "gs_center",
+        "severity": "",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 1,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 7
+      },
+      "ir-dead-left": {
+        "fault_type": "ir_dead",
+        "target": "gs_left",
+        "severity": "0.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 0,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "ir-noise-right-50": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 4,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 2,
+        "median_delay_s": 12.463999999999999,
+        "max_delay_s": 14.4,
+        "cross_model_detected": 7,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-noise-right-200": {
+        "fault_type": "ir_noise",
+        "target": "gs_right",
+        "severity": "200.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 8,
+        "median_delay_s": 4.6240000000000006,
+        "max_delay_s": 16.256,
+        "cross_model_detected": 8,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 1
+      },
+      "ir-noise-left-100": {
+        "fault_type": "ir_noise",
+        "target": "gs_left",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 7,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 0
+      },
+      "ir-drift-center": {
+        "fault_type": "ir_drift",
+        "target": "gs_center",
+        "severity": "100.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 0,
+        "median_delay_s": null,
+        "max_delay_s": null,
+        "cross_model_detected": 5,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      },
+      "ir-drift-right": {
+        "fault_type": "ir_drift",
+        "target": "gs_right",
+        "severity": "50.0",
+        "runs": 8,
+        "primary_model": "ir",
+        "detected": 1,
+        "median_delay_s": 6.400000000000002,
+        "max_delay_s": 6.400000000000002,
+        "cross_model_detected": 3,
+        "pre_onset_false_alarm_runs": 0,
+        "stopped_early_runs": 8
+      }
+    }
+  },
+  "runs": [
+    {
+      "file": "route-20261126-134215-A-2.4-motor-weak-right-80.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "43.456",
+      "faulty_samples": "1172",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134239-A-3.6-motor-weak-right-80.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "30.72",
+      "faulty_samples": "524",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.584000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.064000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.776000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134258-B-2.1-motor-weak-right-80.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "48.0",
+      "faulty_samples": "1189",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134326-B-3.4-motor-weak-right-80.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "18.752",
+      "faulty_samples": "463",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4400000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.5040000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134342-C-2.6-motor-weak-right-80.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "39.296",
+      "faulty_samples": "667",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134405-C-3.9-motor-weak-right-80.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "29.408",
+      "faulty_samples": "671",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.128
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134425-D-2.9-motor-weak-right-80.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "36.672",
+      "faulty_samples": "773",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134447-D-3.1-motor-weak-right-80.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-weak-right-80",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.8",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "33.952",
+      "faulty_samples": "563",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134508-A-2.4-motor-weak-right-70.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "47.008",
+      "faulty_samples": "1283",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134534-A-3.6-motor-weak-right-70.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "32.96",
+      "faulty_samples": "594",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.880000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.160000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134555-B-2.1-motor-weak-right-70.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "51.296",
+      "faulty_samples": "1292",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134623-B-3.4-motor-weak-right-70.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.416",
+      "faulty_samples": "515",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6399999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.1520000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134638-C-2.6-motor-weak-right-70.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "41.312",
+      "faulty_samples": "730",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.007999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134705-C-3.9-motor-weak-right-70.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "31.712",
+      "faulty_samples": "743",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6400000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134725-D-2.9-motor-weak-right-70.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "28.064",
+      "faulty_samples": "504",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6720000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3759999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134743-D-3.1-motor-weak-right-70.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-weak-right-70",
+      "fault_type": "motor_gain",
+      "target": "right",
+      "severity": "0.7",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "25.44",
+      "faulty_samples": "297",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.224
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.120000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134801-A-2.4-motor-weak-left-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "60.416",
+      "faulty_samples": "1702",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6080000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.311999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134833-A-3.6-motor-weak-left-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "39.712",
+      "faulty_samples": "805",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.8720000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 14.336
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.8720000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134856-B-2.1-motor-weak-left-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "43.968",
+      "faulty_samples": "1063",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.336
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 9.28
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134921-B-3.4-motor-weak-left-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "33.504",
+      "faulty_samples": "924",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6080000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-134942-C-2.6-motor-weak-left-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "48.0",
+      "faulty_samples": "939",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.032
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.2159999999999975
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135009-C-3.9-motor-weak-left-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.704",
+      "faulty_samples": "399",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8000000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8640000000000008
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135024-D-2.9-motor-weak-left-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "21.312",
+      "faulty_samples": "293",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.216000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.5679999999999996
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135040-D-3.1-motor-weak-left-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-weak-left-50",
+      "fault_type": "motor_gain",
+      "target": "left",
+      "severity": "0.5",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.032",
+      "faulty_samples": "128",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2319999999999993
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.2319999999999993
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135055-A-2.4-motor-stall-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "8.0",
+      "faulty_samples": "64",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135106-A-3.6-motor-stall-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "22.4",
+      "faulty_samples": "264",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.720000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.752000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135122-B-2.1-motor-stall-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "13.376",
+      "faulty_samples": "107",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3520000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4480000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135135-B-3.4-motor-stall-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "5.984",
+      "faulty_samples": "64",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135145-C-2.6-motor-stall-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "27.776",
+      "faulty_samples": "307",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.744
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.744
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135204-C-3.9-motor-stall-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "9.696",
+      "faulty_samples": "55",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135215-D-2.9-motor-stall-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "14.336",
+      "faulty_samples": "75",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4480000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135229-D-3.1-motor-stall-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-stall-left",
+      "fault_type": "motor_stall",
+      "target": "left",
+      "severity": "",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "21.088",
+      "faulty_samples": "161",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.056000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.056000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135244-A-2.4-motor-intermittent-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "42.56",
+      "faulty_samples": "1144",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.1840000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.1840000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135309-A-3.6-motor-intermittent-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "30.24",
+      "faulty_samples": "509",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.136000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 15.936000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.136000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135329-B-2.1-motor-intermittent-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "47.008",
+      "faulty_samples": "1158",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.16000000000000014
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135356-B-3.4-motor-intermittent-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "4.0",
+      "outcome": "completed",
+      "duration_s": "31.968",
+      "faulty_samples": "876",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.09600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.09600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135501-C-2.6-motor-intermittent-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "38.656",
+      "faulty_samples": "647",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.1359999999999992
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.1679999999999993
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135525-C-3.9-motor-intermittent-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "28.96",
+      "faulty_samples": "657",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.09600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135544-D-2.9-motor-intermittent-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "35.808",
+      "faulty_samples": "746",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.1280000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135606-D-3.1-motor-intermittent-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "motor-intermittent-right",
+      "fault_type": "motor_intermittent",
+      "target": "right",
+      "severity": "",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "33.344",
+      "faulty_samples": "544",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.368000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.368000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135627-A-2.4-encoder-stuck-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.448",
+      "faulty_samples": "453",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.19200000000000017
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135644-A-3.6-encoder-stuck-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "18.88",
+      "faulty_samples": "154",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.224000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.224000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135658-B-2.1-encoder-stuck-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "24.032",
+      "faulty_samples": "440",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.41600000000000037
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135716-B-3.4-encoder-stuck-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "15.36",
+      "faulty_samples": "357",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135730-C-2.6-encoder-stuck-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "24.512",
+      "faulty_samples": "205",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.119999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.119999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135747-C-3.9-encoder-stuck-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "13.504",
+      "faulty_samples": "174",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4480000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5440000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135800-D-2.9-encoder-stuck-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "17.504",
+      "faulty_samples": "174",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6720000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7360000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135814-D-3.1-encoder-stuck-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "encoder-stuck-left",
+      "fault_type": "encoder_stuck",
+      "target": "left",
+      "severity": "",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "21.12",
+      "faulty_samples": "162",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.288
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.288
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135830-A-2.4-encoder-noise-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "39.072",
+      "faulty_samples": "1035",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135853-A-3.6-encoder-noise-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "28.224",
+      "faulty_samples": "446",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.7520000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.7520000000000007
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135911-B-2.1-encoder-noise-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "43.584",
+      "faulty_samples": "1051",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4079999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4079999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135936-B-3.4-encoder-noise-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "4.0",
+      "outcome": "completed",
+      "duration_s": "29.312",
+      "faulty_samples": "793",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5760000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5760000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-135955-C-2.6-encoder-noise-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "36.512",
+      "faulty_samples": "580",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7439999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.7439999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140017-C-3.9-encoder-noise-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "26.656",
+      "faulty_samples": "585",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7040000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7040000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140036-D-2.9-encoder-noise-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.248",
+      "faulty_samples": "666",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7040000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7040000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140056-D-3.1-encoder-noise-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "encoder-noise-right",
+      "fault_type": "encoder_noise",
+      "target": "right",
+      "severity": "0.02",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "31.456",
+      "faulty_samples": "485",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.368000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5279999999999987
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140116-A-2.4-ir-stuck-center.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "32.384",
+      "faulty_samples": "826",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140136-A-3.6-ir-stuck-center.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "16.704",
+      "faulty_samples": "86",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140150-B-2.1-ir-stuck-center.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "27.424",
+      "faulty_samples": "546",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140208-B-3.4-ir-stuck-center.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "7.232",
+      "faulty_samples": "103",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140219-C-2.6-ir-stuck-center.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.8",
+      "faulty_samples": "89",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140235-C-3.9-ir-stuck-center.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "16.032",
+      "faulty_samples": "253",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.9600000000000009
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.088000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.9280000000000008
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140249-D-2.9-ir-stuck-center.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.28",
+      "faulty_samples": "667",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140309-D-3.1-ir-stuck-center.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-stuck-center",
+      "fault_type": "ir_stuck",
+      "target": "gs_center",
+      "severity": "",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "21.984",
+      "faulty_samples": "189",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140325-A-2.4-ir-dead-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "21.088",
+      "faulty_samples": "473",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.28800000000000026
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140341-A-3.6-ir-dead-left.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "19.744",
+      "faulty_samples": "181",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.7520000000000007
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140356-B-2.1-ir-dead-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "22.496",
+      "faulty_samples": "392",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.3200000000000003
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140413-B-3.4-ir-dead-left.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "14.176",
+      "faulty_samples": "320",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4800000000000004
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140426-C-2.6-ir-dead-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "38.784",
+      "faulty_samples": "651",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.879999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140449-C-3.9-ir-dead-left.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "11.808",
+      "faulty_samples": "121",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5440000000000005
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140502-D-2.9-ir-dead-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "36.672",
+      "faulty_samples": "773",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.5120000000000005
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140523-D-3.1-ir-dead-left.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-dead-left",
+      "fault_type": "ir_dead",
+      "target": "gs_left",
+      "severity": "0.0",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "34.432",
+      "faulty_samples": "578",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.336000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140602-A-2.4-ir-noise-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "39.328",
+      "faulty_samples": "1043",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140635-A-3.6-ir-noise-right-50.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "28.384",
+      "faulty_samples": "451",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 11.552000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 11.552000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140654-B-2.1-ir-noise-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "43.392",
+      "faulty_samples": "1045",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140720-B-3.4-ir-noise-right-50.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "4.0",
+      "outcome": "completed",
+      "duration_s": "29.728",
+      "faulty_samples": "806",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.136000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.168000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140741-C-2.6-ir-noise-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "36.704",
+      "faulty_samples": "586",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140805-C-3.9-ir-noise-right-50.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "27.008",
+      "faulty_samples": "596",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.7279999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.7279999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140831-D-2.9-ir-noise-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.312",
+      "faulty_samples": "668",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.072000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140854-D-3.1-ir-noise-right-50.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-50",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "31.744",
+      "faulty_samples": "494",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.815999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.847999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140919-A-2.4-ir-noise-right-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "39.84",
+      "faulty_samples": "1059",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.832000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.832000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-140945-A-3.6-ir-noise-right-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "28.576",
+      "faulty_samples": "457",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 11.392000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 11.392000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 14.4
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141004-B-2.1-ir-noise-right-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "43.584",
+      "faulty_samples": "1051",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141031-B-3.4-ir-noise-right-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "4.0",
+      "outcome": "completed",
+      "duration_s": "30.208",
+      "faulty_samples": "821",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.0
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.048
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141052-C-2.6-ir-noise-right-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "37.184",
+      "faulty_samples": "601",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.703999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.831999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141115-C-3.9-ir-noise-right-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "27.424",
+      "faulty_samples": "609",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3759999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4079999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141136-D-2.9-ir-noise-right-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.824",
+      "faulty_samples": "684",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.712
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 10.559999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.712
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 10.527999999999999
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141203-D-3.1-ir-noise-right-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-100",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "100.0",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "31.904",
+      "faulty_samples": "499",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.975999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.384
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.975999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141225-A-2.4-ir-noise-right-200.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "40.16",
+      "faulty_samples": "1069",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.7999999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3440000000000003
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.8319999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.664
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141252-A-3.6-ir-noise-right-200.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "28.896",
+      "faulty_samples": "467",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.200000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.296000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.200000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3920000000000012
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141322-B-2.1-ir-noise-right-200.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "44.512",
+      "faulty_samples": "1080",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.696
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.904
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.632
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 16.256
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141350-B-3.4-ir-noise-right-200.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "9.504",
+      "faulty_samples": "174",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.640000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.704000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.5840000000000005
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141402-C-2.6-ir-noise-right-200.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "37.312",
+      "faulty_samples": "605",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3599999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3279999999999994
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3599999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 9.215999999999998
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141424-C-3.9-ir-noise-right-200.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "27.84",
+      "faulty_samples": "622",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3439999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4719999999999995
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3119999999999994
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 13.280000000000001
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141442-D-2.9-ir-noise-right-200.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.728",
+      "faulty_samples": "681",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.808
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4480000000000004
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.744
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.5280000000000005
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141506-D-3.1-ir-noise-right-200.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-right-200",
+      "fault_type": "ir_noise",
+      "target": "gs_right",
+      "severity": "200.0",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "32.192",
+      "faulty_samples": "508",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.368000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.847999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.400000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.847999999999999
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141526-A-2.4-ir-noise-left-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "6.0",
+      "outcome": "completed",
+      "duration_s": "39.808",
+      "faulty_samples": "1058",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 23.008000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 23.136000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141549-A-3.6-ir-noise-left-100.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "14.0",
+      "outcome": "completed",
+      "duration_s": "28.64",
+      "faulty_samples": "459",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.767999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.703999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141608-B-2.1-ir-noise-left-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "10.0",
+      "outcome": "completed",
+      "duration_s": "44.224",
+      "faulty_samples": "1071",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141633-B-3.4-ir-noise-left-100.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "4.0",
+      "outcome": "completed",
+      "duration_s": "30.08",
+      "faulty_samples": "817",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 13.952000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6719999999999997
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141654-C-2.6-ir-noise-left-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "18.0",
+      "outcome": "completed",
+      "duration_s": "36.896",
+      "faulty_samples": "592",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.503999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.535999999999998
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141716-C-3.9-ir-noise-left-100.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "8.0",
+      "outcome": "completed",
+      "duration_s": "27.328",
+      "faulty_samples": "606",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.4480000000000004
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 18.208000000000002
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.16
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141734-D-2.9-ir-noise-left-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "12.0",
+      "outcome": "completed",
+      "duration_s": "33.888",
+      "faulty_samples": "686",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6080000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6720000000000006
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 0.6080000000000005
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141755-D-3.1-ir-noise-left-100.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-noise-left-100",
+      "fault_type": "ir_noise",
+      "target": "gs_left",
+      "severity": "100.0",
+      "onset_s": "16.0",
+      "outcome": "completed",
+      "duration_s": "32.0",
+      "faulty_samples": "502",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.952000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.952000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141815-A-2.4-ir-drift-center.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "25.216",
+      "faulty_samples": "602",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.024
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.272
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.2160000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141833-A-3.6-ir-drift-center.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "16.704",
+      "faulty_samples": "86",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141847-B-2.1-ir-drift-center.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "29.088",
+      "faulty_samples": "598",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.2479999999999993
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.960000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.2479999999999993
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141906-B-3.4-ir-drift-center.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "23.328",
+      "faulty_samples": "606",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.3360000000000003
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.552
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.6240000000000006
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141923-C-2.6-ir-drift-center.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "20.8",
+      "faulty_samples": "89",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141939-C-3.9-ir-drift-center.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "16.0",
+      "faulty_samples": "252",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.056000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.056000000000001
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-141953-D-2.9-ir-drift-center.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "19.84",
+      "faulty_samples": "247",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.3120000000000012
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.016
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 1.4079999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142009-D-3.1-ir-drift-center.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-drift-center",
+      "fault_type": "ir_drift",
+      "target": "gs_center",
+      "severity": "100.0",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "18.272",
+      "faulty_samples": "73",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142023-A-2.4-ir-drift-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "2.4",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "6.0",
+      "outcome": "stopped_early",
+      "duration_s": "24.48",
+      "faulty_samples": "579",
+      "control_mode": "esp32",
+      "seed": "10",
+      "onset": 6.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3919999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.84
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.3919999999999995
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142040-A-3.6-ir-drift-right.csv",
+      "route": "A",
+      "start_node": "node-003",
+      "destination_node": "node-001",
+      "wheel_speed_rad_s": "3.6",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "14.0",
+      "outcome": "stopped_early",
+      "duration_s": "18.272",
+      "faulty_samples": "135",
+      "control_mode": "esp32",
+      "seed": "11",
+      "onset": 14.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.6480000000000015
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142055-B-2.1-ir-drift-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "2.1",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "10.0",
+      "outcome": "stopped_early",
+      "duration_s": "15.648",
+      "faulty_samples": "178",
+      "control_mode": "esp32",
+      "seed": "12",
+      "onset": 10.016,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.6799999999999997
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142109-B-3.4-ir-drift-right.csv",
+      "route": "B",
+      "start_node": "node-001",
+      "destination_node": "node-003",
+      "wheel_speed_rad_s": "3.4",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "4.0",
+      "outcome": "stopped_early",
+      "duration_s": "10.432",
+      "faulty_samples": "203",
+      "control_mode": "esp32",
+      "seed": "13",
+      "onset": 4.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 5.824
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.864000000000001
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142121-C-2.6-ir-drift-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "2.6",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "18.0",
+      "outcome": "stopped_early",
+      "duration_s": "22.656",
+      "faulty_samples": "147",
+      "control_mode": "esp32",
+      "seed": "14",
+      "onset": 18.016000000000002,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 4.224
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142137-C-3.9-ir-drift-right.csv",
+      "route": "C",
+      "start_node": "node-002",
+      "destination_node": "node-004",
+      "wheel_speed_rad_s": "3.9",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "8.0",
+      "outcome": "stopped_early",
+      "duration_s": "16.768",
+      "faulty_samples": "276",
+      "control_mode": "esp32",
+      "seed": "15",
+      "onset": 8.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.872
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.672
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 8.384
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142151-D-2.9-ir-drift-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "2.9",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "12.0",
+      "outcome": "stopped_early",
+      "duration_s": "19.552",
+      "faulty_samples": "238",
+      "control_mode": "esp32",
+      "seed": "16",
+      "onset": 12.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.167999999999999
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 7.4239999999999995
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": false,
+            "delay_s": null
+          }
+        }
+      }
+    },
+    {
+      "file": "route-20261126-142207-D-3.1-ir-drift-right.csv",
+      "route": "D",
+      "start_node": "node-004",
+      "destination_node": "node-002",
+      "wheel_speed_rad_s": "3.1",
+      "fault_name": "ir-drift-right",
+      "fault_type": "ir_drift",
+      "target": "gs_right",
+      "severity": "50.0",
+      "onset_s": "16.0",
+      "outcome": "stopped_early",
+      "duration_s": "25.664",
+      "faulty_samples": "304",
+      "control_mode": "esp32",
+      "seed": "17",
+      "onset": 16.0,
+      "results": {
+        "esp-conv-v1 (conv)": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.400000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 3.007999999999999
+          }
+        },
+        "pca_baseline": {
+          "motor": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 2.400000000000002
+          },
+          "ir": {
+            "pre_onset_false_alarm": false,
+            "pre_onset_alarm_windows": 0,
+            "detected": true,
+            "delay_s": 6.400000000000002
+          }
+        }
+      }
+    }
+  ]
+}

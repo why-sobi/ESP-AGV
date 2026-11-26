@@ -1,0 +1,40 @@
+2026-11-26 13:06:52 t=29.824
+Traceback (most recent call last):
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 613, in main
+    ) = _step_esp(
+        ~~~~~~~~~^
+        esp_link,
+        ^^^^^^^^^
+    ...<3 lines>...
+        (encoder_left, encoder_right),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 337, in _step_esp
+    response = _read_esp_line(link, 0.2)
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 281, in _read_esp_line
+    response = link.readline()
+  File "D:\University\SEM7\Edge\Project\.venv\Lib\site-packages\serial\serialwin32.py", line 295, in read
+    raise SerialException("GetOverlappedResult failed ({!r})".format(ctypes.WinError()))
+serial.serialutil.SerialException: GetOverlappedResult failed (PermissionError(13, 'Access is denied.', None, 5))
+
+2026-11-26 13:07:02 t=6.752
+Traceback (most recent call last):
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 613, in main
+    ) = _step_esp(
+        ~~~~~~~~~^
+        esp_link,
+        ^^^^^^^^^
+    ...<3 lines>...
+        (encoder_left, encoder_right),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 337, in _step_esp
+    response = _read_esp_line(link, 0.2)
+  File "D:\University\SEM7\Edge\Project\simulation\controllers\epuck_route\epuck_route.py", line 281, in _read_esp_line
+    response = link.readline()
+  File "D:\University\SEM7\Edge\Project\.venv\Lib\site-packages\serial\serialwin32.py", line 295, in read
+    raise SerialException("GetOverlappedResult failed ({!r})".format(ctypes.WinError()))
+serial.serialutil.SerialException: GetOverlappedResult failed (PermissionError(13, 'Access is denied.', None, 5))
+

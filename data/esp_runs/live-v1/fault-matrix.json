@@ -1,0 +1,17 @@
+{
+  "description": "Live end-to-end check of on-ESP anomaly detection (firmware with esp-conv-v1): the ESP drives the round trip and reports motor/IR scores and alarms in every motor frame, logged as esp_motor_score, esp_ir_score, esp_motor_alarm and esp_ir_alarm. Off-grid speeds and new jitter seeds.",
+  "onset_s": 8.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 2.7, "seed": 20, "onset_s": 6.0},
+    {"route": "B", "speed": 3.3, "seed": 21, "onset_s": 9.0},
+    {"route": "C", "speed": 2.4, "seed": 22, "onset_s": 15.0},
+    {"route": "D", "speed": 3.8, "seed": 23, "onset_s": 12.0}
+  ],
+  "faults": [
+    {"name": "motor-weak-left-50", "type": "motor_gain", "target": "left", "severity": 0.5},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0},
+    {"name": "ir-noise-right-200", "type": "ir_noise", "target": "gs_right", "severity": 200.0}
+  ]
+}

@@ -18,6 +18,12 @@ MOTOR_FEATURES = (
 )
 IR_FEATURES = ("gs_left", "gs_center", "gs_right")
 SPLIT_NAMES = ("train", "validation", "test")
+# ESP states in which the robot executes a commanded manoeuvre (stopping at the
+# destination, unloading, turning around). Windows that overlap them are used
+# for training but not monitored: the ESP knows its own state, so it can
+# suppress anomaly decisions there, like during the start-up warm-up. The
+# first 0.5 s after a U-turn is unmonitored too (see unmonitored_samples).
+UNMONITORED_STATES = ("AT_DEST", "UNLOADING", "U_TURN")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -156,6 +162,31 @@ def _features(rows, run_id, window_size):
     return motor, ir, sample_times, summary
 
 
+def unmonitored_samples(rows, settle_s=0.5):
+    """Per derived sample (rows[1:], as in _features): True in a commanded manoeuvre.
+
+    The first ``settle_s`` after a U-turn also counts: the line follower is
+    still settling onto the line, like the warm-up at the start of a run.
+    """
+    flags = []
+    last_turn = None
+    for row in rows[1:]:
+        time_s = float(row["time"])
+        state = row.get("esp_state", "")
+        if state == "U_TURN":
+            last_turn = time_s
+        settling = last_turn is not None and time_s - last_turn < settle_s
+        flags.append(state in UNMONITORED_STATES or settling)
+    return np.asarray(flags, dtype=bool)
+
+
+def window_monitored(unmonitored, window_size):
+    """Per window start: True when no sample of the window is in a manoeuvre."""
+    counts = np.convolve(unmonitored.astype(np.int32), np.ones(window_size, dtype=np.int32),
+                         mode="valid")
+    return counts == 0
+
+
 def _fit_scaler(matrices):
     joined = np.concatenate(matrices, axis=0)
     mean = joined.mean(axis=0)
@@ -169,12 +200,15 @@ def _make_windows(records, indices, window_size, stride, motor_mean, motor_scale
     ir_windows = []
     run_indices = []
     start_times = []
+    monitored = []
     split_runs = []
 
     for run_index in indices:
-        run_id, motor, ir, times, _ = records[run_index]
+        run_id, motor, ir, times, _, unmonitored = records[run_index]
+        run_monitored = window_monitored(unmonitored, window_size)
         first_window = len(motor_windows)
         for start in range(0, len(motor) - window_size + 1, stride):
+            monitored.append(bool(run_monitored[start]))
             end = start + window_size
             motor_windows.append((motor[start:end] - motor_mean) / motor_scale)
             ir_windows.append((ir[start:end] - ir_mean) / ir_scale)
@@ -202,6 +236,7 @@ def _make_windows(records, indices, window_size, stride, motor_mean, motor_scale
         np.asarray(run_indices, dtype=np.int32),
         np.asarray(start_times, dtype=np.float64),
         split_runs,
+        np.asarray(monitored, dtype=bool),
     )
 
 
@@ -257,7 +292,7 @@ def prepare_dataset(
             if split is not None:
                 summary["assigned_split"] = file_split[path.resolve()]
                 run_split[run_id] = summary["assigned_split"]
-            records.append((run_id, motor, ir, times, summary))
+            records.append((run_id, motor, ir, times, summary, unmonitored_samples(rows)))
 
     records.sort(key=lambda record: record[0])
     unique_records = []
@@ -334,6 +369,9 @@ def prepare_dataset(
         train_window_start_seconds=train[3],
         validation_window_start_seconds=validation[3],
         test_window_start_seconds=test[3],
+        train_window_monitored=train[5],
+        validation_window_monitored=validation[5],
+        test_window_monitored=test[5],
     )
 
     metadata = {
@@ -349,6 +387,7 @@ def prepare_dataset(
             "ir_mean": ir_mean.tolist(),
             "ir_scale": ir_scale.tolist(),
         },
+        "unmonitored_states": list(UNMONITORED_STATES),
         "split_method": "explicit" if split is not None else "validation_fraction",
         "split_source": None if split_source is None else str(split_source),
         "train_runs": train[4],

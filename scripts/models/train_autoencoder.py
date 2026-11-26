@@ -6,9 +6,11 @@ reconstruction-error distribution. Healthy test runs then measure the false
 alarm rate, per window and with a k-of-n persistence rule. A PCA model with the
 same bottleneck size is evaluated identically as a linear baseline.
 
-Windows starting before --warmup-s (the spawn/settling transient) are not
-monitored: they are excluded from thresholds, rates and alarms, but still used
-for training.
+Windows starting before --warmup-s (the spawn/settling transient), and windows
+the dataset marks as unmonitored (overlapping a commanded stop, unload or
+U-turn of the ESP), are not monitored: they are excluded from thresholds, rates
+and alarms, but still used for training. --reuse-weights re-evaluates the
+weights already in --out without training.
 
 Architectures (--arch): ``dense`` (Linear/ReLU only) and ``conv`` (a 1D
 convolutional encoder with the same dense decoder). Both use only layers that
@@ -109,6 +111,7 @@ def load_dataset(dataset_dir):
     metadata = json.loads((dataset_dir / "metadata.json").read_text(encoding="utf-8"))
     arrays = {}
     starts = {}
+    flags = {}
     with np.load(dataset_dir / "windows.npz") as data:
         for split in SPLITS:
             for model in MODELS:
@@ -117,9 +120,12 @@ def load_dataset(dataset_dir):
                     raise ValueError(f"{dataset_dir} has no {key}; rebuild it with --split")
                 arrays[key] = data[key].astype(np.float32)
             starts[split] = data[f"{split}_window_start_seconds"]
+            # Older datasets have no state flags: every window is monitorable.
+            key = f"{split}_window_monitored"
+            flags[split] = data[key] if key in data else np.ones(len(starts[split]), bool)
     if len(arrays["motor_test"]) == 0 or len(arrays["motor_validation"]) == 0:
         raise ValueError("Dataset needs non-empty validation and test splits.")
-    return metadata, arrays, starts
+    return metadata, arrays, starts, flags
 
 
 def flatten(windows):
@@ -145,9 +151,12 @@ def run_slices(split_runs):
     ]
 
 
-def evaluate(scores, threshold, test_runs, test_start_seconds, k, n, warmup_s=0.0):
+def evaluate(scores, threshold, test_runs, test_start_seconds, k, n, warmup_s=0.0,
+             test_flags=None):
     """False-alarm statistics on healthy test runs (warm-up windows unmonitored)."""
     monitored = test_start_seconds >= warmup_s
+    if test_flags is not None:
+        monitored = monitored & test_flags
     exceed = (scores["test"] > threshold) & monitored
     per_run = []
     for run_id, window_slice in run_slices(test_runs):
@@ -175,6 +184,22 @@ def evaluate(scores, threshold, test_runs, test_start_seconds, k, n, warmup_s=0.
         ),
         "test_runs": per_run,
     }
+
+
+def no_alarm_threshold(scores, monitored, runs, k, n):
+    """Smallest threshold at which no run raises a persistent (k-of-n) alarm.
+
+    A run alarms when k of n consecutive monitored windows exceed, so the
+    threshold must sit just above the k-th largest monitored score in every
+    span of n windows of every run.
+    """
+    worst = 0.0
+    for _, window_slice in run_slices(runs):
+        run_scores = np.where(monitored[window_slice], scores[window_slice], 0.0)
+        for end in range(k, len(run_scores) + 1):
+            span = run_scores[max(0, end - n):end]
+            worst = max(worst, float(np.sort(span)[-k]))
+    return float(np.nextafter(worst, np.inf))
 
 
 def score_summary(values):
@@ -279,13 +304,14 @@ def plot_scores(path, title, scores, monitored, threshold, test_runs, test_start
 
 def train_all(dataset, out, arch="dense", hidden=32, bottleneck=8, epochs=300, patience=30,
               batch_size=64, lr=1e-3, seed=0, threshold_percentile=99.5,
-              persist_k=3, persist_n=5, warmup_s=0.5, plots=True):
+              threshold_rule="percentile",
+              persist_k=3, persist_n=5, warmup_s=0.5, plots=True, reuse_weights=False):
     seed_everything(seed)
-    metadata, arrays, starts = load_dataset(dataset)
+    metadata, arrays, starts, flags = load_dataset(dataset)
     window_size = int(metadata["window_size_samples"])
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
-    monitored = {split: starts[split] >= warmup_s for split in SPLITS}
+    monitored = {split: (starts[split] >= warmup_s) & flags[split] for split in SPLITS}
     if not monitored["validation"].any() or not monitored["test"].any():
         raise ValueError(f"No validation/test windows start after warm-up {warmup_s} s.")
 
@@ -304,10 +330,16 @@ def train_all(dataset, out, arch="dense", hidden=32, bottleneck=8, epochs=300, p
                      "learning_rate": lr, "seed": seed, "optimizer": "Adam", "loss": "MSE"},
         "threshold_rule": {
             "score": "mean squared reconstruction error over the scaled window",
-            "threshold": f"{threshold_percentile} percentile of monitored validation scores",
+            "threshold": (
+                f"{threshold_percentile} percentile of monitored validation scores"
+                if threshold_rule == "percentile" else
+                "smallest threshold with no persistent alarm on any healthy validation run"
+            ),
             "persistence": f"alarm when >= {persist_k} of the last {persist_n} windows exceed",
             "warmup_s": warmup_s,
             "warmup": "windows starting before warmup_s are not monitored",
+            "unmonitored_states": metadata.get("unmonitored_states", []),
+            "states": "windows overlapping these ESP states are not monitored",
         },
         "models": {},
     }
@@ -316,26 +348,50 @@ def train_all(dataset, out, arch="dense", hidden=32, bottleneck=8, epochs=300, p
         flat = {split: flatten(arrays[f"{name}_{split}"]) for split in SPLITS}
         features = arrays[f"{name}_train"].shape[2]
         torch.manual_seed(seed)
-        model, reconstruct, train_info = train_model(
-            flat, arch, window_size, features, hidden, bottleneck, epochs, patience,
-            batch_size, lr,
-        )
-        torch.save(model.state_dict(), out / f"{name}.pt")
+        if reuse_weights:
+            previous = json.loads((out / "config.json").read_text(encoding="utf-8"))
+            model = build_model(arch, window_size, features, hidden, bottleneck)
+            model.load_state_dict(torch.load(out / f"{name}.pt", weights_only=True))
+            model.eval()
+
+            def reconstruct(x, model=model):
+                with torch.no_grad():
+                    return model(torch.from_numpy(x)).numpy()
+
+            kept = previous["models"][name]
+            train_info = {
+                "best_epoch": kept["best_epoch"],
+                "epochs_run": kept["epochs_run"],
+                "history": [{"train": kept["final_train_loss"],
+                             "validation": kept["final_validation_loss"]}] * kept["best_epoch"],
+            }
+        else:
+            model, reconstruct, train_info = train_model(
+                flat, arch, window_size, features, hidden, bottleneck, epochs, patience,
+                batch_size, lr,
+            )
+            torch.save(model.state_dict(), out / f"{name}.pt")
 
         results = {}
         for method, recon in ((f"{arch}_autoencoder", reconstruct),
                                ("pca_baseline", fit_pca(flat["train"], bottleneck))):
             scores = {split: window_scores(recon, flat[split]) for split in SPLITS}
-            threshold = float(np.percentile(
-                scores["validation"][monitored["validation"]], threshold_percentile
-            ))
+            if threshold_rule == "percentile":
+                threshold = float(np.percentile(
+                    scores["validation"][monitored["validation"]], threshold_percentile
+                ))
+            else:
+                threshold = no_alarm_threshold(
+                    scores["validation"], monitored["validation"],
+                    metadata["validation_runs"], persist_k, persist_n,
+                )
             results[method] = {
                 "threshold": threshold,
                 "scores": {
                     split: score_summary(scores[split][monitored[split]]) for split in SPLITS
                 },
                 **evaluate(scores, threshold, metadata["test_runs"], starts["test"],
-                           persist_k, persist_n, warmup_s),
+                           persist_k, persist_n, warmup_s, flags["test"]),
             }
             if plots and method != "pca_baseline":
                 plot_scores(out / f"{name}_scores.png", f"{name} {arch} AE", scores,
@@ -378,6 +434,13 @@ def main():
     parser.add_argument("--persist-k", type=int, default=3)
     parser.add_argument("--persist-n", type=int, default=5)
     parser.add_argument("--warmup-s", type=float, default=0.5)
+    parser.add_argument("--threshold-rule", choices=("percentile", "no-validation-alarm"),
+                        default="percentile",
+                        help="percentile: --threshold-percentile of validation scores; "
+                             "no-validation-alarm: lowest threshold with no persistent "
+                             "alarm on any healthy validation run")
+    parser.add_argument("--reuse-weights", action="store_true",
+                        help="Re-evaluate the weights in --out instead of training")
     args = parser.parse_args()
 
     config = train_all(
@@ -385,7 +448,9 @@ def main():
         bottleneck=args.bottleneck, epochs=args.epochs, patience=args.patience,
         batch_size=args.batch_size, lr=args.lr, seed=args.seed,
         threshold_percentile=args.threshold_percentile,
+        threshold_rule=args.threshold_rule,
         persist_k=args.persist_k, persist_n=args.persist_n, warmup_s=args.warmup_s,
+        reuse_weights=args.reuse_weights,
     )
     for name, info in config["models"].items():
         print(f"\n{name}: {info['parameters']} parameters, best epoch "

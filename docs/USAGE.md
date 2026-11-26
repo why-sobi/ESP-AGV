@@ -214,6 +214,33 @@ the Webots exit code, because Webots drops the controller's last console lines
 when it quits. A Webots window that is already open does not interfere; the
 batch instance uses another port.
 
+**ESP-controlled runs (the deployment dataset).** With the ESP on COM3 and no
+other program holding the port:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.telemetry.collect_route_runs `
+  --control-mode esp32 --round-trip --routes ABCD `
+  --speeds 2.0 2.25 2.5 2.75 3.0 3.25 3.5 3.75 4.0 --seeds 0 1 2 `
+  --out data\esp_runs\healthy --timeout 300 --resume
+```
+
+- The speed is sent to the ESP as its route speed (`V@`, mission key
+  `esp_speed_rad_s`).
+- `--round-trip` records the outbound leg, the 1 s unload, the U-turn and
+  the return leg in one CSV.
+- `--seeds` repeats each route/speed with a seeded start-pose jitter
+  (`--jitter-lateral-m`, default 3 mm; `--jitter-heading-deg`, default 4),
+  because Webots otherwise repeats a run byte for byte.
+- Each round trip takes 16-32 s of wall time; the 108-run matrix above took
+  about 40 minutes.
+- If the USB serial link drops mid-run (`SerialException` in
+  `controller-errors.log`), the run is marked `serial_error` and repeated
+  (`--serial-retries`, default 3). `--resume` skips runs already healthy.
+- An ESP run is healthy when it completes and no line loss lasts longer than
+  the firmware's 750 ms search limit. The sensors briefly leave the line on
+  corners and in the last few centimetres into a terminal node (node-001,
+  node-003), which is normal.
+
 **Manual recording.** Edit `maps\routes\mission.json`, then in Webots press
 Reset (Ctrl+Shift+T) so the controller restarts and rereads the mission, and
 run in Fast mode. Wait for `Destination reached` in the console.
@@ -262,6 +289,25 @@ validation and 14 test runs. The file's `speeds_rad_s` field lists the exact
 assignment. `route-runs-v1.json` / `sim-baseline-v2` is the earlier 16-run
 version recorded before the junction log-gap fix; those runs are marked
 `superseded` in the manifest.
+
+**ESP dataset.** `esp-runs-v1.json` (dataset `esp-baseline-v1`) uses the 108
+healthy ESP round trips in `data\esp_runs\healthy`: 4 routes x 9 ESP speeds
+(2.0-4.0 rad/s in 0.25 steps) x 3 start-pose seeds.
+- Seeds 0 and 1 train (72 runs).
+- Seed 2 alternates between validation and test over the speeds, with the
+  phase flipped per route (18 + 18 runs).
+- Every held-out run therefore has two training runs on the same route and
+  speed from different start poses.
+- That gives 74562 training, 18644 validation and 18640 test windows.
+
+These are the models to deploy: the Supervisor-trained models raise alarms on
+every healthy ESP run (see `docs/STATUS.md`).
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.telemetry.prepare_telemetry `
+  --split "data\datasets\splits\esp-runs-v1.json" `
+  --out "data\datasets\esp-baseline-v1"
+```
 
 The older `--runs` form still works and splits by run-id order with
 `--validation-fraction` (no test split):
@@ -494,20 +540,141 @@ Detection limits (`reports\severity-sweep-v1`, conv-v1 / dense-v1):
   separately and take the maximum, or add a high-frequency feature such as the
   sample-to-sample difference.
 
+## ESP-controlled models (the ones to deploy)
+
+The models above were trained on Supervisor-controlled runs. On healthy
+ESP-controlled round trips, `conv-v1` alarms in all 18 test runs (34% of
+motor and 20% of IR windows over threshold). The ESP's PD loop commands
+different wheel targets, and the stop, unload and U-turn are new. The
+deployment models are retrained on `esp-baseline-v1`:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.train_autoencoder `
+  --dataset data\datasets\esp-baseline-v1 --arch conv --out models\esp-conv-v1 `
+  --threshold-rule no-validation-alarm
+.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs `
+  --matrix data\esp_runs\faults\fault-matrix-esp-v1.json --timeout 300
+.\.venv\Scripts\python.exe -m scripts.faults.evaluate_faults --models models\esp-conv-v1 `
+  --manifest data\esp_runs\faults\manifest.csv --out reports\esp-fault-eval-v1
+```
+
+Training takes about 25 minutes per model on the CPU. `--reuse-weights`
+re-evaluates saved weights, for example with another threshold rule.
+
+- **Commanded manoeuvres are not monitored.** Windows that overlap the ESP
+  states `AT_DEST`, `UNLOADING` or `U_TURN`, or the first 0.5 s after a
+  U-turn while the line follower settles, are used for training but excluded
+  from thresholds and alarms, like the warm-up.
+  - `prepare_telemetry.py` stores the per-window flags.
+  - Unmonitored, the stop and the U-turn exit caused most healthy false
+    alarms. Both happen once or twice per run.
+  - On the ESP the firmware knows its state, so it can apply the same gating.
+- **Threshold rule `no-validation-alarm`:** the lowest threshold at which no
+  healthy validation run raises a 3-of-5 alarm. With the 99.5th-percentile
+  rule, 7/18 (motor) and 5/18 (IR) healthy test runs alarmed. The IR model
+  also alarmed before onset in 15 of the 120 fault runs, on unseen speeds.
+- **Fault matrix:** 15 faults x 8 round trips (120 runs).
+  - The runs use speeds between the healthy grid points and new jitter
+    seeds.
+  - Onsets vary from 4 to 18 s, so they fall in the outbound leg, the
+    unload/U-turn or the return leg.
+
+Healthy test runs (18): the motor model alarms in 2/18 (0.09% of windows) and
+the IR model in 0/18. The 2 motor alarms are the last 3 cm into a terminal
+node (C at 3.75 rad/s) and leaving a right turn at 2.0 rad/s. No fault run
+alarmed before its onset (0/120).
+
+| Fault | Detected (own model) | Median delay | Other model fired |
+|---|---|---|---|
+| Motor stall / intermittent | 8/8, 8/8 | 0.38 s, 0.67 s | 0/8, 1/8 |
+| Motor 50% / 30% / 20% power loss | 8/8, 6/8, 3/8 | 2.2 s, 1.8 s, 4.1 s | 1/8, 0/8, 1/8 |
+| Encoder stuck / noisy | 8/8, 8/8 | 0.56 s, 1.06 s | 0/8, 0/8 |
+| IR dead | 8/8 | 0.53 s | 0/8 |
+| IR noise std 200 / 100 (right) / 100 (left) / 50 | 8/8, 3/8, 3/8, 0/8 | 2.2 s, 8.0 s, 14.0 s, - | 8/8, 7/8, 7/8, 5/8 |
+| IR drift centre / right | 4/8, 6/8 | 5.6 s, 4.4 s | 5/8, 7/8 |
+| IR stuck centre | 1/8 | 1.1 s | 1/8 |
+
+- **Under ESP control, IR noise also shows up in the motor model.** The noisy
+  readings make the PD loop command jittery wheel targets. Noise of std 100
+  trips the motor model in 7-8/8 runs, while the IR model alone detects it in
+  3-4/8. "Either model alarms" is a much better fault detector than the IR
+  model alone, but it does not say which subsystem failed.
+- Many faults stop the run (`LINE_LOST`, `JUNCTION_MISSED`): every stall,
+  stuck encoder, dead sensor and drift run, and 7/8 stuck-sensor runs. The
+  ESP's own safety stops are therefore a second line of defence. Undetected
+  drift and stuck-sensor runs ended this way.
+- The PCA baseline matches the conv model on motor faults but misses most IR
+  faults (IR dead 0/8).
+
+**Comparison with the Supervisor-trained models**
+(`reports/esp-model-comparison-v1`): on the same ESP runs, gating and
+3-of-5 rule, the old models are unusable.
+
+| Model | Healthy test runs alarming (motor, IR) | Healthy windows over threshold |
+|---|---|---|
+| esp-conv-v1 | 2/18, 0/18 | 0.09%, 0.01% |
+| conv-v1 | 18/18, 18/18 | 23.2%, 13.3% |
+| dense-v1 | 18/18, 18/18 | 24.8%, 14.1% |
+
+The old models "detect" almost every fault in 8/8 runs only because they are
+already alarming before the onset, in nearly every fault run.
+
+### Inference on the ESP
+
+The firmware runs both models on every sensor frame and returns the scores and
+alarms in the motor frame (see `firmware/README.md`). After retraining,
+regenerate the weights header and reflash:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --out firmware\main\anomaly_model.h
+```
+
+**Agreement with Python.** `scripts/esp/replay_scores.py` replays recorded
+ESP runs through the ESP: the same route commands and sensor/encoder frames,
+without the host-side unload rows. It compares the ESP's wheel targets,
+scores and alarms with the Python reference:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.esp.replay_scores --port COM3 <run.csv> ... --out reports\esp-replay-v1\agreement.json
+```
+
+On the 18 healthy test runs and one run of each of the 15 faults (65044
+windows):
+- Scores differed by at most 4.5e-5. Thresholds are 0.19 (motor) and 0.45
+  (IR).
+- The alarm decisions were identical on every window: 2559 alarm windows,
+  0 mismatches.
+- One wheel target in one run differed by 0.001 rad/s. The `-O2` build
+  rounds one value the other way.
+
+**Live end-to-end** (`data\esp_runs\live-v1`, 16 round trips with the ESP
+driving and detecting):
+- The 4 healthy runs raised no alarm.
+- 50% weak left motor: detected by the motor model 4/4 (0.5-5.2 s).
+- Dead left IR: detected by the IR model 4/4 (0.1-3.9 s).
+- IR noise std 200: detected by the IR model 4/4 (0.7-3.9 s), and the motor
+  model fired too.
+- No alarm came before a fault's onset.
+- The logged live scores matched Python within 3.3e-5, with no alarm
+  mismatches.
+
+Inference costs about 4.5 ms per frame. Each 31 s round trip then takes about
+26 s of wall time instead of about 19 s.
+
 ## Deployment and integration status
 
 The control half of the loop works: in ESP mode, `epuck_route` is the Python
 bridge, and all four two-edge routes (A-D) complete with the ESP computing the
-wheel commands. The ESP stopped 1.0-1.4 cm from the destination node, and the
-maximum path error was 2.4-2.5 cm, the same as the Supervisor controller.
+wheel commands, one way or as round trips, at 2.0-4.0 rad/s. The ESP stopped
+1.0-1.4 cm from the destination node, and the maximum path error was 2.4-2.5
+cm, the same as the Supervisor controller.
+
+Anomaly detection also runs on the ESP and agrees with Python (see above).
 
 Still to do:
 
-- ESP-compatible anomaly inference (exporting the weights to C) and a way to
-  report scores in the motor frame.
-- Check whether the models trained on Supervisor-controlled runs raise false
-  alarms on ESP-controlled runs. The ESP's PD loop commands different wheel
-  targets, so a healthy dataset recorded under ESP control may be needed.
+- Decide what the robot does on an alarm; alarms are currently only reported
+  and logged.
 
 ## Tests
 

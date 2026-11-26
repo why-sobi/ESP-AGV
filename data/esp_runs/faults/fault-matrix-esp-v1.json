@@ -1,0 +1,33 @@
+{
+  "description": "ESP-controlled fault runs (round trips) for detection evaluation. The runs use speeds between the healthy grid points (2.0-4.0 rad/s in 0.25 steps) and jitter seeds not used for healthy data, so the pre-onset part is unseen healthy data. Onsets vary per run (4-18 s), covering the outbound leg, the unload/U-turn and the return leg. Severity units: motor_gain = fraction of commanded speed applied; encoder_noise = position noise std (rad); ir_dead = constant reading; ir_noise = reading noise std; ir_drift = offset growth per second. Healthy ground-sensor readings are about 300 on the line and 760 off it.",
+  "onset_s": 5.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 2.4, "seed": 10, "onset_s": 6.0},
+    {"route": "A", "speed": 3.6, "seed": 11, "onset_s": 14.0},
+    {"route": "B", "speed": 2.1, "seed": 12, "onset_s": 10.0},
+    {"route": "B", "speed": 3.4, "seed": 13, "onset_s": 4.0},
+    {"route": "C", "speed": 2.6, "seed": 14, "onset_s": 18.0},
+    {"route": "C", "speed": 3.9, "seed": 15, "onset_s": 8.0},
+    {"route": "D", "speed": 2.9, "seed": 16, "onset_s": 12.0},
+    {"route": "D", "speed": 3.1, "seed": 17, "onset_s": 16.0}
+  ],
+  "faults": [
+    {"name": "motor-weak-right-80", "type": "motor_gain", "target": "right", "severity": 0.8},
+    {"name": "motor-weak-right-70", "type": "motor_gain", "target": "right", "severity": 0.7},
+    {"name": "motor-weak-left-50", "type": "motor_gain", "target": "left", "severity": 0.5},
+    {"name": "motor-stall-left", "type": "motor_stall", "target": "left"},
+    {"name": "motor-intermittent-right", "type": "motor_intermittent", "target": "right", "period_s": 1.0, "burst_s": 0.15},
+    {"name": "encoder-stuck-left", "type": "encoder_stuck", "target": "left"},
+    {"name": "encoder-noise-right", "type": "encoder_noise", "target": "right", "severity": 0.02},
+    {"name": "ir-stuck-center", "type": "ir_stuck", "target": "gs_center"},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0},
+    {"name": "ir-noise-right-50", "type": "ir_noise", "target": "gs_right", "severity": 50.0},
+    {"name": "ir-noise-right-100", "type": "ir_noise", "target": "gs_right", "severity": 100.0},
+    {"name": "ir-noise-right-200", "type": "ir_noise", "target": "gs_right", "severity": 200.0},
+    {"name": "ir-noise-left-100", "type": "ir_noise", "target": "gs_left", "severity": 100.0},
+    {"name": "ir-drift-center", "type": "ir_drift", "target": "gs_center", "severity": 100.0},
+    {"name": "ir-drift-right", "type": "ir_drift", "target": "gs_right", "severity": 50.0}
+  ]
+}

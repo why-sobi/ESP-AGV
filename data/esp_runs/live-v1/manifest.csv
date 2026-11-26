@@ -1,0 +1,13 @@
+file,route,start_node,destination_node,wheel_speed_rad_s,fault_name,fault_type,target,severity,onset_s,outcome,duration_s,faulty_samples,control_mode,seed
+route-20261126-154608-A-2.7-motor-weak-left-50.csv,A,node-003,node-001,2.7,motor-weak-left-50,motor_gain,left,0.5,6.0,completed,55.2,1539,esp32,20
+route-20261126-154702-B-3.3-motor-weak-left-50.csv,B,node-001,node-003,3.3,motor-weak-left-50,motor_gain,left,0.5,9.0,stopped_early,32.32,730,esp32,21
+route-20261126-154734-C-2.4-motor-weak-left-50.csv,C,node-002,node-004,2.4,motor-weak-left-50,motor_gain,left,0.5,15.0,stopped_early,20.0,158,esp32,22
+route-20261126-154755-D-3.8-motor-weak-left-50.csv,D,node-004,node-002,3.8,motor-weak-left-50,motor_gain,left,0.5,12.0,stopped_early,17.472,173,esp32,23
+route-20261126-154813-A-2.7-ir-dead-left.csv,A,node-003,node-001,2.7,ir-dead-left,ir_dead,gs_left,0.0,6.0,stopped_early,18.816,402,esp32,20
+route-20261126-154837-B-3.3-ir-dead-left.csv,B,node-001,node-003,3.3,ir-dead-left,ir_dead,gs_left,0.0,9.0,stopped_early,13.984,157,esp32,21
+route-20261126-154853-C-2.4-ir-dead-left.csv,C,node-002,node-004,2.4,ir-dead-left,ir_dead,gs_left,0.0,15.0,stopped_early,18.848,122,esp32,22
+route-20261126-154912-D-3.8-ir-dead-left.csv,D,node-004,node-002,3.8,ir-dead-left,ir_dead,gs_left,0.0,12.0,stopped_early,18.496,205,esp32,23
+route-20261126-154929-A-2.7-ir-noise-right-200.csv,A,node-003,node-001,2.7,ir-noise-right-200,ir_noise,gs_right,200.0,6.0,completed,36.672,960,esp32,20
+route-20261126-154957-B-3.3-ir-noise-right-200.csv,B,node-001,node-003,3.3,ir-noise-right-200,ir_noise,gs_right,200.0,9.0,completed,30.976,688,esp32,21
+route-20261126-155022-C-2.4-ir-noise-right-200.csv,C,node-002,node-004,2.4,ir-noise-right-200,ir_noise,gs_right,200.0,15.0,completed,40.128,787,esp32,22
+route-20261126-155052-D-3.8-ir-noise-right-200.csv,D,node-004,node-002,3.8,ir-noise-right-200,ir_noise,gs_right,200.0,12.0,completed,27.616,490,esp32,23

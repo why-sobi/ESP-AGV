@@ -108,6 +108,10 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
     )
     if u_turn_first:
         plan = [("U", 0.0)] + plan
+    # Optional straight-line speed for the ESP's PD loop (firmware default
+    # 3.5 rad/s); it must come before every other step.
+    if mission.get("esp_speed_rad_s") is not None:
+        plan = [("V", float(mission["esp_speed_rad_s"]))] + plan
     return route, route_paths, format_route_command(plan)
 
 
@@ -335,7 +339,8 @@ def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
             raise RuntimeError(f"ESP rejected sensor frame: {response}")
 
         fields = response.split(",")
-        if len(fields) != 7 or fields[0] != "M":
+        # 7 fields from firmware without anomaly detection, 11 with it.
+        if len(fields) not in (7, 11) or fields[0] != "M":
             raise RuntimeError(f"Malformed ESP motor response: {response!r}")
         if int(fields[1]) >= sequence:
             break
@@ -360,7 +365,9 @@ def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
     state = fields[4]
     if state not in ESP_STATES:
         raise RuntimeError(f"Unknown ESP controller state: {state!r}")
-    return left_target, right_target, state, int(fields[5]), float(fields[6])
+    # Motor/IR anomaly scores (-1 before the first full window) and alarms.
+    anomaly = tuple(fields[7:11]) if len(fields) == 11 else ("", "", "", "")
+    return left_target, right_target, state, int(fields[5]), float(fields[6]), anomaly
 
 
 def main():
@@ -442,8 +449,21 @@ def main():
             if first_direction is None:
                 raise ValueError("First route edge has no usable direction.")
             heading = math.atan2(first_direction[1], first_direction[0])
+            spawn_x, spawn_y = start_world
+            # Optional seeded start-pose variation, so repeated runs of one
+            # route and speed are not identical (Webots is deterministic).
+            jitter = mission.get("spawn_jitter")
+            if jitter:
+                jitter_rng = random.Random(int(jitter.get("seed", 0)))
+                lateral = jitter_rng.uniform(-1.0, 1.0) * float(jitter.get("lateral_m", 0.0))
+                heading += math.radians(
+                    jitter_rng.uniform(-1.0, 1.0) * float(jitter.get("heading_deg", 0.0))
+                )
+                spawn_x -= lateral * math.sin(heading)
+                spawn_y += lateral * math.cos(heading)
+                print(f"Spawn jitter: {lateral * 1000:.1f} mm lateral, heading {math.degrees(heading):.1f} deg")
             current_z = self_node.getPosition()[2]
-            translation_field.setSFVec3f([start_world[0], start_world[1], current_z])
+            translation_field.setSFVec3f([spawn_x, spawn_y, current_z])
             rotation_field.setSFRotation([0.0, 0.0, 1.0, heading])
             self_node.resetPhysics()
 
@@ -482,7 +502,10 @@ def main():
             "fault_active",
         ]
         if control_mode == "esp32":
-            header.extend(("esp_state", "esp_route_index", "esp_distance_m"))
+            header.extend((
+                "esp_state", "esp_route_index", "esp_distance_m",
+                "esp_motor_score", "esp_ir_score", "esp_motor_alarm", "esp_ir_alarm",
+            ))
         writer.writerow(header)
         fault = FaultInjector(mission.get("fault"))
         if fault.spec:
@@ -579,6 +602,7 @@ def main():
             esp_state = ""
             esp_route_index = -1
             esp_distance = ""
+            esp_anomaly = ("", "", "", "")
             if unloading_until is not None:
                 # Stopped at the destination; the ESP gets no frames until
                 # the return route is sent.
@@ -593,6 +617,7 @@ def main():
                     esp_state,
                     esp_route_index,
                     esp_distance,
+                    esp_anomaly,
                 ) = _step_esp(
                     esp_link,
                     esp_sequence,
@@ -649,7 +674,7 @@ def main():
                 int(fault.active(now)),
             ]
             if control_mode == "esp32":
-                row.extend((esp_state, esp_route_index, esp_distance))
+                row.extend((esp_state, esp_route_index, esp_distance, *esp_anomaly))
             writer.writerow(row)
             buffered_rows += 1
             if buffered_rows >= batch_size:

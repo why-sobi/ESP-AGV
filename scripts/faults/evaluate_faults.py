@@ -24,7 +24,11 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from scripts.telemetry.prepare_telemetry import _features
+from scripts.telemetry.prepare_telemetry import (
+    _features,
+    unmonitored_samples,
+    window_monitored,
+)
 from scripts.models.train_autoencoder import (
     MODELS,
     build_model,
@@ -77,7 +81,7 @@ def load_detectors(model_dirs):
         if "pca_baseline" not in detectors:
             # Same dataset/bottleneck for every model dir; refit PCA once.
             dataset = ROOT / config["dataset"]
-            _, arrays, _ = load_dataset(dataset)
+            _, arrays, _, _ = load_dataset(dataset)
             detectors["pca_baseline"] = {}
             for name in MODELS:
                 info = config["models"][name]
@@ -92,7 +96,8 @@ def load_detectors(model_dirs):
 
 
 def run_windows(path, window_size):
-    """Return motor/IR windows (unscaled), window start/end times and the onset time."""
+    """Return motor/IR windows (unscaled), window start/end times, the onset time
+    and which windows are monitored (none overlaps a commanded ESP manoeuvre)."""
     with path.open(newline="", encoding="utf-8") as file:
         rows = list(csv.DictReader(file))
     motor, ir, times, _ = _features(rows, path.stem, window_size)
@@ -100,15 +105,19 @@ def run_windows(path, window_size):
     onset = next((t for t, a in zip(times, active) if a), None)
     count = len(times) - window_size + 1
     index = np.arange(count)[:, None] + np.arange(window_size)[None, :]
-    return {"motor": motor[index], "ir": ir[index]}, times[:count], times[window_size - 1:], onset
+    monitored = window_monitored(unmonitored_samples(rows), window_size)
+    return ({"motor": motor[index], "ir": ir[index]}, times[:count], times[window_size - 1:],
+            onset, monitored)
 
 
-def evaluate_run(windows, starts, ends, onset, detectors, k, n, warmup_s):
+def evaluate_run(windows, starts, ends, onset, detectors, k, n, warmup_s, monitored=None):
     results = {}
     for name, (reconstruct, threshold, mean, scale) in detectors.items():
         flat = flatten(((windows[name] - mean) / scale).astype(np.float32))
         scores = window_scores(reconstruct, flat)
         exceed = (scores > threshold) & (starts >= warmup_s)
+        if monitored is not None:
+            exceed &= monitored
         alarms = persistence_alarms(exceed, k, n)
         pre = alarms & (ends < onset) if onset is not None else alarms
         post = np.flatnonzero(alarms & (ends >= onset)) if onset is not None else []
@@ -270,16 +279,17 @@ def main():
 
     detectors, window_size = load_detectors([ROOT / m for m in args.models])
     with args.manifest.open(newline="", encoding="utf-8") as file:
-        runs = list(csv.DictReader(file))
+        # Runs cut short by a dropped ESP serial link were repeated; skip them.
+        runs = [run for run in csv.DictReader(file) if run["outcome"] != "serial_error"]
     records = []
     for run in runs:
         path = args.manifest.parent / run["file"]
-        windows, starts, ends, onset = run_windows(path, window_size)
+        windows, starts, ends, onset, monitored = run_windows(path, window_size)
         record = dict(run, onset=onset, ends=ends, results={})
         for method, method_detectors in detectors.items():
             record["results"][method] = evaluate_run(
                 windows, starts, ends, onset, method_detectors,
-                args.persist_k, args.persist_n, args.warmup_s,
+                args.persist_k, args.persist_n, args.warmup_s, monitored,
             )
         records.append(record)
 

@@ -108,17 +108,57 @@ The Webots simulation remains the environment throughout this plan.
     ESP resumes after `LINK_LOST` once frames return. Webots pauses in
     wall-clock time at startup, which used to latch `LINK_LOST`.
 
+- **ESP dataset and models (2026-11-26).**
+  - **Route speed:** the route command takes an optional `V@<rad/s>`, which
+    `epuck_route` sends from the mission's `esp_speed_rad_s`. The smoke test
+    covers it.
+  - **Start-pose jitter:** seeded `spawn_jitter` makes repeated runs differ.
+  - **Healthy data:** 108 ESP round trips, 4 routes x 9 speeds (2.0-4.0
+    rad/s) x 3 seeds, all complete.
+  - **Dataset:** `esp-baseline-v1`, split `esp-runs-v1.json` (72/18/18
+    runs).
+  - **Old models fail on ESP data:** the Supervisor-trained `conv-v1`
+    alarmed on all 18 healthy ESP test runs.
+  - **New models:** `models/esp-conv-v1` (motor 5208 and IR 4500
+    parameters). Windows overlapping `AT_DEST`/`UNLOADING`/`U_TURN` are not
+    monitored, and the thresholds are the lowest with no alarm on any healthy
+    validation run.
+  - **Healthy test false alarms:** motor 2/18 runs, IR 0/18. The first 0.5 s
+    after a U-turn is unmonitored too.
+  - **Old models on the same runs:** `conv-v1` and `dense-v1` alarm on 18/18
+    healthy runs, with 13-25% of windows over threshold
+    (`reports/esp-model-comparison-v1`).
+  - **Fault runs (`reports/esp-fault-eval-v1`, 120 runs):** no pre-onset
+    alarms. Stall, intermittent, 50% power loss, stuck/noisy encoder, IR dead
+    and IR noise std 200 are detected 8/8. IR noise also trips the motor
+    model, because the PD loop reacts to it.
+  - **Weak spots:** 20% power loss (3/8), IR noise of std 100 or less (0-4/8
+    by the IR model), IR stuck (1/8) and IR drift (4-6/8).
+  - **USB serial drops:** `SerialException` runs are now retried. Moving the
+    laptop charger caused one drop.
+
+- **Anomaly detection on the ESP (2026-11-26).**
+  - **Export:** `scripts/models/export_c.py` writes
+    `firmware/main/anomaly_model.h`. `firmware/main/anomaly.cpp` runs both
+    float32 models on every frame.
+  - **Protocol:** the motor frame carries the motor/IR scores and the 3-of-5
+    alarms, and the controller logs them.
+  - **Cost:** about 2.3 + 2.0 ms per frame at `-O2`.
+  - **Replay agreement** (`scripts/esp/replay_scores.py`, 33 runs, 65044
+    windows): scores within 4.5e-5 and identical alarm decisions.
+  - **Live** (`data/esp_runs/live-v1`, 16 round trips): no alarms on the 4
+    healthy runs, and all 12 fault runs were detected on the ESP by the right
+    model (0.1-5.2 s), with no pre-onset alarm.
+  - **Supervisor mode** still reproduces the committed healthy run
+    byte-for-byte in the first 15 columns.
+
 ## Not yet implemented
 
-- ESP model inference (weights export to C), anomaly scores in the serial
-  protocol, and Python-vs-ESP score agreement.
-- A check of the Supervisor-trained models on ESP-controlled runs, and a
-  healthy dataset recorded under ESP control if they raise false alarms.
-- ESP-mode runs through the parallel edges (edge-002, edge-004) and with
-  injected faults. Round trips are ESP-only; the Supervisor controller has
-  no U-turn. The ESP ignores the mission's
-  `wheel_speed_rad_s` (its PD loop runs at 2.5-3.5 rad/s), so ESP runs do not
-  yet cover a speed grid.
+- A response to anomaly alarms (they are reported and logged only).
+- ESP-mode runs through the parallel edges (edge-002, edge-004). Round trips
+  are ESP-only; the Supervisor controller has no U-turn.
+- Weak detections: mild motor power loss (20%), IR noise of std 100 or
+  less, a stuck IR sensor, and IR drift.
 
 ## Current data/model status
 

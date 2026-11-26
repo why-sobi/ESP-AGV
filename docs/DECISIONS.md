@@ -106,8 +106,9 @@ Once a surveyed map exists, the planner can be called with
 - `firmware/` is an ESP-IDF project for the ESP32-S3. It accepts a
   distance-tagged route and per-step IR and encoder readings over serial, runs
   the PD loop and odometry-gated junction actions, and returns wheel targets.
-  In `esp32` mode, `epuck_route` drives Webots with those targets; routes A-D
-  complete. Anomaly inference is still future work.
+  It also runs the motor and IR anomaly models and returns their scores and
+  alarms. In `esp32` mode, `epuck_route` drives Webots with those targets;
+  routes A-D complete, one way or as round trips.
 - The current Webots route integration is still a prototype: its pixel-to-world
   transform uses the explicitly configured 1 m by 1 m arena. A headless
   Webots run completed the two-edge mission with all ground sensors seeing the
@@ -172,8 +173,48 @@ Once a surveyed map exists, the planner can be called with
    - The angle gate makes it ignore branches swept earlier in the spin.
    - Teleporting the robot with the Supervisor was not considered, because
      the ESP would no longer be driving.
+9. **Retrain the anomaly models on ESP-controlled runs (2026-11-26).** The
+   motor features include the controller's wheel targets, and the ESP's PD
+   loop commands different targets from the Supervisor controller. The round
+   trip also adds the stop, unload and U-turn.
+   - The Supervisor-trained `conv-v1`/`dense-v1` alarm on every healthy ESP
+     run.
+   - The new healthy data covers the ESP speed grid (route speed `V@`) and
+     three seeded start poses per route and speed, because Webots repeats an
+     identical run byte for byte.
+   - INT8 quantisation alone would not have helped: the data changed, not
+     the arithmetic.
+10. **Do not monitor commanded manoeuvres.** Windows overlapping `AT_DEST`,
+    `UNLOADING` or `U_TURN`, and the first 0.5 s after a U-turn, are trained
+    on but not scored. These transients happen once or twice per run and
+    caused most healthy false alarms. The ESP knows its own state, so the
+    same gating runs on the device. A fault that starts during a manoeuvre
+    is detected once normal driving resumes.
+11. **Set thresholds so that no healthy validation run alarms.** The 99.5th
+    percentile of validation windows means that about 0.5% of healthy windows
+    exceed it by definition. Those cluster enough to trip the 3-of-5 rule:
+    7/18 motor and 5/18 IR healthy test runs alarmed, and the IR model fired
+    before onset in 15 of 120 fault runs. The run-level rule cut this to
+    2/18, 0/18 and 0/120, at the cost of mild faults (20% power loss 3/8).
+12. **Run the models on the ESP in plain float32 C++.** The two conv
+    autoencoders (about 9.7k parameters) need about 4.5 ms per 32 ms frame at
+    `-O2`, and the image leaves 80% of the app partition free. A runtime
+    library or INT8 was not needed. The weights header is generated from the
+    trained model (`scripts/models/export_c.py`), and a replay test checks
+    the ESP against Python window by window.
 
 ## Failure points observed
+
+- **Supervisor-trained models on ESP data:** 13-25% of healthy windows over
+  threshold, and alarms on every run (see decision 9).
+- **Healthy-run check too strict for the ESP:** the ESP's sensors briefly
+  leave the line on corners and in the last few centimetres into a terminal
+  node (node-001, node-003), where the line ends. An ESP run now fails the
+  check only if the line is lost for longer than the firmware's own 750 ms
+  search limit.
+- **USB serial drops:** COM3 dropped mid-run a few times (`SerialException`,
+  "Access is denied"), once when the laptop charger was moved. The collectors
+  mark such runs `serial_error` and repeat them.
 
 - The original threshold controller switched wheel commands abruptly and made
   high-frequency, jerky steering corrections.
@@ -228,10 +269,12 @@ Once a surveyed map exists, the planner can be called with
    for hardware; the current Supervisor controller is simulation-only.
 4. Validate routes through the circular feature and multi-branch junctions,
    including unreachable destinations and changed maps.
-5. Done: healthy and fault runs collected, motor/IR autoencoders trained and
-   evaluated (see `docs/STATUS.md`). Check them on ESP-controlled runs.
-6. Deploy preprocessing and inference to the ESP32-S3 and compare its scores
-   with the Python reference.
-7. Done for control: the bridge, distance-tagged route conversion and ESP
-   closed-loop line following complete routes A-D. Remaining: anomaly scores
-   over the link, return legs, and fault scenarios under ESP control.
+5. Done: healthy and fault runs collected under ESP control, and motor/IR
+   autoencoders (`models/esp-conv-v1`) trained and evaluated (see
+   `docs/STATUS.md`).
+6. Done: preprocessing and inference run on the ESP32-S3 and agree with the
+   Python reference; live fault runs are detected on the device.
+7. Done: the bridge, distance-tagged routes, ESP line following, return legs,
+   fault scenarios under ESP control, and anomaly scores over the link.
+8. Decide the robot's response to an anomaly alarm. Currently it only
+   reports.

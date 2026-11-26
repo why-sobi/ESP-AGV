@@ -52,7 +52,7 @@ class Session:
             )
 
         fields = response.split(",")
-        if len(fields) != 7:
+        if len(fields) != 11:
             raise AssertionError(f"Malformed motor response: {response!r}")
         return {
             "left_speed": float(fields[2]),
@@ -60,6 +60,10 @@ class Session:
             "state": fields[4],
             "route_index": int(fields[5]),
             "distance_m": float(fields[6]),
+            "motor_score": float(fields[7]),
+            "ir_score": float(fields[8]),
+            "motor_alarm": int(fields[9]),
+            "ir_alarm": int(fields[10]),
             "raw": response,
         }
 
@@ -208,8 +212,56 @@ def main():
             f"U-turn did not give up: {lost['raw']}",
         )
 
+        # A leading V@ sets the straight-line speed; corrections scale with it.
+        ack = esp.route("V@2.0,U@0.000,D@0.30")
+        esp.frame(CENTERED, 0.0)
+        handed_over = esp.frame(CENTERED, 0.0, math.radians(170))
+        slow = esp.frame(CENTERED, 0.01, math.radians(170))
+        check(
+            ack == "A,ROUTE_OK"
+            and handed_over["route_index"] == 1
+            and abs(slow["left_speed"] - 2.0) <= 0.05
+            and abs(slow["right_speed"] - 2.0) <= 0.05,
+            f"route speed V@2.0 sets straight-line speed: {slow['raw']}",
+            f"Route speed not applied: {slow['raw']}",
+        )
+        esp.route("L@0.30,D@0.60")
+        default = esp.frame(CENTERED, 0.0)
+        check(
+            abs(default["left_speed"] - 3.5) <= 0.05,
+            f"speed returns to default without V@: {default['raw']}",
+            f"Default speed not restored: {default['raw']}",
+        )
+
+        # Anomaly scores appear once a 20-sample window exists. A sample
+        # needs a wheel speed, so the first frame of a route adds none.
+        esp.route("D@5.0")
+        frames = [esp.frame(CENTERED, 0.001 * i) for i in range(22)]
+        check(
+            frames[19]["ir_score"] == -1.0
+            and frames[19]["motor_score"] == -1.0
+            and frames[20]["ir_score"] >= 0.0
+            and frames[20]["motor_score"] >= 0.0
+            and frames[21]["motor_alarm"] == 0
+            and frames[21]["ir_alarm"] == 0,
+            f"anomaly scores start after a full window: {frames[21]['raw']}",
+            f"Anomaly scores not reported as expected: {frames[18]['raw']} / {frames[21]['raw']}",
+        )
+        port.write(b"Q\n")
+        timing = read_line(port, 2.0)
+        fields = timing.split(",")
+        check(
+            fields[0] == "I" and len(fields) == 5 and 0 < int(fields[2]) < 20000,
+            f"inference timing reported (us: motor last,max  ir last,max): {timing}",
+            f"Inference timing missing or too slow: {timing!r}",
+        )
+
         for payload in (
             "XD",
+            "V@9.0,D@0.3",
+            "V@0.5,D@0.3",
+            "R@0.1,V@2.0,D@0.3",
+            "V@2.0",
             "RD",
             "R@0.3",
             "R@0.5,D@0.4",

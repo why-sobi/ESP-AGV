@@ -1,8 +1,8 @@
 # ESP-AGV
 
 A simulation-first AGV project using the e-puck robot in Webots. Webots remains
-the environment; an ESP32-S3 is being integrated as an external compute target
-for line control and anomaly inference.
+the environment; an ESP32-S3 on USB serial is the robot's onboard computer. It
+runs the line control and the motor/IR anomaly detection.
 
 - Follow the track with PD line control and map-based route planning.
 - Collect simulated motor/encoder and ground-IR telemetry.
@@ -72,14 +72,23 @@ and [docs/USAGE.md](docs/USAGE.md) for the full workflows.
 ## Status
 
 - **Navigation:** the map planner drives the Webots route controller.
-- **Anomaly models:** 64 healthy runs (4 routes x 16 speeds) train motor and
-  IR autoencoders. They are evaluated on 184 labelled fault runs, including a
-  severity sweep.
 - **ESP control:** with `control_mode: esp32`, the ESP32-S3 runs the PD
   line-following loop over COM3. Junctions are identified with wheel odometry,
   and Webots applies the ESP's wheel commands. All four two-edge routes
-  complete, stopping within 1.4 cm of the destination.
-- **Not yet implemented:** anomaly inference on the ESP.
+  complete, one way or as round trips, stopping within 1.4 cm of the
+  destination.
+- **Anomaly detection on the ESP:** motor and IR conv autoencoders
+  (`models/esp-conv-v1`) are trained on 108 healthy ESP round trips and run
+  on the ESP every frame.
+  - On 120 labelled fault runs they detect stalls, intermittent motors, 50%
+    power loss, encoder faults, a dead IR sensor and heavy IR noise in 8/8
+    runs, with no alarm before a fault's onset.
+  - Healthy false alarms: motor 2/18 runs, IR 0/18.
+  - The ESP's scores agree with Python within 4.5e-5, with identical alarms.
+- **Earlier models:** `conv-v1`/`dense-v1` were trained on Supervisor-driven
+  runs (64 healthy, 184 fault runs). They do not transfer to ESP control.
+- **Open:** the robot's response to an alarm (it only reports now). See
+  [handoff.md](handoff.md) for the current state and next steps.
 
 See [docs/USAGE.md](docs/USAGE.md) for commands and project-file workflows,
 [docs/STATUS.md](docs/STATUS.md) for verified scope, and

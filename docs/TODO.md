@@ -2,9 +2,10 @@
 
 ## Currently Doing
 
-The ESP32-S3 now runs the PD line-following loop for Webots over COM3 (routes
-A-D complete). Next: check the anomaly models on ESP-controlled runs, then put
-inference on the ESP. Keep Webots as the simulation environment; the ESP32-S3
+The ESP32-S3 runs the PD line-following loop and both anomaly models for
+Webots over COM3. Round trips A-D complete, and the on-ESP scores agree with
+Python. Next: decide how the robot responds to an alarm, and improve the weak
+detections. Keep Webots as the simulation environment; the ESP32-S3
 is the external compute target, not a move to a physical AGV.
 
 ## 1. Collect and qualify healthy runs (done)
@@ -37,16 +38,26 @@ is the external compute target, not a move to a physical AGV.
 
 ## 4. Deploy inference to the ESP32-S3
 
-- First, score ESP-controlled healthy runs with `conv-v1`. The models were
-  trained on Supervisor-controlled runs, and the ESP's PD loop commands
-  different wheel targets. If they raise false alarms, record a healthy
-  dataset under ESP control and retrain before exporting.
+- Done: `conv-v1` alarmed on every healthy ESP run, so a healthy ESP dataset
+  (`esp-baseline-v1`, 108 round trips) was recorded and `models/esp-conv-v1`
+  trained, with manoeuvre gating and the no-validation-alarm threshold. Fault
+  results are in `reports/esp-fault-eval-v1`.
+- Done: the first 0.5 s after a U-turn is unmonitored (healthy test false
+  alarms are now motor 2/18, IR 0/18).
+- Improve the weak IR detections (noise std 100 or less, stuck, drift). Options:
+  per-sensor max scoring, a sample-difference feature, or more healthy seeds.
+- Decide how to report a fault when only the motor model fires on an IR
+  fault (the PD loop couples them).
 
-- Select a model representation/runtime supported by ESP-IDF and verify
-  operator coverage, RAM/flash use, and inference latency.
-- Port preprocessing and the exact training scaler parameters; test ESP scores
-  against Python outputs on the same recorded windows.
-- Define how the ESP reports motor/IR anomaly scores and threshold decisions.
+- Done: plain float32 C++ forward pass (`firmware/main/anomaly.cpp`, weights
+  from `scripts/models/export_c.py`). It costs about 4.5 ms per frame at -O2,
+  and the image is 0x336b0 bytes.
+- Done: the scaler, state gating, warm-up, threshold and 3-of-5 rule on the
+  ESP. Replay agreement holds within 4.5e-5, with identical alarms
+  (`scripts/esp/replay_scores.py`).
+- Done: scores and alarms in the motor frame; the controller logs them.
+- Optional: INT8 quantisation as a comparison (float32 already fits easily).
+- Decide what the robot does on an alarm (it currently keeps driving).
 
 ## 5. Connect Webots, Python, and the ESP
 
@@ -58,14 +69,14 @@ is the external compute target, not a move to a physical AGV.
 - Done: sequence checking, timeouts, safe stop on line loss, missed junction
   and destination, and recovery after a host stall (`LINK_LOST`).
 - Done: routes A-D complete with the ESP in the loop (see `docs/STATUS.md`).
-- Add anomaly scores and alarm decisions to the motor frame once inference
-  runs on the ESP.
+- Done: anomaly scores and alarm decisions in the motor frame; live runs
+  in `data/esp_runs/live-v1` detect all 12 faults with no false alarm.
 - Done: return leg. With `return_to_start`, the Supervisor plans destination
   to start and sends it with a leading U-turn; round trips A-D complete.
-- Run ESP-mode fault scenarios. A fault that changes the driven path can push
+- Done: ESP-mode fault scenarios (120 runs). A fault that changes the driven path can push
   a junction out of its +/-0.10 m window and stop the run with
   `JUNCTION_MISSED`; decide whether that is the desired safe behavior.
-- Decide whether the ESP should take the mission speed, so ESP runs can cover
+- Done: the ESP takes a route speed (`V@`, mission `esp_speed_rad_s`), so ESP runs can cover
   the same speed grid as the healthy dataset.
 - Reconnect handling if COM3 disappears mid-run (currently the run fails).
 
