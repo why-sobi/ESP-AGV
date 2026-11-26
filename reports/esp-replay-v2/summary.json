@@ -1,0 +1,302 @@
+[
+  {
+    "file": "route-20261126-130838-A-2.25-s2.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1213,
+      "max_abs_diff": 1.333085536957268e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 1213,
+      "max_abs_diff": 5.0926113128735295e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1129,
+      "max_abs_diff": 8.622928678989408e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-131128-A-2.75-s2.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1019,
+      "max_abs_diff": 1.2375590801236291e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 1019,
+      "max_abs_diff": 5.161495208738653e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 935,
+      "max_abs_diff": 4.09582102298741e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-134215-A-2.4-motor-weak-right-80.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1288,
+      "max_abs_diff": 1.618815898894732e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 988,
+      "python_alarm_windows": 988
+    },
+    "ir": {
+      "windows": 1288,
+      "max_abs_diff": 5.363416671733123e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1204,
+      "max_abs_diff": 9.800289154066055e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 988,
+      "python_alarm_windows": 988
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-134508-A-2.4-motor-weak-right-70.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1399,
+      "max_abs_diff": 4.954679489133085e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1101,
+      "python_alarm_windows": 1101
+    },
+    "ir": {
+      "windows": 1399,
+      "max_abs_diff": 5.047301650046299e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1315,
+      "max_abs_diff": 1.5236228942838714e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1101,
+      "python_alarm_windows": 1101
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-135055-A-2.4-motor-stall-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 231,
+      "max_abs_diff": 6.81888580311707e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 61,
+      "python_alarm_windows": 61
+    },
+    "ir": {
+      "windows": 231,
+      "max_abs_diff": 4.954404830932605e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 189,
+      "max_abs_diff": 1.2037734985360232e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 61,
+      "python_alarm_windows": 61
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-135627-A-2.4-encoder-stuck-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 620,
+      "max_abs_diff": 8.263263702401602e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 450,
+      "python_alarm_windows": 450
+    },
+    "ir": {
+      "windows": 620,
+      "max_abs_diff": 4.9829617515206e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 578,
+      "max_abs_diff": 1.6318359374878355e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 450,
+      "python_alarm_windows": 450
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-140116-A-2.4-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 942,
+      "max_abs_diff": 8.04879188537333e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 942,
+      "max_abs_diff": 5.049953460692369e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 657,
+      "python_alarm_windows": 657
+    },
+    "gru": {
+      "windows": 858,
+      "max_abs_diff": 4.404987514019729e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 657,
+      "python_alarm_windows": 657
+    }
+  },
+  {
+    "file": "route-20261126-140136-A-3.6-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 452,
+      "max_abs_diff": 5.439360588789174e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 452,
+      "max_abs_diff": 5.226206779479492e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 368,
+      "max_abs_diff": 1.4595547318460578e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-140325-A-2.4-ir-dead-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 640,
+      "max_abs_diff": 6.221575438976681e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 640,
+      "max_abs_diff": 6.203022003159475e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 464,
+      "python_alarm_windows": 464
+    },
+    "gru": {
+      "windows": 598,
+      "max_abs_diff": 2.9904908835885757e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 440,
+      "python_alarm_windows": 440
+    }
+  },
+  {
+    "file": "route-20261126-231448-C-2.4-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 926,
+      "max_abs_diff": 6.755346581339798e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 926,
+      "max_abs_diff": 5.17113327980212e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 360,
+      "python_alarm_windows": 360
+    },
+    "gru": {
+      "windows": 842,
+      "max_abs_diff": 5.8572111129757964e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 360,
+      "python_alarm_windows": 360
+    }
+  }
+]

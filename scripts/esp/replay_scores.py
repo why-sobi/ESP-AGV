@@ -7,10 +7,14 @@ host-side UNLOADING rows, which the ESP never saw), then checks that:
 - the ESP reproduces the logged wheel targets (same firmware control logic);
 - its motor/IR window scores match the Python reference (scripts/models and
   scripts/faults/evaluate_faults.py) for the same windows;
-- its persistent-alarm flags match the Python 3-of-5 rule.
+- its motor GRU scores match scripts/models/gru_experiment.py;
+- its alarms match the Python 3-of-5 rule: the GRU alarm, the stuck-sensor
+  alarm, and the motor (conv or GRU) and IR (conv or stuck) alarms.
 
-The ESP restarts its window on the return route, so windows that would span
-the unload/U-turn are compared only where the ESP reports a score.
+The ESP restarts its windows (and the GRU state) on the return route, so conv
+windows that would span the unload/U-turn are compared only where the ESP
+reports a score. The GRU and stuck-rule reference restarts per leg like the
+ESP.
 
     python -m scripts.esp.replay_scores --port COM3 data/esp_runs/healthy/route-...csv
 """
@@ -24,10 +28,20 @@ from pathlib import Path
 
 import numpy as np
 import serial
+import torch
 
 from scripts.esp.route_actions import format_route_command, route_action_plan
 from scripts.faults.evaluate_faults import load_detectors, run_windows
 from scripts.maps.route_planner import TrackMap, shortest_route
+from scripts.models.gru_experiment import (
+    GRUForecaster,
+    alarms as gated_alarms,
+    gru_errors,
+    load_run,
+    stuck_score,
+    trailing_mean,
+    window_mask,
+)
 from scripts.models.train_autoencoder import MODELS, flatten, persistence_alarms, window_scores
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,6 +50,8 @@ MISSION_PATH = ROOT / "maps" / "routes" / "mission.json"
 TARGET_TOLERANCE = 0.0015  # rad/s; targets are sent with 3 decimals.
 # Scores are sent with 5 decimals; thresholds are about 0.2-0.5.
 SCORE_TOLERANCE = 1e-4
+# GRU scores are sent with 6 decimals; its threshold is about 0.025.
+GRU_SCORE_TOLERANCE = 2e-5
 
 
 def route_command(track_map, mission, start, destination, speed, u_turn):
@@ -83,7 +99,7 @@ def replay(link, path, track_map, mission):
              f"{float(row['actual_pos_right']):.6f}\n").encode("ascii")
         )
         fields = read_line(link).split(",")
-        if fields[0] != "M" or int(fields[1]) != sequence or len(fields) != 11:
+        if fields[0] != "M" or int(fields[1]) != sequence or len(fields) != 14:
             raise RuntimeError(f"{path.name} row {index}: unexpected reply {fields}")
         # One print step (0.001) of slack: firmware built with another
         # optimisation level may round a target the other way.
@@ -94,6 +110,8 @@ def replay(link, path, track_map, mission):
         results[index] = {
             "motor": float(fields[7]), "ir": float(fields[8]),
             "motor_alarm": int(fields[9]), "ir_alarm": int(fields[10]),
+            "gru": float(fields[11]), "gru_alarm": int(fields[12]),
+            "stuck_alarm": int(fields[13]),
         }
     return rows, results, target_mismatches
 
@@ -111,12 +129,51 @@ def python_reference(path, detectors, window_size, k, n, warmup_s):
     return reference
 
 
+def gru_stuck_reference(path, gru, deploy, mean, scale, k, n):
+    """Per CSV row: motor GRU score, GRU alarm and stuck alarm, computed per leg
+    like the ESP (state reset on each route command, UNLOADING rows skipped,
+    time counted from the leg's first frame). NaN/False where not defined."""
+    with path.open(newline="", encoding="utf-8") as file:
+        rows = list(csv.DictReader(file))
+    count = len(rows)
+    score = np.full(count, np.nan)
+    gru_alarm = np.zeros(count, bool)
+    stuck_alarm = np.zeros(count, bool)
+    legs = []
+    for index, row in enumerate(rows):
+        if row["esp_state"] == "UNLOADING":
+            continue
+        leg = (row["route_start"], row["route_destination"])
+        if not legs or legs[-1][0] != leg:
+            legs.append((leg, []))
+        legs[-1][1].append(index)
+    warmup = float(deploy["warmup_s"])
+    motor_gru = deploy["motor_gru"]
+    stuck = deploy["ir_stuck"]
+    for _, indices in legs:
+        leg_rows = [rows[i] for i in indices]
+        run = load_run(path, leg_rows, path.stem, mean, scale)
+        # The ESP counts time from the leg's first frame (32 ms at that frame).
+        run["times"] = run["times"] - float(leg_rows[0]["time"]) + 0.032
+        samples = np.asarray(indices[1:])
+        window = int(motor_gru["score_window_samples"])
+        leg_score = trailing_mean(gru_errors(gru, run, "motor"), window).max(axis=1)
+        score[samples] = leg_score
+        gru_alarm[samples] = gated_alarms(leg_score, window_mask(run, window, warmup),
+                                          motor_gru["threshold"], k, n)
+        span = int(stuck["samples"]) + 1
+        flags = stuck_score(run, int(stuck["samples"]), stuck["eps"], stuck["speed"])
+        stuck_alarm[samples] = gated_alarms(flags, window_mask(run, span, warmup), 0.5, k, n)
+    return score, gru_alarm, stuck_alarm
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("runs", nargs="+", type=Path, help="ESP-mode run CSVs")
     parser.add_argument("--port", default="COM3")
     parser.add_argument("--model", default="models/esp-conv-v1")
+    parser.add_argument("--gru", default="models/esp-gru-v1")
     parser.add_argument("--out", type=Path, help="Optional JSON summary")
     args = parser.parse_args()
 
@@ -127,6 +184,13 @@ def main():
         raise ValueError(f"Unexpected persistence rule: {rule['persistence']}")
     detectors, window_size = load_detectors([ROOT / args.model])
     detectors = next(value for key, value in detectors.items() if key != "pca_baseline")
+    gru_config = json.loads((ROOT / args.gru / "config.json").read_text(encoding="utf-8"))
+    deploy = gru_config["deploy"]
+    gru = GRUForecaster(2, 2, int(gru_config["hidden"]))
+    gru.load_state_dict(torch.load(ROOT / args.gru / "gru_motor.pt", weights_only=True))
+    gru.eval()
+    mean = {name: np.asarray(config["models"][name]["scaler_mean"]) for name in MODELS}
+    scale = {name: np.asarray(config["models"][name]["scaler_scale"]) for name in MODELS}
     track_map = json.loads(MAP_PATH.read_text(encoding="utf-8"))
     mission = json.loads(MISSION_PATH.read_text(encoding="utf-8-sig"))
 
@@ -143,11 +207,15 @@ def main():
             rows, esp, target_mismatches = replay(link, path, track_map, mission)
             reference = python_reference(path, detectors, window_size, k, n,
                                          float(rule["warmup_s"]))
+            gru_score, gru_alarm, stuck_alarm = gru_stuck_reference(
+                path, gru, deploy, mean, scale, k, n)
+            # The ESP's motor/IR alarms include the GRU / stuck rule.
+            extra = {"motor": gru_alarm, "ir": stuck_alarm}
             run = {"file": path.name, "target_mismatches": target_mismatches}
             for name in MODELS:
                 scores, alarms, threshold = reference[name]
                 pairs = [(esp[r][name], scores[r - window_size], esp[r][f"{name}_alarm"],
-                          alarms[r - window_size])
+                          alarms[r - window_size] or extra[name][r])
                          for r in range(window_size, len(rows))
                          if esp[r] is not None and esp[r][name] >= 0.0]
                 esp_scores = np.array([p[0] for p in pairs])
@@ -157,18 +225,45 @@ def main():
                 run[name] = {
                     "windows": len(pairs),
                     "max_abs_diff": float(difference.max()),
-                    "alarm_mismatches": alarm_mismatch,
+                    "alarm_mismatches": int(alarm_mismatch),
                     "esp_alarm_windows": int(sum(p[2] for p in pairs)),
-                    "python_alarm_windows": int(sum(p[3] for p in pairs)),
+                    "python_alarm_windows": int(sum(bool(p[3]) for p in pairs)),
                 }
                 failed |= alarm_mismatch > 0 or difference.max() > SCORE_TOLERANCE
+            compared = [r for r in range(len(rows)) if esp[r] is not None]
+            gru_rows = [r for r in compared if esp[r]["gru"] >= 0.0]
+            gru_difference = np.abs(np.array([esp[r]["gru"] - gru_score[r] for r in gru_rows]))
+            run["gru"] = {
+                "windows": len(gru_rows),
+                "max_abs_diff": float(gru_difference.max()) if gru_rows else 0.0,
+                "alarm_mismatches": int(sum(esp[r]["gru_alarm"] != gru_alarm[r]
+                                            for r in compared)),
+                "esp_alarm_windows": sum(esp[r]["gru_alarm"] for r in compared),
+                "python_alarm_windows": int(gru_alarm[compared].sum()),
+            }
+            run["stuck"] = {
+                "alarm_mismatches": int(sum(esp[r]["stuck_alarm"] != stuck_alarm[r]
+                                            for r in compared)),
+                "esp_alarm_windows": sum(esp[r]["stuck_alarm"] for r in compared),
+                "python_alarm_windows": int(stuck_alarm[compared].sum()),
+            }
+            # NaN: the ESP scored a window Python has no score for.
+            failed |= (run["gru"]["alarm_mismatches"] > 0
+                       or run["stuck"]["alarm_mismatches"] > 0
+                       or not run["gru"]["max_abs_diff"] <= GRU_SCORE_TOLERANCE)
             failed |= target_mismatches > 0
             summary.append(run)
             print(f"{path.name}: targets mismatched {target_mismatches}; " + "; ".join(
                 f"{name} {run[name]['windows']} windows, max diff {run[name]['max_abs_diff']:.2e}"
                 f", alarms ESP/Python "
                 f"{run[name]['esp_alarm_windows']}/{run[name]['python_alarm_windows']}, "
-                f"mismatched {run[name]['alarm_mismatches']}" for name in MODELS), flush=True)
+                f"mismatched {run[name]['alarm_mismatches']}" for name in MODELS)
+                + f"; gru {run['gru']['windows']} windows, max diff "
+                f"{run['gru']['max_abs_diff']:.2e}, alarms ESP/Python "
+                f"{run['gru']['esp_alarm_windows']}/{run['gru']['python_alarm_windows']}, "
+                f"mismatched {run['gru']['alarm_mismatches']}; stuck alarms ESP/Python "
+                f"{run['stuck']['esp_alarm_windows']}/{run['stuck']['python_alarm_windows']}, "
+                f"mismatched {run['stuck']['alarm_mismatches']}", flush=True)
     finally:
         link.close()
     if args.out:

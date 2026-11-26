@@ -2,11 +2,23 @@
 
 ## Currently Doing
 
-The ESP32-S3 runs the PD line-following loop and both anomaly models for
-Webots over COM3. Round trips A-D complete, and the on-ESP scores agree with
-Python. Next: decide how the robot responds to an alarm, and improve the weak
-detections. Keep Webots as the simulation environment; the ESP32-S3
-is the external compute target, not a move to a physical AGV.
+The ESP32-S3 drives Webots round trips, runs four anomaly detectors (motor and
+IR conv autoencoders, motor GRU, stuck-sensor rule) on esp-dsp, and on a
+persistent alarm pulls over to the map-chosen side, stops and notifies the
+phone. Everything is summarized in `REPORT.md`. Open work, in priority order:
+
+1. Detect IR drift (4-6/8) and IR noise of std 100 or less (0-3/8 by the IR
+   model): a level check or a cross-sensor model.
+2. Deploy the architecture-search winners (motor conv: 28/28 held-out at
+   100 us; GRU: 28/28 at 127 us). Needs a configurable conv window and
+   channel count in `export_c.py` and `anomaly.cpp`, then replay and live
+   runs. The smaller IR conv is a trade-off (22/32 vs 17/32, but 2/18 healthy
+   test alarms).
+3. Reconnect when COM3 drops mid-run.
+4. ESP runs over the parallel edges (edge-002, edge-004).
+
+Keep Webots as the simulation environment; the ESP32-S3 is the external
+compute target, not a move to a physical AGV.
 
 ## 1. Collect and qualify healthy runs (done)
 
@@ -30,11 +42,9 @@ is the external compute target, not a move to a physical AGV.
   evaluation (`scripts/faults/evaluate_faults.py`, `reports/fault-eval-v1`).
 - Done: severity sweep for right-motor power loss (5-50%) and right IR noise
   (std 25-200) in `reports/severity-sweep-v1`.
-- Optional: per-sensor max scoring or a sample-difference feature for
-  single-sensor noise, a longer window for stuck-sensor faults, and sweeps for
-  other fault types and onset times.
-- Choose the deployed architecture. conv-v1 currently has no pre-onset false
-  alarms and detects as well as dense-v1.
+- Done: architectures chosen (conv autoencoders, later paired with a motor
+  GRU) and backed by an architecture search on measured ESP latency.
+- Optional: sweeps for other fault types and onset times.
 
 ## 4. Deploy inference to the ESP32-S3
 
@@ -44,8 +54,11 @@ is the external compute target, not a move to a physical AGV.
   results are in `reports/esp-fault-eval-v1`.
 - Done: the first 0.5 s after a U-turn is unmonitored (healthy test false
   alarms are now motor 2/18, IR 0/18).
-- Improve the weak IR detections (noise std 100 or less, stuck, drift). Options:
-  per-sensor max scoring, a sample-difference feature, or more healthy seeds.
+- Done: weak motor faults and IR stuck (motor GRU and stuck-sensor rule,
+  `reports/esp-gru-eval-v1`): detection 82 -> 94/120 with no extra false
+  alarm. Per-sensor max scoring and a sample-difference score were tried and
+  did not help.
+- Open: IR noise of std 100 or less and IR drift.
 - Decide how to report a fault when only the motor model fires on an IR
   fault (the PD loop couples them).
 
@@ -56,8 +69,15 @@ is the external compute target, not a move to a physical AGV.
   ESP. Replay agreement holds within 4.5e-5, with identical alarms
   (`scripts/esp/replay_scores.py`).
 - Done: scores and alarms in the motor frame; the controller logs them.
-- Optional: INT8 quantisation as a comparison (float32 already fits easily).
-- Decide what the robot does on an alarm (it currently keeps driving).
+- Done: all detectors on esp-dsp with weights in RAM, ~1.05 ms per frame
+  (`firmware/README.md`); replay within 5e-5 with identical alarms
+  (`reports/esp-replay-v2`).
+- Done: INT8/INT16 comparison with ESP-DL (`reports/esp-int8-v1`): slower at
+  these sizes and INT8 breaks the motor conv model; float32 kept.
+- Done: on-ESP latency table (`reports/esp-latency-v1`) and Optuna search
+  (`reports/arch-search-v1`); winners not deployed yet.
+- Done: on a persistent alarm the robot pulls over (side from the map), stops
+  and sends a phone notification.
 
 ## 5. Connect Webots, Python, and the ESP
 
@@ -78,7 +98,9 @@ is the external compute target, not a move to a physical AGV.
   `JUNCTION_MISSED`; decide whether that is the desired safe behavior.
 - Done: the ESP takes a route speed (`V@`, mission `esp_speed_rad_s`), so ESP runs can cover
   the same speed grid as the healthy dataset.
-- Reconnect handling if COM3 disappears mid-run (currently the run fails).
+- Done: pull-over side per route step from the map (`P@`).
+- Open: reconnect handling if COM3 disappears mid-run (currently the run
+  fails; the ESP stops on `LINK_LOST`).
 
 ## Navigation follow-up
 
@@ -100,3 +122,6 @@ is the external compute target, not a move to a physical AGV.
   bridge, and anomaly detections/telemetry are logged with route context.
 - Communication loss, malformed frames, line loss, and destination completion
   result in documented, tested safe behavior.
+
+Status: all met except reconnecting after a COM3 drop (the ESP stops safely,
+but the host run fails instead of resuming).

@@ -3,6 +3,8 @@
 import math
 from typing import Any
 
+import numpy as np
+
 
 def _world_point(point: list[float], transform: dict[str, Any]) -> tuple[float, float]:
     origin_x, origin_y = transform["world_origin"]
@@ -97,6 +99,87 @@ def route_action_plan(
         travelled += _polyline_length(geometry, transform)
         distances.append(travelled * distance_scale)
     return list(zip(actions, distances))
+
+
+def _distance_to_segments(points: Any, starts: Any, ends: Any) -> Any:
+    """Distance from each point (P, 2) to the nearest segment (S, 2)-(S, 2)."""
+    direction = ends - starts
+    length_sq = np.maximum((direction ** 2).sum(axis=1), 1e-18)
+    offset = points[:, None, :] - starts[None, :, :]
+    t = np.clip((offset * direction[None]).sum(axis=2) / length_sq[None], 0.0, 1.0)
+    nearest = starts[None] + t[..., None] * direction[None]
+    return np.sqrt(((points[:, None, :] - nearest) ** 2).sum(axis=2)).min(axis=1)
+
+
+def pull_over_clearance(
+    map_data: dict[str, Any],
+    route: Any,
+    drive_m: float = 0.08,
+    robot_radius_m: float = 0.037,
+    junction_gap_m: float = 0.06,
+    sample_m: float = 0.01,
+    arena_half_m: float = 0.5,
+) -> list[dict[str, float]]:
+    """Per route step, the worst clearance of a pull-over to each side.
+
+    The ESP pulls over by turning 90 degrees in place and driving ``drive_m``
+    forward. From points every ``sample_m`` along the step's edge (except
+    within ``junction_gap_m`` of its end nodes, where other lines meet anyway),
+    the robot's path from one robot radius out to ``drive_m + robot_radius_m``
+    is checked against every other edge's centerline and the arena walls; the
+    result is the smallest distance per side, in metres (negative: past a
+    wall).
+    """
+    edges = {edge["id"]: edge for edge in map_data.get("edges", [])}
+    transform = map_data["world_transform"]
+    world = {
+        edge_id: np.array([_world_point(point, transform) for point in edge["geometry"]])
+        for edge_id, edge in edges.items()
+    }
+    reach = drive_m + robot_radius_m
+    probe_steps = robot_radius_m + (reach - robot_radius_m) * np.arange(1, 9) / 8
+    result = []
+    for step in route.steps:
+        points = np.array([
+            _world_point(point, transform)
+            for point in _oriented_geometry(edges[step.edge_id], step.source, step.target)
+        ])
+        others = [line for edge_id, line in world.items() if edge_id != step.edge_id]
+        seg_starts = np.vstack([line[:-1] for line in others])
+        seg_ends = np.vstack([line[1:] for line in others])
+        lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
+        keep = lengths > 0
+        a, direction, lengths = points[:-1][keep], np.diff(points, axis=0)[keep], lengths[keep]
+        cumulative = np.concatenate([[0.0], np.cumsum(lengths)])
+        samples = np.arange(junction_gap_m, cumulative[-1] - junction_gap_m + 1e-12, sample_m)
+        clearance = {"R": float("inf"), "L": float("inf")}
+        if len(samples):
+            index = np.clip(np.searchsorted(cumulative, samples, side="right") - 1,
+                            0, len(lengths) - 1)
+            tangent = direction[index] / lengths[index, None]
+            here = a[index] + tangent * (samples - cumulative[index])[:, None]
+            for side, normal in (("R", np.column_stack([tangent[:, 1], -tangent[:, 0]])),
+                                 ("L", np.column_stack([-tangent[:, 1], tangent[:, 0]]))):
+                out = here + reach * normal
+                wall = arena_half_m - np.abs(out).max(axis=1)
+                probes = (here[:, None, :] + probe_steps[None, :, None] * normal[:, None, :])
+                lines = _distance_to_segments(probes.reshape(-1, 2), seg_starts, seg_ends)
+                nearest = np.minimum(wall, lines.reshape(len(samples), -1).min(axis=1))
+                clearance[side] = float(nearest.min())
+        result.append(clearance)
+    return result
+
+
+def pull_over_sides(
+    map_data: dict[str, Any], route: Any, margin_m: float = 0.03, **kwargs: float
+) -> str:
+    """One pull-over side per route step: 'R' unless the right side comes
+    within ``margin_m`` of another line or a wall and the left is clearer."""
+    sides = []
+    for clearance in pull_over_clearance(map_data, route, **kwargs):
+        right_ok = clearance["R"] >= margin_m
+        sides.append("R" if right_ok or clearance["R"] >= clearance["L"] else "L")
+    return "".join(sides)
 
 
 def format_route_command(plan: list[tuple[str, float]]) -> str:

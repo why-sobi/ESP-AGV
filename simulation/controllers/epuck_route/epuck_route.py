@@ -63,7 +63,11 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
     starts facing back along the previous leg.
     """
     sys.path.insert(0, str(ROOT_DIR))
-    from scripts.esp.route_actions import format_route_command, route_action_plan
+    from scripts.esp.route_actions import (
+        format_route_command,
+        pull_over_sides,
+        route_action_plan,
+    )
     from scripts.maps.route_planner import TrackMap, shortest_route
 
     transform = track_map["world_transform"]
@@ -116,8 +120,24 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
     # this many seconds. Without it the ESP only reports alarms.
     if mission.get("esp_fault_stop_s") is not None:
         plan = [("F", float(mission["esp_fault_stop_s"]))] + plan
-    esp_route = _place_labels(track_map, route, u_turn_first) + format_route_command(plan)
+    esp_route = (
+        _place_labels(track_map, route, u_turn_first)
+        + _pull_over_option(track_map, route, u_turn_first, pull_over_sides)
+        + format_route_command(plan)
+    )
     return route, route_paths, esp_route
+
+
+def _pull_over_option(track_map, route, u_turn_first, pull_over_sides):
+    """ESP 'P@' option: the side to pull over to on each route step, the one
+    clear of other lines and the walls (right unless the right is blocked).
+
+    Laid out like the 'E@' labels: a leading U-turn repeats the first edge.
+    """
+    sides = pull_over_sides(track_map, route)
+    if u_turn_first:
+        sides = sides[:1] + sides
+    return f"P@{sides},"
 
 
 def _place_labels(track_map, route, u_turn_first):
@@ -367,8 +387,9 @@ def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
             raise RuntimeError(f"ESP rejected sensor frame: {response}")
 
         fields = response.split(",")
-        # 7 fields from firmware without anomaly detection, 11 with it.
-        if len(fields) not in (7, 11) or fields[0] != "M":
+        # 7 fields from firmware without anomaly detection, 11 with the conv
+        # models only, 14 with the motor GRU and stuck-sensor rule.
+        if len(fields) not in (7, 11, 14) or fields[0] != "M":
             raise RuntimeError(f"Malformed ESP motor response: {response!r}")
         if int(fields[1]) >= sequence:
             break
@@ -393,8 +414,9 @@ def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
     state = fields[4]
     if state not in ESP_STATES:
         raise RuntimeError(f"Unknown ESP controller state: {state!r}")
-    # Motor/IR anomaly scores (-1 before the first full window) and alarms.
-    anomaly = tuple(fields[7:11]) if len(fields) == 11 else ("", "", "", "")
+    # Motor/IR conv scores (-1 before the first full window), motor/IR alarms,
+    # then the motor GRU score, GRU alarm and stuck-sensor alarm.
+    anomaly = tuple(fields[7:]) + ("",) * (14 - len(fields))
     return left_target, right_target, state, int(fields[5]), float(fields[6]), anomaly
 
 
@@ -533,6 +555,7 @@ def main():
             header.extend((
                 "esp_state", "esp_route_index", "esp_distance_m",
                 "esp_motor_score", "esp_ir_score", "esp_motor_alarm", "esp_ir_alarm",
+                "esp_gru_score", "esp_gru_alarm", "esp_stuck_alarm",
             ))
         writer.writerow(header)
         fault = FaultInjector(mission.get("fault"))
@@ -630,7 +653,7 @@ def main():
             esp_state = ""
             esp_route_index = -1
             esp_distance = ""
-            esp_anomaly = ("", "", "", "")
+            esp_anomaly = ("",) * 7
             if unloading_until is not None:
                 # Stopped at the destination; the ESP gets no frames until
                 # the return route is sent.

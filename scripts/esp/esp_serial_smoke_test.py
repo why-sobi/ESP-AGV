@@ -53,7 +53,7 @@ class Session:
             )
 
         fields = response.split(",")
-        if len(fields) != 11:
+        if len(fields) != 14:
             raise AssertionError(f"Malformed motor response: {response!r}")
         return {
             "left_speed": float(fields[2]),
@@ -65,6 +65,9 @@ class Session:
             "ir_score": float(fields[8]),
             "motor_alarm": int(fields[9]),
             "ir_alarm": int(fields[10]),
+            "gru_score": float(fields[11]),
+            "gru_alarm": int(fields[12]),
+            "stuck_alarm": int(fields[13]),
             "raw": response,
         }
 
@@ -252,8 +255,9 @@ def main():
         timing = read_line(port, 2.0)
         fields = timing.split(",")
         check(
-            fields[0] == "I" and len(fields) == 5 and 0 < int(fields[2]) < 20000,
-            f"inference timing reported (us: motor last,max  ir last,max): {timing}",
+            fields[0] == "I" and len(fields) == 7 and 0 < int(fields[2]) < 20000
+            and 0 < int(fields[6]) < 20000,
+            f"inference timing reported (us: motor, IR conv, motor GRU last,max): {timing}",
             f"Inference timing missing or too slow: {timing!r}",
         )
 
@@ -321,6 +325,30 @@ def main():
             f"Pull-over did not stop: {stopped['raw']} / {after['raw']}",
         )
 
+        # P@ gives the pull-over side per step: 'L' spins left instead.
+        frames, distance = drive_with_ir_noise("P@L,F@0.3,D@5.0")
+        pulling = frames[-1]
+        check(
+            pulling["state"] == "FAULT_PULLOVER"
+            and pulling["left_speed"] < 0.0 < pulling["right_speed"],
+            f"P@L pulls over to the left (left spin): {pulling['raw']}",
+            f"P@L pull-over did not spin left: {pulling['raw']}",
+        )
+        still_turning = esp.frame(ALL_LIGHT, distance, math.radians(-95))
+        esp.frame(ALL_LIGHT, distance, math.radians(95))
+        forward = esp.frame(ALL_LIGHT, distance + 0.04, math.radians(95))
+        stopped = esp.frame(ALL_LIGHT, distance + 0.09, math.radians(95))
+        check(
+            still_turning["state"] == "FAULT_PULLOVER"
+            and still_turning["left_speed"] < 0.0
+            and forward["left_speed"] > 0.0
+            and forward["left_speed"] == forward["right_speed"]
+            and stopped["state"] == "FAULT_STOP",
+            f"left pull-over turns 90 degrees left, drives off and stops: {stopped['raw']}",
+            f"Left pull-over went wrong: {still_turning['raw']} / {forward['raw']} / "
+            f"{stopped['raw']}",
+        )
+
         # A drive that cannot turn (e.g. stalled) still stops after 6 s.
         frames, distance = drive_with_ir_noise("F@0.3,D@5.0")
         for _ in range(195):
@@ -357,6 +385,11 @@ def main():
             "R@0.5,D@0.4",
             "D@0.2,D@0.4",
             "R@0.1,U@0.2,D@0.3",
+            "P@X,D@0.3",
+            "P@,D@0.3",
+            "P@RL,D@0.3",
+            "P@R,R@0.1,D@0.3",
+            "R@0.1,P@RR,D@0.3",
         ):
             error = esp.route(payload)
             check(

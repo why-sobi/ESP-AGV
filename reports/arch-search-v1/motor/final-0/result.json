@@ -1,0 +1,28 @@
+{
+  "label": "candidate 0",
+  "arch": {
+    "window": 10,
+    "channels": 8,
+    "kernel": 3,
+    "bottleneck": 12,
+    "hidden": 16,
+    "lr": 0.0025612019833140165,
+    "trial": 34
+  },
+  "latency_us": 100,
+  "weight_bytes": 6736,
+  "threshold": 0.08614455908536912,
+  "detected": 28,
+  "runs": 28,
+  "median_delay_s": 0.40000000000000036,
+  "pre_onset_runs": 0,
+  "healthy_alarm_runs": {
+    "validation": 0,
+    "test": 2
+  },
+  "score": 27.98,
+  "training": {
+    "best_epoch": 30,
+    "validation_loss": 0.015157501213252544
+  }
+}

@@ -2,7 +2,12 @@
 
 A simulation-first AGV project using the e-puck robot in Webots. Webots remains
 the environment; an ESP32-S3 on USB serial is the robot's onboard computer. It
-runs the line control and the motor/IR anomaly detection.
+runs the line control, four anomaly detectors (motor and IR conv autoencoders,
+a motor GRU and a stuck-sensor rule), and on a fault pulls over, stops and
+sends a phone notification.
+
+**[REPORT.md](REPORT.md)** describes the whole project, its decisions and every
+result.
 
 - Follow the track with PD line control and map-based route planning.
 - Collect simulated motor/encoder and ground-IR telemetry.
@@ -16,6 +21,8 @@ runs the line control and the motor/IR anomaly detection.
 ```
 data/          Logged sensor data (CSV)
 docs/          Design notes, status, TODO, and usage guide
+models/        Trained detectors (deployed: esp-conv-v1, esp-gru-v1)
+reports/       Evaluation results referenced by REPORT.md
 firmware/      ESP-IDF firmware and serial controller prototype
 maps/          Track image and generated graph maps
 scripts/       Automation tools grouped by purpose

@@ -1,0 +1,254 @@
+[
+  {
+    "number": 0,
+    "params": {
+      "hidden": 32,
+      "score_window": 62,
+      "lr": 0.003
+    },
+    "score": 24.9904,
+    "latency_us": 267,
+    "detected": 25,
+    "median_delay_s": 0.19200000000000017,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.024888027459383014,
+    "training": {
+      "best_iteration": 1800,
+      "validation_loss": 0.005661702714860439
+    },
+    "weight_bytes": 14864,
+    "pareto": false
+  },
+  {
+    "number": 1,
+    "params": {
+      "hidden": 12,
+      "score_window": 47,
+      "lr": 0.0033798304921413393
+    },
+    "score": 25.9872,
+    "latency_us": 95,
+    "detected": 26,
+    "median_delay_s": 0.2560000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.027858698740601543,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.006077537313103676
+    },
+    "weight_bytes": 2704,
+    "pareto": false
+  },
+  {
+    "number": 2,
+    "params": {
+      "hidden": 12,
+      "score_window": 47,
+      "lr": 0.006032942364042933
+    },
+    "score": 25.9864,
+    "latency_us": 95,
+    "detected": 26,
+    "median_delay_s": 0.27200000000000024,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.027573885396122936,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.0059210569597780704
+    },
+    "weight_bytes": 2704,
+    "pareto": false
+  },
+  {
+    "number": 3,
+    "params": {
+      "hidden": 24,
+      "score_window": 31,
+      "lr": 0.004146059182322341
+    },
+    "score": 26.9872,
+    "latency_us": 195,
+    "detected": 27,
+    "median_delay_s": 0.2560000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.029633332043886188,
+    "training": {
+      "best_iteration": 1700,
+      "validation_loss": 0.006009935867041349
+    },
+    "weight_bytes": 8848,
+    "pareto": false
+  },
+  {
+    "number": 4,
+    "params": {
+      "hidden": 16,
+      "score_window": 62,
+      "lr": 0.0013456319729640445
+    },
+    "score": 24.9888,
+    "latency_us": 127,
+    "detected": 25,
+    "median_delay_s": 0.2240000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.02885997295379639,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.0068189785815775394
+    },
+    "weight_bytes": 4368,
+    "pareto": false
+  },
+  {
+    "number": 5,
+    "params": {
+      "hidden": 32,
+      "score_window": 47,
+      "lr": 0.0017556000801557709
+    },
+    "score": 25.9888,
+    "latency_us": 267,
+    "detected": 26,
+    "median_delay_s": 0.2240000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.025783088058233265,
+    "training": {
+      "best_iteration": 1900,
+      "validation_loss": 0.0056930528953671455
+    },
+    "weight_bytes": 14864,
+    "pareto": false
+  },
+  {
+    "number": 6,
+    "params": {
+      "hidden": 64,
+      "score_window": 93,
+      "lr": 0.0029420578065975887
+    },
+    "score": 23.9896,
+    "latency_us": 589,
+    "detected": 24,
+    "median_delay_s": 0.20800000000000018,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.023345408961176876,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.005737596191465855
+    },
+    "weight_bytes": 54288,
+    "pareto": false
+  },
+  {
+    "number": 7,
+    "params": {
+      "hidden": 8,
+      "score_window": 62,
+      "lr": 0.004925747202576053
+    },
+    "score": 24.9888,
+    "latency_us": 63,
+    "detected": 25,
+    "median_delay_s": 0.2240000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.026682682335376743,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.006906649097800255
+    },
+    "weight_bytes": 1424,
+    "pareto": false
+  },
+  {
+    "number": 8,
+    "params": {
+      "hidden": 48,
+      "score_window": 62,
+      "lr": 0.0015247244410258021
+    },
+    "score": 24.9904,
+    "latency_us": 421,
+    "detected": 25,
+    "median_delay_s": 0.19200000000000017,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.024631943553686145,
+    "training": {
+      "best_iteration": 1900,
+      "validation_loss": 0.005644501186907291
+    },
+    "weight_bytes": 31504,
+    "pareto": false
+  },
+  {
+    "number": 9,
+    "params": {
+      "hidden": 16,
+      "score_window": 31,
+      "lr": 0.0037346671857171965
+    },
+    "score": 26.9888,
+    "latency_us": 127,
+    "detected": 27,
+    "median_delay_s": 0.2240000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.02879138290882111,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.006226775702089071
+    },
+    "weight_bytes": 4368,
+    "pareto": true
+  },
+  {
+    "number": 10,
+    "params": {
+      "hidden": 8,
+      "score_window": 47,
+      "lr": 0.009437997935055415
+    },
+    "score": 25.9872,
+    "latency_us": 63,
+    "detected": 26,
+    "median_delay_s": 0.2560000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.02761674672365189,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.006305755116045475
+    },
+    "weight_bytes": 1424,
+    "pareto": true
+  },
+  {
+    "number": 11,
+    "params": {
+      "hidden": 8,
+      "score_window": 47,
+      "lr": 0.009171618827927362
+    },
+    "score": 25.9872,
+    "latency_us": 63,
+    "detected": 26,
+    "median_delay_s": 0.2560000000000002,
+    "pre_onset_runs": 0,
+    "runs": 28,
+    "threshold": 0.027595451101660732,
+    "training": {
+      "best_iteration": 2000,
+      "validation_loss": 0.006308522075414658
+    },
+    "weight_bytes": 1424,
+    "pareto": true
+  }
+]

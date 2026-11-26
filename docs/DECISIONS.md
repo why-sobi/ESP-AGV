@@ -202,6 +202,58 @@ Once a surveyed map exists, the planner can be called with
     library or INT8 was not needed. The weights header is generated from the
     trained model (`scripts/models/export_c.py`), and a replay test checks
     the ESP against Python window by window.
+    (Superseded by decisions 15-16: the detectors now run on esp-dsp.)
+13. **On a persistent alarm, pull over, stop and notify (2026-11-26).** An
+    alarm that has lasted the route's `F@` hold (2 s) makes the ESP turn ~90
+    degrees, drive 8 cm off the line and stop, then post a notification to
+    ntfy.sh. Stopping on the line would block the track; driving on with a
+    fault risks the robot. Sending runs on the other core so control never
+    waits for WiFi. Motor faults often lose the line first; `LINE_LOST`
+    then also notifies, naming any alarm from the last 10 s.
+14. **Pair the conv autoencoders with a motor GRU and a stuck-sensor rule,
+    not replace them (2026-11-26).** The conv models are good at sudden
+    faults; the GRU (a plant model predicting wheel speeds from the targets
+    only, so it cannot hide a weak wheel by copying the last speed) catches
+    20-30% power loss; the rule catches a frozen sensor. Each keeps its own
+    threshold and the motor/IR alarm is either detector's. Separate models
+    also keep fault attribution ("motor" vs "line sensor") for the
+    notification. The GRU threshold is 2x the no-validation-alarm value: its
+    weakest fault peaks at >=25x, its worst healthy test run at 1.01x.
+    An IR GRU, worst-feature scoring and a sample-difference score were
+    tried and did not help (`reports/esp-gru-eval-v1`).
+15. **Use Espressif's esp-dsp for inference, not ESP-DL (2026-11-26).**
+    esp-dsp's float32 dot products and matrix multiplies use the S3's SIMD
+    instructions and keep the float match with Python (1e-5). ESP-DL runs
+    Conv/Gemm only quantized; INT8 breaks the motor conv model and, at these
+    model sizes, ESP-DL is ~2.5x slower than esp-dsp (decision 19).
+16. **Keep the weights in internal RAM.** Read from flash through the cache
+    shared with WiFi, the detectors were bound by flash bandwidth (~4.8 ms
+    per frame); copied to RAM once (~63 KB) they take ~1.05 ms.
+17. **Stuck sensor = flat while the robot drives, not while another sensor
+    moves (2026-11-27).** A centre sensor stuck at its on-the-line value
+    makes the ESP drive off the track, where all three sensors read flat
+    floor, so the "another sensor moving" condition failed live. Healthy
+    sensors are never flat for 1 s even when the robot is still.
+18. **Choose the pull-over side from the map on the Supervisor
+    (2026-11-27).** The ESP has no map; the Supervisor checks each step's
+    swept pull-over path against other lines and walls and sends one side
+    per step (`P@`). A blind right turn landed on the other line of the
+    small loop on half the round-trip legs. Sensing the side on the ESP was
+    not used: the fault being reacted to may be an IR fault.
+19. **Keep float32; INT8 only as a benchmark (2026-11-27).** With ESP-DL on
+    the ESP, INT8 and INT16 take ~0.75-0.8 ms per model vs ~0.3 ms for
+    float32 on esp-dsp (fixed per-layer runtime cost dominates models of
+    3-17k multiply-adds). INT8 makes every healthy run alarm on the motor
+    conv model (its healthy error is below INT8's rounding noise). INT8's
+    only gain, ~4x smaller weights, is not needed (165 KB heap free).
+20. **Back architectures with measured latency and a held-out search
+    (2026-11-27).** Every architecture's ESP time comes from a benchmark on
+    the chip (967 measured), and Optuna tunes on half the fault runs while
+    the other half and the healthy test runs judge the final candidates,
+    retrained with the full budget. The search found smaller motor conv and
+    GRU models that are 2-3x faster and detect as well or better; the
+    smaller IR model trades 2/18 healthy test alarms for 5 more detections.
+    They are not deployed yet (`reports/arch-search-v1`).
 
 ## Failure points observed
 
@@ -212,6 +264,12 @@ Once a surveyed map exists, the planner can be called with
   node (node-001, node-003), where the line ends. An ESP run now fails the
   check only if the line is lost for longer than the firmware's own 750 ms
   search limit.
+- **Stuck sensor on the line value (fault-stop-v3):** the ESP drove off the
+  track with the first stuck rule; see decision 17.
+- **Blind right pull-over:** would land on the small loop's other line; see
+  decision 18.
+- **Weights in flash:** esp-dsp alone barely helped until the weights moved
+  to RAM; see decision 16.
 - **USB serial drops:** COM3 dropped mid-run a few times (`SerialException`,
   "Access is denied"), once when the laptop charger was moved. The collectors
   mark such runs `serial_error` and repeat them.
@@ -261,20 +319,19 @@ Once a surveyed map exists, the planner can be called with
 
 ## Remaining work
 
-1. Validate the reviewed graph semantics and branch choices at all junctions;
-   the initial Webots run tested only one route.
+1. Validate the reviewed graph semantics and branch choices at all junctions,
+   including the parallel edges (edge-002, edge-004), which shortest-path
+   routes never use.
 2. Refine the generated graph and names against the visualized path; pixel
    skeleton extraction can merge nearby segments or produce parallel edges.
 3. Keep route tracking/localization behind an interface that can be replaced
    for hardware; the current Supervisor controller is simulation-only.
-4. Validate routes through the circular feature and multi-branch junctions,
-   including unreachable destinations and changed maps.
-5. Done: healthy and fault runs collected under ESP control, and motor/IR
-   autoencoders (`models/esp-conv-v1`) trained and evaluated (see
-   `docs/STATUS.md`).
-6. Done: preprocessing and inference run on the ESP32-S3 and agree with the
-   Python reference; live fault runs are detected on the device.
-7. Done: the bridge, distance-tagged routes, ESP line following, return legs,
-   fault scenarios under ESP control, and anomaly scores over the link.
-8. Decide the robot's response to an anomaly alarm. Currently it only
-   reports.
+4. Detect IR drift and light IR noise (a level check or a cross-sensor
+   model; a one-step GRU does not help).
+5. Deploy the architecture-search winners (configurable conv window and
+   channel count in the export and firmware).
+6. Reconnect when COM3 drops mid-run.
+7. Done: healthy and fault runs under ESP control, models on the ESP that
+   agree with Python, the response to an alarm (pull over, stop, notify),
+   weak-motor and stuck-sensor detection, and evidence for the architectures
+   (latency table, INT8 benchmark, architecture search). See `REPORT.md`.

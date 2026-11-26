@@ -1,0 +1,16 @@
+{
+  "description": "Live check after the stuck-rule fix (flat sensor while the robot drives, not while another sensor moves) and map-based pull-over sides (P@). 'healthy' (motor_gain 1.0) is the false-stop control. Same routes, speeds, seeds and onsets as fault-stop-v1/v3.",
+  "onset_s": 8.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true, "esp_fault_stop_s": 2.0},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 2.7, "seed": 20, "onset_s": 6.0},
+    {"route": "B", "speed": 3.3, "seed": 21, "onset_s": 9.0},
+    {"route": "C", "speed": 2.4, "seed": 22, "onset_s": 15.0},
+    {"route": "D", "speed": 3.8, "seed": 23, "onset_s": 12.0}
+  ],
+  "faults": [
+    {"name": "healthy", "type": "motor_gain", "target": "left", "severity": 1.0},
+    {"name": "ir-stuck-center", "type": "ir_stuck", "target": "gs_center"}
+  ]
+}

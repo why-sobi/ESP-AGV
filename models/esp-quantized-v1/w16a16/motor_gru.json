@@ -1,0 +1,1059 @@
+{
+    "configs": {
+        "/cell/Gemm": {
+            "onnx::Gemm_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 83719403,
+                "dominator": 83719403
+            },
+            "cell.weight_ih": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2734533634,
+                "dominator": 2734533634
+            },
+            "cell.bias_ih": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 2095325885,
+                "dominator": 2095325885
+            },
+            "/cell/Gemm_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2330684044,
+                "dominator": 2330684044
+            }
+        },
+        "/cell/Split": {
+            "/cell/Gemm_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 659918623,
+                "dominator": 2330684044
+            },
+            "PPQ_Variable_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "FP32",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 4052168038,
+                "dominator": 4052168038
+            },
+            "/cell/Split_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2614242961,
+                "dominator": 2330684044
+            },
+            "/cell/Split_output_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2361497360,
+                "dominator": 2330684044
+            },
+            "/cell/Split_output_2": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2335316371,
+                "dominator": 2330684044
+            }
+        },
+        "/cell/Gemm_1": {
+            "onnx::Gemm_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 4195638794,
+                "dominator": 4195638794
+            },
+            "cell.weight_hh": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2499947685,
+                "dominator": 2499947685
+            },
+            "cell.bias_hh": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 1525345492,
+                "dominator": 1525345492
+            },
+            "/cell/Gemm_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 483010631,
+                "dominator": 483010631
+            }
+        },
+        "/cell/Split_1": {
+            "/cell/Gemm_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3578790382,
+                "dominator": 483010631
+            },
+            "PPQ_Variable_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "FP32",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3330527481,
+                "dominator": 3330527481
+            },
+            "/cell/Split_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 587747288,
+                "dominator": 483010631
+            },
+            "/cell/Split_1_output_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3150647099,
+                "dominator": 483010631
+            },
+            "/cell/Split_1_output_2": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3934395666,
+                "dominator": 483010631
+            }
+        },
+        "/cell/Add": {
+            "PPQ_Variable_2": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 663687053,
+                "dominator": 663687053
+            },
+            "PPQ_Variable_5": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3091325980,
+                "dominator": 3091325980
+            },
+            "/cell/Add_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 72114799,
+                "dominator": 72114799
+            }
+        },
+        "/cell/Sigmoid": {
+            "/cell/Add_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1689514870,
+                "dominator": 72114799
+            },
+            "/cell/Sigmoid_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2031623265,
+                "dominator": 2031623265
+            }
+        },
+        "/cell/Add_1": {
+            "/cell/Split_1_output_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1368067488,
+                "dominator": 1368067488
+            },
+            "PPQ_Variable_8": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 604239331,
+                "dominator": 604239331
+            },
+            "/cell/Add_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2199128346,
+                "dominator": 2199128346
+            }
+        },
+        "/cell/Sigmoid_1": {
+            "/cell/Add_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3835915125,
+                "dominator": 2199128346
+            },
+            "/cell/Sigmoid_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 4247154788,
+                "dominator": 4247154788
+            }
+        },
+        "/cell/Mul": {
+            "/cell/Split_1_output_2": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2411322775,
+                "dominator": 483010631
+            },
+            "/cell/Sigmoid_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1218060798,
+                "dominator": 2031623265
+            },
+            "/cell/Mul_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2103029961,
+                "dominator": 2103029961
+            }
+        },
+        "/cell/Add_2": {
+            "/cell/Split_output_2": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1835659368,
+                "dominator": 1835659368
+            },
+            "/cell/Mul_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2902224267,
+                "dominator": 2902224267
+            },
+            "/cell/Add_2_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1324040738,
+                "dominator": 1324040738
+            }
+        },
+        "/cell/Tanh": {
+            "/cell/Add_2_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1465639005,
+                "dominator": 1324040738
+            },
+            "/cell/Tanh_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 46313900,
+                "dominator": 46313900
+            }
+        },
+        "/cell/Sub": {
+            "onnx::Gemm_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3289659839,
+                "dominator": 3289659839
+            },
+            "/cell/Tanh_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3229461894,
+                "dominator": 3229461894
+            },
+            "/cell/Sub_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 693579313,
+                "dominator": 693579313
+            }
+        },
+        "/cell/Mul_1": {
+            "/cell/Sub_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 922294320,
+                "dominator": 693579313
+            },
+            "/cell/Sigmoid_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3459782195,
+                "dominator": 4247154788
+            },
+            "/cell/Mul_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3187468330,
+                "dominator": 3187468330
+            }
+        },
+        "/cell/Add_3": {
+            "/cell/Mul_1_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2891517509,
+                "dominator": 2891517509
+            },
+            "/cell/Tanh_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3451176948,
+                "dominator": 3451176948
+            },
+            "onnx::Gemm_27": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 4093712103,
+                "dominator": 4093712103
+            }
+        },
+        "/head/Gemm": {
+            "onnx::Gemm_27": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3001923086,
+                "dominator": 4093712103
+            },
+            "head.weight": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 769864857,
+                "dominator": 769864857
+            },
+            "head.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 1849730296,
+                "dominator": 1849730296
+            },
+            "28": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3491663835,
+                "dominator": 3491663835
+            }
+        }
+    },
+    "dispatchings": {
+        "/cell/Gemm": "ESPDL_S3_INT16",
+        "/cell/Split": "ESPDL_S3_INT16",
+        "/cell/Gemm_1": "ESPDL_S3_INT16",
+        "/cell/Split_1": "ESPDL_S3_INT16",
+        "/cell/Add": "ESPDL_S3_INT16",
+        "/cell/Sigmoid": "ESPDL_S3_INT16",
+        "/cell/Add_1": "ESPDL_S3_INT16",
+        "/cell/Sigmoid_1": "ESPDL_S3_INT16",
+        "/cell/Mul": "ESPDL_S3_INT16",
+        "/cell/Add_2": "ESPDL_S3_INT16",
+        "/cell/Tanh": "ESPDL_S3_INT16",
+        "/cell/Sub": "ESPDL_S3_INT16",
+        "/cell/Mul_1": "ESPDL_S3_INT16",
+        "/cell/Add_3": "ESPDL_S3_INT16",
+        "/head/Gemm": "ESPDL_S3_INT16"
+    },
+    "values": {
+        "83719403": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        },
+        "2734533634": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "2095325885": {
+            "scale": 3.725290298461914e-09,
+            "zero_point": 0.0
+        },
+        "2330684044": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "4195638794": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "2499947685": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "1525345492": {
+            "scale": 1.862645149230957e-09,
+            "zero_point": 0.0
+        },
+        "483010631": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "663687053": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        },
+        "3091325980": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        },
+        "72114799": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        },
+        "2031623265": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "1368067488": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "604239331": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "2199128346": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "4247154788": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "2103029961": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "1835659368": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "2902224267": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "1324040738": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "46313900": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "3289659839": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "3229461894": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "693579313": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "3187468330": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "2891517509": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "3451176948": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "4093712103": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "769864857": {
+            "scale": 1.52587890625e-05,
+            "zero_point": 0.0
+        },
+        "1849730296": {
+            "scale": 4.656612873077393e-10,
+            "zero_point": 0.0
+        },
+        "3491663835": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        }
+    }
+}

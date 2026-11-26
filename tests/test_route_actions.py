@@ -2,6 +2,7 @@ import unittest
 
 from scripts.esp.route_actions import (
     format_route_command,
+    pull_over_sides,
     route_action_plan,
     route_actions,
 )
@@ -111,6 +112,51 @@ class RouteActionTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             route_action_plan(map_data, route, distance_scale=0.0)
+
+
+def parallel_map(offset_x):
+    """A 1 m track going +y, and a parallel line ``offset_x`` metres to its +x
+    side (the right when driving +y)."""
+    return {
+        "map_id": "pull-over-test",
+        "version": 1,
+        "world_transform": {"world_origin": [0.0, 0.0], "world_units_per_pixel": [1.0, 1.0]},
+        "nodes": [
+            {"id": "a", "x": 0.0, "y": 0.0},
+            {"id": "b", "x": 0.0, "y": 1.0},
+            {"id": "c", "x": offset_x, "y": 0.0},
+            {"id": "d", "x": offset_x, "y": 1.0},
+        ],
+        "edges": [
+            {"id": "track", "from": "a", "to": "b", "distance": 1.0,
+             "geometry": [[0.0, 0.0], [0.0, 1.0]]},
+            {"id": "other", "from": "c", "to": "d", "distance": 1.0,
+             "geometry": [[offset_x, 0.0], [offset_x, 1.0]]},
+        ],
+    }
+
+
+class PullOverSideTests(unittest.TestCase):
+    def sides(self, offset_x, start="a", goal="b"):
+        map_data = parallel_map(offset_x)
+        route = shortest_route(TrackMap.from_dict(map_data), start, goal)
+        return pull_over_sides(map_data, route, arena_half_m=10.0)
+
+    def test_pulls_over_right_when_the_right_is_clear(self):
+        self.assertEqual(self.sides(0.5), "R")
+
+    def test_pulls_over_left_when_a_line_is_close_on_the_right(self):
+        self.assertEqual(self.sides(0.1), "L")
+        # Driving the other way, that line is on the left.
+        self.assertEqual(self.sides(0.1, "b", "a"), "R")
+
+    def test_avoids_the_arena_wall(self):
+        # The track runs 0.1 m from the arena's +x wall (on its right), the
+        # other line far to the left.
+        map_data = parallel_map(-0.9)
+        map_data["world_transform"]["world_origin"] = [0.4, -0.5]
+        route = shortest_route(TrackMap.from_dict(map_data), "a", "b")
+        self.assertEqual(pull_over_sides(map_data, route, arena_half_m=0.5), "L")
 
 
 if __name__ == "__main__":

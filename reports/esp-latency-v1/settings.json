@@ -1,0 +1,55 @@
+{
+  "repeats": 31,
+  "conv_space": {
+    "features": [
+      3,
+      4
+    ],
+    "window": [
+      10,
+      16,
+      20,
+      24,
+      32
+    ],
+    "channels": [
+      8,
+      16,
+      24,
+      32
+    ],
+    "kernel": [
+      3,
+      5
+    ],
+    "bottleneck": [
+      4,
+      8,
+      12,
+      16
+    ],
+    "hidden": [
+      16,
+      32,
+      64
+    ]
+  },
+  "gru_space": {
+    "inputs": [
+      2
+    ],
+    "hidden": [
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64
+    ],
+    "outputs": [
+      2
+    ]
+  },
+  "firmware": "esp-dsp float32, weights in internal RAM, -O2, 160 MHz"
+}

@@ -1,0 +1,5 @@
+dependencies:
+  idf: ">=6.0"
+  # Espressif's DSP library: float32 dot products and matrix multiplies with
+  # ESP32-S3 assembly (SIMD) implementations, used by the anomaly detectors.
+  espressif/esp-dsp: "^1.5"

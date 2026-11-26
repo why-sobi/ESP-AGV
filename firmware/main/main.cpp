@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "anomaly.h"
+#include "bench.h"
 #include "notify.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
@@ -56,12 +57,13 @@ constexpr float kUTurnMinRad = 2.79F;     // 160 degrees: ignore lines crossed e
 constexpr float kUTurnMaxRad = 4.71F;     // 270 degrees: give up, the line was not found.
 
 // Fault stop, only for routes with 'F@<s>': once an anomaly alarm has been
-// raised continuously for that long, spin right about 90 degrees in place,
-// drive forward off the line, stop with FAULT_STOP and send a notification.
+// raised continuously for that long, spin about 90 degrees in place (right,
+// or the side the route's 'P@' option gives for the current step), drive
+// forward off the line, stop with FAULT_STOP and send a notification.
 constexpr float kLowestFaultHoldS = 0.1F;    // Accepted range for a route's 'F' hold.
 constexpr float kHighestFaultHoldS = 10.0F;
 constexpr float kPullOverSpeed = 2.0F;       // Wheel speed while pulling over, rad/s.
-constexpr float kPullOverTurnRad = 1.571F;   // 90 degrees right.
+constexpr float kPullOverTurnRad = 1.571F;   // 90 degrees.
 constexpr float kPullOverDriveM = 0.08F;     // Then this far forward.
 constexpr uint32_t kPullOverLimitMs = 6000;  // Healthy ~2.8 s, 50% weak motor ~4.1 s; then stop anyway.
 
@@ -112,6 +114,11 @@ struct Controller {
   float pull_over_distance_m = 0.0F;
   uint32_t pull_over_ms = 0;
   bool pull_over_turned = false;
+  bool pulling_over_left = false;
+  // Optional 'P@' sides: pull over to the left (true) or right per step; the
+  // Supervisor picks the side clear of other lines from the map.
+  bool pull_over_left[kMaxRouteLength]{};
+  size_t pull_over_side_count = 0;
   // The alarm that started the pull-over, for the notification.
   bool fault_motor_alarm = false;
   bool fault_ir_alarm = false;
@@ -126,8 +133,16 @@ Controller g_controller;
 // Anomaly detection runs on every sensor frame of a route. The motor sample is
 // (left target, right target, left speed, right speed) and the IR sample the
 // three ground sensors, exactly as logged by epuck_route and used in training.
+// The motor GRU (slow motor faults) and the stuck-sensor rule pair with the
+// conv models: the motor alarm is either motor detector's, the IR alarm
+// either IR detector's (scripts/models/gru_experiment.py).
 AnomalyDetector g_motor_detector(anomaly_model::kMotor);
 AnomalyDetector g_ir_detector(anomaly_model::kIr);
+MotorGruDetector g_motor_gru;
+IrStuckDetector g_ir_stuck;
+
+bool motor_alarm() { return g_motor_detector.alarm() || g_motor_gru.alarm(); }
+bool ir_alarm() { return g_ir_detector.alarm() || g_ir_stuck.alarm(); }
 
 struct FrameInputs {
   bool pending = false;  // A sensor frame awaits its response (and samples).
@@ -224,19 +239,22 @@ void update_detectors(float left, float right) {
         (g_frame.encoders[0] - timing.previous_encoders[0]) / dt,
         (g_frame.encoders[1] - timing.previous_encoders[1]) / dt,
     };
+    const float wheel_speed = (std::fabs(motor[2]) + std::fabs(motor[3])) * 0.5F;
+    g_ir_stuck.add_sample(g_frame.readings, wheel_speed, timing.elapsed_ms, monitored);
     g_motor_detector.add_sample(motor, timing.elapsed_ms, monitored);
+    g_motor_gru.add_sample(motor, timing.elapsed_ms, monitored);
   }
-  const bool alarm = g_motor_detector.alarm() || g_ir_detector.alarm();
+  const bool alarm = motor_alarm() || ir_alarm();
   if (alarm && !timing.alarm_on) {
     timing.alarm_since_ms = timing.elapsed_ms;
   }
   timing.alarm_on = alarm;
   g_alarms.clock_ms += static_cast<uint32_t>(std::lround(g_frame.dt_ms));
-  if (g_motor_detector.alarm()) {
+  if (motor_alarm()) {
     g_alarms.motor_seen = true;
     g_alarms.last_motor_ms = g_alarms.clock_ms;
   }
-  if (g_ir_detector.alarm()) {
+  if (ir_alarm()) {
     g_alarms.ir_seen = true;
     g_alarms.last_ir_ms = g_alarms.clock_ms;
   }
@@ -248,11 +266,15 @@ void update_detectors(float left, float right) {
 void reset_detectors() {
   g_motor_detector.reset();
   g_ir_detector.reset();
+  g_motor_gru.reset();
+  g_ir_stuck.reset();
   g_detection = DetectionTiming{};
 }
 
-// Motor frame: wheel targets, controller state, then the motor and IR anomaly
-// scores (-1 until a full window exists) and their persistent-alarm flags.
+// Motor frame: wheel targets, controller state, then the motor and IR conv
+// scores (-1 until a full window exists), the motor and IR alarms (conv or
+// GRU; conv or stuck rule), the motor GRU score (-1 until its first window),
+// the GRU alarm and the stuck-sensor alarm.
 void send_response(uint32_t sequence, float left, float right) {
   if (g_frame.pending) {
     g_frame.pending = false;
@@ -260,12 +282,14 @@ void send_response(uint32_t sequence, float left, float right) {
   }
   const float motor_score = g_motor_detector.has_score() ? g_motor_detector.score() : -1.0F;
   const float ir_score = g_ir_detector.has_score() ? g_ir_detector.score() : -1.0F;
-  char response[160];
+  const float gru_score = g_motor_gru.has_score() ? g_motor_gru.score() : -1.0F;
+  char response[192];
   const int length = std::snprintf(
-      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u,%.4f,%.5f,%.5f,%d,%d\n",
+      response, sizeof(response), "M,%lu,%.3f,%.3f,%s,%u,%.4f,%.5f,%.5f,%d,%d,%.6f,%d,%d\n",
       static_cast<unsigned long>(sequence), left, right, state_name(g_controller.state),
       static_cast<unsigned>(g_controller.route_index), g_controller.distance_m, motor_score,
-      ir_score, g_motor_detector.alarm() ? 1 : 0, g_ir_detector.alarm() ? 1 : 0);
+      ir_score, motor_alarm() ? 1 : 0, ir_alarm() ? 1 : 0, gru_score,
+      g_motor_gru.alarm() ? 1 : 0, g_ir_stuck.alarm() ? 1 : 0);
   if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
     uart_write_bytes(kSerialPort, response, length);
   }
@@ -285,13 +309,16 @@ void send_error(const char *reason) {
 // place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779". An
 // optional leading "V@<rad/s>" sets the straight-line speed for the route, an
 // optional leading "F@<seconds>" enables the fault stop with that alarm hold,
-// and an optional leading "E@<place>|<place>|..." names where the robot is
-// while heading for each step (one per step, for notifications).
+// an optional leading "E@<place>|<place>|..." names where the robot is
+// while heading for each step (one per step, for notifications), and an
+// optional leading "P@<R|L>..." gives the pull-over side per step.
 bool configure_route(char *steps) {
   static char places[kMaxRouteLength][kMaxPlaceLength];
   RouteStep parsed[kMaxRouteLength];
+  bool sides_left[kMaxRouteLength]{};
   size_t length = 0;
   size_t place_count = 0;
+  size_t side_count = 0;
   float previous_distance = 0.0F;
   float max_speed = kDefaultMaxSpeed;
   float fault_hold_s = 0.0F;
@@ -307,6 +334,19 @@ bool configure_route(char *steps) {
           return false;
         }
         std::strcpy(places[place_count++], place);
+      }
+      continue;
+    }
+    if (options_allowed && token[0] == 'P' && token[1] == '@') {
+      side_count = 0;
+      for (const char *side = token + 2; *side != '\0'; ++side) {
+        if ((*side != 'R' && *side != 'L') || side_count == kMaxRouteLength) {
+          return false;
+        }
+        sides_left[side_count++] = *side == 'L';
+      }
+      if (side_count == 0) {
+        return false;
       }
       continue;
     }
@@ -356,11 +396,14 @@ bool configure_route(char *steps) {
       return false;
     }
   }
-  if (place_count != 0 && place_count != length) {
+  if ((place_count != 0 && place_count != length) ||
+      (side_count != 0 && side_count != length)) {
     return false;
   }
 
   std::copy(parsed, parsed + length, g_controller.route);
+  std::copy(sides_left, sides_left + side_count, g_controller.pull_over_left);
+  g_controller.pull_over_side_count = side_count;
   for (size_t i = 0; i < place_count; ++i) {
     std::strcpy(g_controller.places[i], places[i]);
   }
@@ -495,9 +538,10 @@ void notify_fault_stop(bool completed) {
   notify_send(title, message);
 }
 
-// Pull over once an alarm has lasted the route's fault hold: spin right in
-// place, drive forward off the line, then stop. Returns true while pulling
-// over or once stopped (the response has been sent).
+// Pull over once an alarm has lasted the route's fault hold: spin in place
+// towards the step's 'P@' side (right without it), drive forward off the
+// line, then stop. Returns true while pulling over or once stopped (the
+// response has been sent).
 bool run_fault_stop(uint32_t sequence, float dt_ms) {
   Controller &c = g_controller;
   if (c.state != State::kFaultPullOver) {
@@ -512,11 +556,17 @@ bool run_fault_stop(uint32_t sequence, float dt_ms) {
     c.pull_over_distance_m = c.distance_m;
     c.pull_over_ms = 0;
     c.pull_over_turned = false;
-    c.fault_motor_alarm = g_motor_detector.alarm();
-    c.fault_ir_alarm = g_ir_detector.alarm();
+    c.pulling_over_left =
+        c.pull_over_side_count != 0 &&
+        c.pull_over_left[std::min(c.route_index, c.pull_over_side_count - 1)];
+    c.fault_motor_alarm = motor_alarm();
+    c.fault_ir_alarm = ir_alarm();
   }
   c.pull_over_ms += static_cast<uint32_t>(dt_ms);
-  if (!c.pull_over_turned && c.pull_over_heading_rad - c.heading_rad >= kPullOverTurnRad) {
+  // heading_rad is left-positive.
+  const float turned = c.pulling_over_left ? c.heading_rad - c.pull_over_heading_rad
+                                           : c.pull_over_heading_rad - c.heading_rad;
+  if (!c.pull_over_turned && turned >= kPullOverTurnRad) {
     c.pull_over_turned = true;
     c.pull_over_distance_m = c.distance_m;
   }
@@ -529,6 +579,8 @@ bool run_fault_stop(uint32_t sequence, float dt_ms) {
     send_response(sequence, 0.0F, 0.0F);
   } else if (c.pull_over_turned) {
     send_response(sequence, kPullOverSpeed, kPullOverSpeed);
+  } else if (c.pulling_over_left) {
+    send_response(sequence, -kPullOverSpeed, kPullOverSpeed);
   } else {
     send_response(sequence, kPullOverSpeed, -kPullOverSpeed);
   }
@@ -730,14 +782,42 @@ void process_command(char *line) {
     return;
   }
   if (line[0] == 'Q' && line[1] == '\0') {
-    // Inference timing: last and maximum microseconds per window, per model.
-    char response[80];
+    // Inference timing: last and maximum microseconds per frame, for the
+    // motor conv, IR conv and motor GRU models.
+    char response[112];
     const int length = std::snprintf(
-        response, sizeof(response), "I,%lu,%lu,%lu,%lu\n",
+        response, sizeof(response), "I,%lu,%lu,%lu,%lu,%lu,%lu\n",
         static_cast<unsigned long>(g_motor_detector.last_inference_us()),
         static_cast<unsigned long>(g_motor_detector.max_inference_us()),
         static_cast<unsigned long>(g_ir_detector.last_inference_us()),
-        static_cast<unsigned long>(g_ir_detector.max_inference_us()));
+        static_cast<unsigned long>(g_ir_detector.max_inference_us()),
+        static_cast<unsigned long>(g_motor_gru.last_inference_us()),
+        static_cast<unsigned long>(g_motor_gru.max_inference_us()));
+    if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
+      uart_write_bytes(kSerialPort, response, length);
+    }
+    return;
+  }
+  if (line[0] == 'B' && line[1] == ',') {
+    // Latency benchmark: "B,C,<features>,<window>,<channels>,<kernel>,
+    // <bottleneck>,<hidden>,<repeats>" (conv autoencoder) or
+    // "B,G,<inputs>,<hidden>,<outputs>,<repeats>" (GRU step); replies
+    // "b,<ok>,<median_us>,<max_us>,<weight_bytes>". Not for use during a route.
+    int v[7] = {};
+    bench::Result result;
+    if (line[2] == 'C' &&
+        std::sscanf(line + 3, ",%d,%d,%d,%d,%d,%d,%d", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5],
+                    &v[6]) == 7) {
+      result = bench::conv(v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
+    } else if (line[2] == 'G' &&
+               std::sscanf(line + 3, ",%d,%d,%d,%d", &v[0], &v[1], &v[2], &v[3]) == 4) {
+      result = bench::gru(v[0], v[1], v[2], v[3]);
+    }
+    char response[80];
+    const int length = std::snprintf(
+        response, sizeof(response), "b,%d,%lu,%lu,%lu\n", result.ok ? 1 : 0,
+        static_cast<unsigned long>(result.median_us), static_cast<unsigned long>(result.max_us),
+        static_cast<unsigned long>(result.weight_bytes));
     if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
       uart_write_bytes(kSerialPort, response, length);
     }

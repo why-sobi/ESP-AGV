@@ -1,0 +1,541 @@
+{
+  "settings": {
+    "quant": [
+      "w8a8",
+      "w8a16",
+      "w16a16"
+    ],
+    "target": "esp32s3",
+    "calibration_windows": 1024
+  },
+  "models": {
+    "motor": {
+      "w8a8": {
+        "score_abs_error": {
+          "median": 0.3463629484176636,
+          "p99": 1.6780977114662532,
+          "max": 2.974061965942383,
+          "relative_to_threshold_p99": 8.861455489798706
+        },
+        "float": {
+          "threshold": 0.18937043845653537,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 2
+        },
+        "quant_float_threshold": {
+          "threshold": 0.18937043845653537,
+          "detected": 56,
+          "pre_onset_runs": 56,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 18,
+          "healthy_test_alarm_runs": 18
+        },
+        "quant_own_threshold": {
+          "threshold": 2.6426181793212895,
+          "detected": 12,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 0,
+            "motor-weak-right-70": 0,
+            "motor-weak-left-50": 3,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 0,
+            "encoder-stuck-left": 1,
+            "encoder-noise-right": 0
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 11968
+      },
+      "w8a16": {
+        "score_abs_error": {
+          "median": 0.002072066068649292,
+          "p99": 0.038140820264816376,
+          "max": 0.3428688049316406,
+          "relative_to_threshold_p99": 0.20140852276460522
+        },
+        "float": {
+          "threshold": 0.18937043845653537,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 2
+        },
+        "quant_float_threshold": {
+          "threshold": 0.18937043845653537,
+          "detected": 50,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 7,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 3,
+          "healthy_test_alarm_runs": 2
+        },
+        "quant_own_threshold": {
+          "threshold": 0.1995620131492615,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 2
+        },
+        "espdl_bytes": 12592
+      },
+      "w16a16": {
+        "score_abs_error": {
+          "median": 4.718080163002014e-06,
+          "p99": 0.0001345485448837288,
+          "max": 0.33928728103637695,
+          "relative_to_threshold_p99": 0.0007105044798985911
+        },
+        "float": {
+          "threshold": 0.18937043845653537,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 2
+        },
+        "quant_float_threshold": {
+          "threshold": 0.18937043845653537,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 1,
+          "healthy_test_alarm_runs": 2
+        },
+        "quant_own_threshold": {
+          "threshold": 0.18938170373439792,
+          "detected": 49,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 3,
+            "motor-weak-right-70": 6,
+            "motor-weak-left-50": 8,
+            "motor-stall-left": 8,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 8,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 2
+        },
+        "espdl_bytes": 17616
+      }
+    },
+    "ir": {
+      "w8a8": {
+        "score_abs_error": {
+          "median": 0.008163422346115112,
+          "p99": 0.22089393973350924,
+          "max": 26.67363691329956,
+          "relative_to_threshold_p99": 0.4934701944022025
+        },
+        "float": {
+          "threshold": 0.44763380289077764,
+          "detected": 33,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 3,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 3,
+            "ir-drift-center": 4,
+            "ir-drift-right": 6
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.44763380289077764,
+          "detected": 36,
+          "pre_onset_runs": 8,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 4,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 4,
+            "ir-drift-center": 4,
+            "ir-drift-right": 7
+          },
+          "healthy_validation_alarm_runs": 3,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.5005576610565187,
+          "detected": 31,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 3,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 2,
+            "ir-drift-center": 4,
+            "ir-drift-right": 5
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 11216
+      },
+      "w8a16": {
+        "score_abs_error": {
+          "median": 0.006901562213897705,
+          "p99": 0.21202691137790908,
+          "max": 26.515071392059326,
+          "relative_to_threshold_p99": 0.47366152870640893
+        },
+        "float": {
+          "threshold": 0.44763380289077764,
+          "detected": 33,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 3,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 3,
+            "ir-drift-center": 4,
+            "ir-drift-right": 6
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.44763380289077764,
+          "detected": 35,
+          "pre_onset_runs": 8,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 4,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 3,
+            "ir-drift-center": 4,
+            "ir-drift-right": 7
+          },
+          "healthy_validation_alarm_runs": 3,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.49231851100921636,
+          "detected": 31,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 3,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 2,
+            "ir-drift-center": 4,
+            "ir-drift-right": 5
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 11760
+      },
+      "w16a16": {
+        "score_abs_error": {
+          "median": 5.527585744857788e-05,
+          "p99": 0.22419696688652058,
+          "max": 26.869014501571655,
+          "relative_to_threshold_p99": 0.500849054380338
+        },
+        "float": {
+          "threshold": 0.44763380289077764,
+          "detected": 33,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 3,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 3,
+            "ir-drift-center": 4,
+            "ir-drift-right": 6
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.44763380289077764,
+          "detected": 36,
+          "pre_onset_runs": 8,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 4,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 4,
+            "ir-drift-center": 4,
+            "ir-drift-right": 7
+          },
+          "healthy_validation_alarm_runs": 3,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.4833068251609803,
+          "detected": 35,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "ir-stuck-center": 1,
+            "ir-dead-left": 8,
+            "ir-noise-right-50": 0,
+            "ir-noise-right-100": 4,
+            "ir-noise-right-200": 8,
+            "ir-noise-left-100": 4,
+            "ir-drift-center": 4,
+            "ir-drift-right": 6
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 16096
+      }
+    },
+    "gru": {
+      "w8a8": {
+        "score_abs_error": {
+          "median": 0.0023453817702829838,
+          "p99": 0.07084501266479495,
+          "max": 0.16027569770812988,
+          "relative_to_threshold_p99": 2.8793041939992556
+        },
+        "float": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.042014885693788535,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 15920
+      },
+      "w8a16": {
+        "score_abs_error": {
+          "median": 0.00012576021254062653,
+          "p99": 0.057862672805786136,
+          "max": 0.12798571586608887,
+          "relative_to_threshold_p99": 2.351672054517077
+        },
+        "float": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.025054536759853367,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 27936
+      },
+      "w16a16": {
+        "score_abs_error": {
+          "median": 1.835264265537262e-05,
+          "p99": 0.0011194133758545,
+          "max": 0.011913299560546875,
+          "relative_to_threshold_p99": 0.04549553323064616
+        },
+        "float": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_float_threshold": {
+          "threshold": 0.024604907259345058,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "quant_own_threshold": {
+          "threshold": 0.024579942226409916,
+          "detected": 52,
+          "pre_onset_runs": 0,
+          "per_fault": {
+            "motor-weak-right-80": 8,
+            "motor-weak-right-70": 8,
+            "motor-weak-left-50": 7,
+            "motor-stall-left": 7,
+            "motor-intermittent-right": 8,
+            "encoder-stuck-left": 6,
+            "encoder-noise-right": 8
+          },
+          "healthy_validation_alarm_runs": 0,
+          "healthy_test_alarm_runs": 0
+        },
+        "espdl_bytes": 31264
+      }
+    }
+  }
+}

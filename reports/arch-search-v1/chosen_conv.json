@@ -1,0 +1,42 @@
+{
+  "motor": [
+    {
+      "window": 10,
+      "channels": 8,
+      "kernel": 3,
+      "bottleneck": 12,
+      "hidden": 16,
+      "lr": 0.0025612019833140165,
+      "trial": 34
+    },
+    {
+      "window": 10,
+      "channels": 8,
+      "kernel": 3,
+      "bottleneck": 16,
+      "hidden": 16,
+      "lr": 0.0016787463062197974,
+      "trial": 19
+    }
+  ],
+  "ir": [
+    {
+      "window": 10,
+      "channels": 8,
+      "kernel": 3,
+      "bottleneck": 4,
+      "hidden": 32,
+      "lr": 0.00274558164177853,
+      "trial": 26
+    },
+    {
+      "window": 10,
+      "channels": 24,
+      "kernel": 3,
+      "bottleneck": 4,
+      "hidden": 32,
+      "lr": 0.0009270423574445176,
+      "trial": 33
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 .venv
+.venv-ppq/
 .vscode/
 
 build/

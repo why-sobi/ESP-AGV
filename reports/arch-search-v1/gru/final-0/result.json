@@ -1,0 +1,25 @@
+{
+  "label": "candidate 0",
+  "arch": {
+    "hidden": 16,
+    "score_window": 31,
+    "lr": 0.0037346671857171965,
+    "trial": 9
+  },
+  "latency_us": 127,
+  "weight_bytes": 4368,
+  "threshold": 0.02850431948900223,
+  "detected": 28,
+  "runs": 28,
+  "median_delay_s": 0.1280000000000001,
+  "pre_onset_runs": 0,
+  "healthy_alarm_runs": {
+    "validation": 0,
+    "test": 0
+  },
+  "score": 27.9936,
+  "training": {
+    "best_iteration": 4000,
+    "validation_loss": 0.006025996059179306
+  }
+}

@@ -1,0 +1,17 @@
+file,route,start_node,destination_node,wheel_speed_rad_s,fault_name,fault_type,target,severity,onset_s,outcome,duration_s,faulty_samples,control_mode,seed
+route-20261126-231004-A-2.7-healthy.csv,A,node-003,node-001,2.7,healthy,motor_gain,left,1.0,6.0,completed,35.392,920,esp32,20
+route-20261126-231034-B-3.3-healthy.csv,B,node-001,node-003,3.3,healthy,motor_gain,left,1.0,9.0,completed,29.984,657,esp32,21
+route-20261126-231101-C-2.4-healthy.csv,C,node-002,node-004,2.4,healthy,motor_gain,left,1.0,15.0,completed,39.008,752,esp32,22
+route-20261126-231133-D-3.8-healthy.csv,D,node-004,node-002,3.8,healthy,motor_gain,left,1.0,12.0,completed,26.752,463,esp32,23
+route-20261126-231157-A-2.7-motor-weak-right-80.csv,A,node-003,node-001,2.7,motor-weak-right-80,motor_gain,right,0.8,6.0,stopped_early,11.744,181,esp32,20
+route-20261126-231213-B-3.3-motor-weak-right-80.csv,B,node-001,node-003,3.3,motor-weak-right-80,motor_gain,right,0.8,9.0,stopped_early,14.56,175,esp32,21
+route-20261126-231230-C-2.4-motor-weak-right-80.csv,C,node-002,node-004,2.4,motor-weak-right-80,motor_gain,right,0.8,15.0,stopped_early,20.608,177,esp32,22
+route-20261126-231249-D-3.8-motor-weak-right-80.csv,D,node-004,node-002,3.8,motor-weak-right-80,motor_gain,right,0.8,12.0,stopped_early,22.848,341,esp32,23
+route-20261126-231310-A-2.7-motor-weak-right-70.csv,A,node-003,node-001,2.7,motor-weak-right-70,motor_gain,right,0.7,6.0,stopped_early,11.808,183,esp32,20
+route-20261126-231324-B-3.3-motor-weak-right-70.csv,B,node-001,node-003,3.3,motor-weak-right-70,motor_gain,right,0.7,9.0,stopped_early,14.72,180,esp32,21
+route-20261126-231339-C-2.4-motor-weak-right-70.csv,C,node-002,node-004,2.4,motor-weak-right-70,motor_gain,right,0.7,15.0,stopped_early,20.736,181,esp32,22
+route-20261126-231358-D-3.8-motor-weak-right-70.csv,D,node-004,node-002,3.8,motor-weak-right-70,motor_gain,right,0.7,12.0,stopped_early,23.104,349,esp32,23
+route-20261126-231418-A-2.7-ir-stuck-center.csv,A,node-003,node-001,2.7,ir-stuck-center,ir_stuck,gs_center,,6.0,stopped_early,12.128,193,esp32,20
+route-20261126-231432-B-3.3-ir-stuck-center.csv,B,node-001,node-003,3.3,ir-stuck-center,ir_stuck,gs_center,,9.0,stopped_early,14.848,184,esp32,21
+route-20261126-231448-C-2.4-ir-stuck-center.csv,C,node-002,node-004,2.4,ir-stuck-center,ir_stuck,gs_center,,15.0,stopped_early,31.872,529,esp32,22
+route-20261126-231513-D-3.8-ir-stuck-center.csv,D,node-004,node-002,3.8,ir-stuck-center,ir_stuck,gs_center,,12.0,stopped_early,15.936,125,esp32,23

@@ -1,0 +1,14 @@
+{
+  "description": "Pull-over side on the small loop: route C starts on edge-005 heading south (Junction 2 to Junction 3), where a right turn lands on edge-004 inside the loop. With the fault from 1 s, the ESP pulls over on that edge; P@ sends 'L' there.",
+  "onset_s": 1.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true, "esp_fault_stop_s": 2.0},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "C", "speed": 2.4, "seed": 30},
+    {"route": "C", "speed": 3.0, "seed": 31}
+  ],
+  "faults": [
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0},
+    {"name": "motor-weak-right-70", "type": "motor_gain", "target": "right", "severity": 0.7}
+  ]
+}

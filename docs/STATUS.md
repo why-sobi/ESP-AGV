@@ -77,7 +77,6 @@ The Webots simulation remains the environment throughout this plan.
     30% loss.
   - Right IR noise is reliable only at std 200 (8/8); std 100 is detected in
     4/8.
-- The Python script test suite passes (36 tests at last verification).
 - **ESP closed-loop control (2026-11-14).** With `control_mode: esp32`,
   `epuck_route` acts as the Webots-to-ESP bridge over COM3. All four two-edge
   routes (A-D) complete headlessly with the ESP computing every wheel command:
@@ -152,13 +151,63 @@ The Webots simulation remains the environment throughout this plan.
   - **Supervisor mode** still reproduces the committed healthy run
     byte-for-byte in the first 15 columns.
 
+- **Fault stop and notifications (2026-11-26).**
+  - Route option `F@<s>`: once an alarm has lasted that long the ESP pulls
+    over (90 degrees, 8 cm) and stops (`FAULT_STOP`), giving up after 6 s.
+  - The ESP posts a plain-language notification to ntfy.sh over WiFi (core 0,
+    never blocking control), naming the problem and the place (`E@` labels).
+    WiFi settings live in a 12 KB `wificfg` partition.
+  - Live (`fault-stop-v1`, `-v2`, 24 runs): healthy 4/4 `AT_DEST`; IR dead
+    and IR noise 200 `FAULT_STOP` 4/4; motor faults stop with `FAULT_STOP`
+    or `LINE_LOST`; every stop notified exactly once.
+
+- **Motor GRU and stuck-sensor rule (2026-11-26/27).** See `REPORT.md`
+  sections 9-12 and `reports/esp-gru-eval-v1`.
+  - Offline (120 fault runs): detection by the fault's own detector 82 ->
+    94/120, by either detector 98 -> 110/120; healthy validation 0/18, test
+    2/18 (unchanged, same runs); no pre-onset alarm. Weak motor 20%/30%
+    3/8, 6/8 -> 8/8, 8/8; IR stuck 1/8 -> 6/8 (6 observable).
+  - The motor GRU (32 hidden) predicts both wheel speeds from the wheel
+    targets; threshold 2x the no-validation-alarm value (0.0246).
+  - The stuck rule flags a sensor flat for 1 s while the robot drives (mean
+    wheel speed > 1 rad/s). The first version (another sensor moving) missed
+    a sensor stuck at the on-the-line value live.
+  - All four detectors run on esp-dsp (ESP32-S3 SIMD) with weights copied to
+    internal RAM: 0.31 + 0.36 + 0.38 ms per frame (was 2.3 + 2.0 ms for two).
+  - Replay (`reports/esp-replay-v2`, 10 runs): conv within 5e-5, GRU within
+    1.6e-5, alarms identical. Live (`fault-stop-v3`, `-v4`): healthy 8/8
+    clean; weak motor 8/8 `FAULT_STOP`; stuck IR 3/4 `FAULT_STOP` (the 4th
+    starts in a U-turn and stops with `LINE_LOST`).
+
+- **Pull-over side from the map (2026-11-27).** The Supervisor checks each
+  route step for other lines and walls on both sides and sends `P@` (one
+  side per step). On the small loop half the legs would have pulled over onto
+  the other loop line; live (`pull-over-v1`) the ESP pulled over left, 4-5 cm
+  outside the loop.
+
+- **Architecture evidence (2026-11-27).** See `REPORT.md` sections 14-16.
+  - 967 architectures timed on the ESP (`reports/esp-latency-v1`).
+  - INT8/INT16 with ESP-DL (`reports/esp-int8-v1`): ~2.5x slower than the
+    float32 esp-dsp code at these model sizes; INT8 breaks the motor conv
+    model; float32 kept.
+  - Optuna search (`reports/arch-search-v1`): smaller motor conv (100 us,
+    28/28 held-out vs 25/28) and GRU (127 us, 28/28 vs 27/28) beat the
+    deployed ones; the smaller IR conv detects more (22/32 vs 17/32) but adds
+    2/18 healthy test alarms. Not deployed yet.
+
+- The Python test suite passes (46 tests).
+
 ## Not yet implemented
 
-- A response to anomaly alarms (they are reported and logged only).
-- ESP-mode runs through the parallel edges (edge-002, edge-004). Round trips
-  are ESP-only; the Supervisor controller has no U-turn.
-- Weak detections: mild motor power loss (20%), IR noise of std 100 or
-  less, a stuck IR sensor, and IR drift.
+- Detection of IR drift (4-6/8) and IR noise of std 100 or less (0-3/8 by
+  the IR model).
+- Deploying the architecture-search winners (the conv window and channel
+  count are compile-time constants in the firmware).
+- Reconnecting when COM3 drops mid-run (the run fails; the ESP stops on
+  `LINK_LOST`).
+- ESP-mode runs over the parallel edges (edge-002, edge-004).
+- Faults that start in a U-turn and lose the line before any monitored window
+  are only caught as `LINE_LOST`.
 
 ## Current data/model status
 
@@ -172,7 +221,7 @@ The Webots simulation remains the environment throughout this plan.
 - The motor PCA baseline is nearly as good as the autoencoders. The IR
   autoencoders clearly beat it.
 - A stuck sensor frozen at a plausible value (the centre sensor on the line) is
-  hard to detect from a 0.64 s window.
+  hard to detect from a 0.64 s window; the stuck-sensor rule now covers it.
 - IR noise on a single sensor is diluted by the window-mean score. It is
   reliably detected only at about 0.9 of the scaler std.
 - Faults use one onset time (5 s). Only motor gain and IR noise have been swept
@@ -187,6 +236,7 @@ the source of sensor data and the destination for wheel commands.
 
 ## References
 
+- `REPORT.md`: the whole project, every result and number in one place.
 - `docs/USAGE.md`: commands, project files, data collection, preparation, ESP
   checks, and what is or is not wired together.
 - `docs/TODO.md`: ordered next steps and completion criteria.

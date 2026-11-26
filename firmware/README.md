@@ -72,21 +72,36 @@ own COM3 at a time.
   `E@between Junction 3 and Junction 2|between Junction 2 and Junction 1`.
   Notifications name it; labels are at most 63 characters, without `,` or
   `|`, and their count must match the steps. `epuck_route` always sends
-  them. `E@`, `V@` and `F@` must come before every other step, in any order. The controller replies `A,ROUTE_OK\n`, or `E,BAD_ROUTE\n`. At
+  them. An optional leading `P@<R|L>...` gives the pull-over side per step
+  (one letter per step, like `E@`; right without it), e.g. `P@RL`;
+  `epuck_route` picks each from the map (see "Fault stop" below). `E@`,
+  `P@`, `V@` and `F@` must come before every other step, in any order. The controller replies `A,ROUTE_OK\n`, or `E,BAD_ROUTE\n`. At
   most 32 steps.
 - Supply sensor frames:
   `S,<sequence>,<dt_ms>,<left>,<center>,<right>,<enc_left_rad>,<enc_right_rad>\n`.
   Lower ground-sensor values mean darker track, matching the Webots sensors.
   Encoder values are the wheel position sensors in radians.
 - Read motor frames:
-  `M,<sequence>,<left_rad_s>,<right_rad_s>,<state>,<route_index>,<distance_m>,<motor_score>,<ir_score>,<motor_alarm>,<ir_alarm>\n`.
-  `distance_m` is the ESP's odometry distance since the route started. The
-  scores are the motor and IR anomaly scores of the latest window (`-1` until
-  a full window exists), and the alarms are the persistent 3-of-5 decisions
-  (`0`/`1`). `epuck_route` logs them as `esp_motor_score`, `esp_ir_score`,
-  `esp_motor_alarm` and `esp_ir_alarm`.
+  `M,<sequence>,<left_rad_s>,<right_rad_s>,<state>,<route_index>,<distance_m>,<motor_score>,<ir_score>,<motor_alarm>,<ir_alarm>,<gru_score>,<gru_alarm>,<stuck_alarm>\n`.
+  `distance_m` is the ESP's odometry distance since the route started.
+  `motor_score`/`ir_score` are the conv autoencoder scores of the latest
+  window (`-1` until a full window exists). `motor_alarm` is the motor conv
+  or motor GRU alarm, `ir_alarm` the IR conv or stuck-sensor alarm (`0`/`1`);
+  these drive the fault stop. `gru_score` is the motor GRU score (`-1` for
+  the first 62 samples), `gru_alarm` and `stuck_alarm` the two new detectors'
+  own alarms. `epuck_route` logs them as `esp_motor_score`, `esp_ir_score`,
+  `esp_motor_alarm`, `esp_ir_alarm`, `esp_gru_score`, `esp_gru_alarm` and
+  `esp_stuck_alarm`.
 - Inference timing: `Q\n` replies
-  `I,<motor_last_us>,<motor_max_us>,<ir_last_us>,<ir_max_us>\n`.
+  `I,<motor_last_us>,<motor_max_us>,<ir_last_us>,<ir_max_us>,<gru_last_us>,<gru_max_us>\n`.
+- Latency benchmark (`main/bench.cpp`, not during a route):
+  `B,C,<features>,<window>,<channels>,<kernel>,<bottleneck>,<hidden>,<repeats>\n`
+  (conv autoencoder) or `B,G,<inputs>,<hidden>,<outputs>,<repeats>\n` (GRU
+  step) runs the same esp-dsp forward pass as the detectors with those sizes
+  and random weights in internal RAM, and replies
+  `b,<ok>,<median_us>,<max_us>,<weight_bytes>\n`.
+  `scripts/models/esp_latency.py` sweeps the architecture search space with
+  it.
 - WiFi status: `W\n` replies
   `W,<OFF|CONNECTING|CONNECTED>,<ip or ->,<last send result>,heap=<bytes>\n`.
   The send result is `NONE`, `SENDING_<attempt>`, `HTTP_<status>`, `NO_WIFI`
@@ -146,28 +161,62 @@ or the spin of a fault pull-over.
 
 ## Anomaly detection
 
-The firmware runs the motor and IR autoencoders of `models/esp-conv-v1` on
-every sensor frame, as `scripts/models/train_autoencoder.py` defines them.
+The firmware runs four detectors on every sensor frame (`main/anomaly.cpp`):
+
+| Detector | Catches | Defined in |
+|---|---|---|
+| Motor conv autoencoder (`models/esp-conv-v1`) | sudden motor and encoder faults | `scripts/models/train_autoencoder.py` |
+| Motor GRU plant model (`models/esp-gru-v1`) | weak motors (20-30% power loss), faster on all motor faults | `scripts/models/gru_experiment.py` |
+| IR conv autoencoder (`models/esp-conv-v1`) | dead, noisy and drifting sensors | `scripts/models/train_autoencoder.py` |
+| Stuck-sensor rule | a ground sensor stuck at one value | `scripts/models/gru_experiment.py` |
+
+The motor alarm is either motor detector's, the IR alarm either IR
+detector's; why this pairing is in `reports/esp-gru-eval-v1/FINDINGS.md`.
 `main/anomaly_model.h` is generated; regenerate it after retraining:
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --out firmware\main\anomaly_model.h
+.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --gru models\esp-gru-v1 --out firmware\main\anomaly_model.h
 ```
 
 - **Samples:** one per frame, from the second frame of a route. The motor
   sample is the frame's wheel targets (rounded to the 3 decimals sent) and
   the wheel speeds from the encoder change. The IR sample is the three
-  ground sensors. Each is scaled with the training scaler.
-- **Score:** reconstruction MSE of the last 20 samples (0.64 s), computed in
-  `main/anomaly.cpp`. The model is a float32 forward pass with no
-  libraries: 5208 motor and 4500 IR parameters, held in flash.
+  ground sensors. Each is scaled with the training scaler (the stuck rule
+  uses raw readings).
+- **Conv score:** reconstruction MSE of the last 20 samples (0.64 s).
+- **GRU score:** the GRU (32 hidden) predicts both wheel speeds from the
+  wheel targets, one step per frame from the start of the route; the score
+  is the larger wheel's mean squared prediction error over the last 62
+  samples (2 s). Threshold: 2x the lowest value with no alarm on the healthy
+  validation runs.
+- **Stuck rule:** a sensor whose reading changes by less than 0.5 between
+  every pair of the last 32 frames (1 s) while the robot drives (mean
+  `(|left| + |right|) / 2` encoder wheel speed over them above 1 rad/s). An
+  earlier version required another sensor to move instead; that missed a
+  center sensor stuck at its on-the-line value, which takes the robot off
+  the track where all three sensors read flat floor.
 - **Monitoring:** a window is only monitored when it starts at least 0.5 s
-  after the route started and none of its samples is `AT_DEST`, `U_TURN` or
-  within 0.5 s after a U-turn. The alarm is set when 3 of the last 5
-  windows exceed the model's threshold.
-- **Reset:** a new route command clears the windows and alarm history.
-- **Cost:** about 2.3 ms (motor) + 2.0 ms (IR) per frame with `-O2`
-  (`CONFIG_COMPILER_OPTIMIZATION_PERF`), unchanged with WiFi running.
+  after the route started and none of its samples is `AT_DEST`, `U_TURN`,
+  `FAULT_PULLOVER`, `FAULT_STOP` or within 0.5 s after a U-turn. Each
+  detector alarms when 3 of its last 5 windows exceed its threshold.
+- **Reset:** a new route command clears the windows, the GRU state and the
+  alarm history.
+- **esp-dsp:** the matrix work uses Espressif's
+  [esp-dsp](https://components.espressif.com/components/espressif/esp-dsp)
+  component (`main/idf_component.yml`; fetched into `managed_components/`
+  by the first build), whose ESP32-S3 routines use the S3's SIMD
+  instructions. Each conv layer is one `dspm_mult_f32` (im2col), each
+  dense/GRU row one `dsps_dotprod_f32`. The SIMD path needs 16-byte-aligned
+  data and sizes that are multiples of 4, so `export_c.py` writes the
+  weights pre-arranged and padded. ESP-DL was not used: its Conv and Gemm
+  only run quantized (int8/int16), which would shift the scores against
+  thresholds set in float32.
+- **Weights in RAM:** the exported weights are in flash; each detector copies
+  them into internal RAM at start-up (about 63 KB). Read through the flash
+  cache, which the WiFi stack shares, they took ~4.4 ms per frame.
+- **Cost** (`-O2`, 160 MHz, WiFi on): about 0.31 ms (motor conv) + 0.36 ms
+  (IR conv) + 0.38 ms (GRU) per frame; the scalar C version before esp-dsp
+  took 2.3 + 2.0 ms for the two conv models.
 - **Agreement:** `scripts/esp/replay_scores.py` replays recorded runs and
   compares the ESP's scores and alarms with Python (see `docs/USAGE.md`).
 
@@ -202,9 +251,22 @@ Setup and the phone side are in `docs/USAGE.md`.
 
 ## Important limitations
 
-- The fault stop's 90-degree right turn does not look at the track: next to a
-  parallel line it may end up on that line. With a faulty drive or encoder
-  the turn and drive are only approximate, which the 6 s limit bounds.
+- The fault stop's turn side comes from the map (`P@`, chosen per route
+  step), but near a junction other lines meet anyway: a pull-over there can
+  end ~5 cm from another line. With a faulty drive or encoder the turn and
+  drive are only approximate, which the 6 s limit bounds.
+- The conv window (20) and channel count (16) are compile-time constants in
+  `anomaly.cpp`; the smaller architectures found by
+  `scripts/models/search_architectures.py` need them made configurable.
+
+## ESP-DL benchmark app
+
+`esp-dl-bench/` is a separate ESP-IDF app that runs the INT8/INT16 versions
+of the detectors (exported by `scripts/models/quantize_int8.py`) with
+Espressif's ESP-DL, for `scripts/esp/int8_bench.py`. Flashing it replaces
+this firmware (and its partition table, with the default large single-app
+one; the `wificfg` data is left in place) until this firmware is flashed
+again. Results: `reports/esp-int8-v1/summary.md`.
 - Junction distances come from the map scaled by the mission's
   `esp_odometry_scale` (0.92, measured on the base track). A track with
   different curvature may need a re-measured scale, and junctions closer than

@@ -1,0 +1,582 @@
+{
+    "configs": {
+        "/Reshape": {
+            "onnx::Reshape_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2718014237,
+                "dominator": 2718014237
+            },
+            "_v_25": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "FP32",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1487700332,
+                "dominator": 1487700332
+            },
+            "/Reshape_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1288030847,
+                "dominator": 2718014237
+            }
+        },
+        "/encoder/encoder.0/Conv": {
+            "/Reshape_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 656397296,
+                "dominator": 2718014237
+            },
+            "encoder.0.weight": {
+                "bit_width": 8,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -128,
+                "quant_max": 127,
+                "hash": 2061689587,
+                "dominator": 2061689587
+            },
+            "encoder.0.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 2090828266,
+                "dominator": 2090828266
+            },
+            "/encoder/encoder.1/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2840059815,
+                "dominator": 2840059815
+            }
+        },
+        "/encoder/encoder.2/Conv": {
+            "/encoder/encoder.1/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3131857870,
+                "dominator": 2840059815
+            },
+            "encoder.2.weight": {
+                "bit_width": 8,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -128,
+                "quant_max": 127,
+                "hash": 2884518745,
+                "dominator": 2884518745
+            },
+            "encoder.2.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 273316024,
+                "dominator": 273316024
+            },
+            "/encoder/encoder.3/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3483058157,
+                "dominator": 3483058157
+            }
+        },
+        "/encoder/encoder.4/Flatten": {
+            "PPQ_Variable_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2383860476,
+                "dominator": 3483058157
+            },
+            "/encoder/encoder.4/Flatten_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3739293135,
+                "dominator": 3483058157
+            }
+        },
+        "/encoder/encoder.5/Gemm": {
+            "/encoder/encoder.4/Flatten_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1857771862,
+                "dominator": 3483058157
+            },
+            "encoder.5.weight": {
+                "bit_width": 8,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -128,
+                "quant_max": 127,
+                "hash": 2209442497,
+                "dominator": 2209442497
+            },
+            "encoder.5.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 3585122944,
+                "dominator": 3585122944
+            },
+            "/encoder/encoder.5/Gemm_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1371453251,
+                "dominator": 1371453251
+            }
+        },
+        "/decoder/decoder.0/Gemm": {
+            "/encoder/encoder.5/Gemm_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 3647030522,
+                "dominator": 1371453251
+            },
+            "decoder.0.weight": {
+                "bit_width": 8,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -128,
+                "quant_max": 127,
+                "hash": 423835605,
+                "dominator": 423835605
+            },
+            "decoder.0.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 917539652,
+                "dominator": 917539652
+            },
+            "/decoder/decoder.1/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2271697705,
+                "dominator": 2271697705
+            }
+        },
+        "/decoder/decoder.2/Gemm": {
+            "/decoder/decoder.1/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 4020400456,
+                "dominator": 2271697705
+            },
+            "decoder.2.weight": {
+                "bit_width": 8,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -128,
+                "quant_max": 127,
+                "hash": 2871945963,
+                "dominator": 2871945963
+            },
+            "decoder.2.bias": {
+                "bit_width": 40,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "PASSIVE",
+                "quant_min": -549755813888,
+                "quant_max": 549755813887,
+                "hash": 2479016450,
+                "dominator": 2479016450
+            },
+            "22": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "ACTIVATED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 1619839165,
+                "dominator": 1619839165
+            }
+        },
+        "PPQ_Operation_1": {
+            "/encoder/encoder.3/Relu_output_0": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2383860476,
+                "dominator": 3483058157
+            },
+            "PPQ_Variable_1": {
+                "bit_width": 16,
+                "policy": {
+                    "PER_TENSOR": true,
+                    "PER_CHANNEL": false,
+                    "LINEAR": true,
+                    "FLOATING": false,
+                    "SYMMETRICAL": true,
+                    "ASYMMETRICAL": false,
+                    "POWER_OF_2": true,
+                    "DYNAMIC": false
+                },
+                "state": "OVERLAPPED",
+                "quant_min": -32768,
+                "quant_max": 32767,
+                "hash": 2383860476,
+                "dominator": 3483058157
+            }
+        }
+    },
+    "dispatchings": {
+        "/Reshape": "ESPDL_S3_W8A16",
+        "/encoder/encoder.0/Conv": "ESPDL_S3_W8A16",
+        "/encoder/encoder.2/Conv": "ESPDL_S3_W8A16",
+        "/encoder/encoder.4/Flatten": "ESPDL_S3_W8A16",
+        "/encoder/encoder.5/Gemm": "ESPDL_S3_W8A16",
+        "/decoder/decoder.0/Gemm": "ESPDL_S3_W8A16",
+        "/decoder/decoder.2/Gemm": "ESPDL_S3_W8A16",
+        "PPQ_Operation_1": "ESPDL_S3_W8A16"
+    },
+    "values": {
+        "2718014237": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        },
+        "2061689587": {
+            "scale": 0.0078125,
+            "zero_point": 0.0
+        },
+        "2090828266": {
+            "scale": 9.5367431640625e-07,
+            "zero_point": 0.0
+        },
+        "2840059815": {
+            "scale": 6.103515625e-05,
+            "zero_point": 0.0
+        },
+        "2884518745": {
+            "scale": 0.03125,
+            "zero_point": 0.0
+        },
+        "273316024": {
+            "scale": 1.9073486328125e-06,
+            "zero_point": 0.0
+        },
+        "3483058157": {
+            "scale": 3.0517578125e-05,
+            "zero_point": 0.0
+        },
+        "2209442497": {
+            "scale": 0.015625,
+            "zero_point": 0.0
+        },
+        "3585122944": {
+            "scale": 4.76837158203125e-07,
+            "zero_point": 0.0
+        },
+        "1371453251": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "423835605": {
+            "scale": 0.015625,
+            "zero_point": 0.0
+        },
+        "917539652": {
+            "scale": 3.814697265625e-06,
+            "zero_point": 0.0
+        },
+        "2271697705": {
+            "scale": 0.000244140625,
+            "zero_point": 0.0
+        },
+        "2871945963": {
+            "scale": 0.015625,
+            "zero_point": 0.0
+        },
+        "2479016450": {
+            "scale": 3.814697265625e-06,
+            "zero_point": 0.0
+        },
+        "1619839165": {
+            "scale": 0.0001220703125,
+            "zero_point": 0.0
+        }
+    }
+}

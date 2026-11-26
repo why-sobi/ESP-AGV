@@ -19,18 +19,19 @@ workflow.
 | `maps/routes/mission.json` | Webots route mission, speed, and simulation settings |
 | `scripts/maps/` | Track-image conversion, map visualization, and graph route planning |
 | `scripts/telemetry/` | Healthy Webots run collection and telemetry preparation |
-| `scripts/models/` | Autoencoder training and healthy-run evaluation |
+| `scripts/models/` | Autoencoder training, GRU experiment, weight export, on-ESP latency sweep, INT8 quantization and architecture search |
 | `scripts/faults/` | Fault-run collection and detection evaluation |
-| `scripts/esp/` | Route-to-ESP action/distance conversion and the ESP serial smoke test |
+| `scripts/esp/` | Route-to-ESP conversion and pull-over sides, serial smoke test, replay agreement, WiFi tools, INT8 benchmark |
 | `tests/` | Automated Python regression tests |
 | `notebooks/` | Exploratory analysis notebooks |
 | `models/` | Trained weights, thresholds, scalers and evaluation results |
 | `data/fault_runs/` | Fault matrix, fault-run CSVs and their manifest |
 | `reports/` | Fault-evaluation summaries, results and plots |
-| `firmware/` | ESP-IDF project, serial protocol, and prototype PD/junction firmware |
+| `firmware/` | ESP-IDF project: control, anomaly detectors (esp-dsp), fault stop, notifications; `firmware/esp-dl-bench/` is a separate ESP-DL benchmark app |
 | `data/route_runs/` | Per-run telemetry from the map-based Webots controller |
 | `data/sensor_runs/` | Per-session telemetry from the sensor-only PD controller |
 | `data/datasets/` | Prepared model-input arrays and dataset metadata |
+| `REPORT.md` | The whole project: what was done, why, and every result |
 | `docs/STATUS.md`, `docs/TODO.md`, `docs/DECISIONS.md` | Verified status, next work, and design history |
 
 Build output, local ESP-IDF configuration, Python caches, and installed Python
@@ -394,8 +395,15 @@ the ESP acts on a persistent anomaly alarm:
 
 1. Either model's alarm (3 of the last 5 windows over threshold) has stayed on
    for `esp_fault_stop_s` seconds. Shorter alarms are only reported.
-2. The ESP spins right about 90 degrees in place, drives 8 cm forward off the
-   line (`FAULT_PULLOVER`), and stops (`FAULT_STOP`). If the turn and drive
+2. The ESP spins about 90 degrees in place, drives 8 cm forward off the
+   line (`FAULT_PULLOVER`), and stops (`FAULT_STOP`). It turns to the side
+   the route's `P@` option gives for the current step: `epuck_route` checks,
+   along each edge, the pull-over path on both sides against the other track
+   lines and the arena walls (`scripts/esp/route_actions.py`,
+   `pull_over_sides`) and picks the right unless the right comes within 3 cm
+   of a line or wall and the left is clearer. On the base track that means
+   the left on edge-005 from Junction 2 to Junction 3, where a right turn
+   ends on edge-004 inside the small loop; right everywhere else. If the turn and drive
    are not finished within 6 s, for example because a motor is stalled, it
    stops where it is.
 3. The ESP itself sends a push notification over WiFi through
@@ -431,6 +439,43 @@ firmware):
 - Every `LINE_LOST` stop came with a motor alarm in the preceding second.
 - Re-run the check with
   `.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs --matrix data\esp_runs\fault-stop-v1\fault-matrix.json --out <dir> --timeout 300`.
+
+**Live check with the motor GRU and stuck rule** (`data\esp_runs\fault-stop-v3`,
+esp-dsp firmware; same routes, speeds and seeds):
+
+| Fault (4 runs each) | Ends in | First alarm after onset | Notified |
+|---|---|---|---|
+| None (`healthy`) | `AT_DEST` 4/4, no alarm | - | - |
+| Motor weak right 20% | `FAULT_STOP` 4/4, 8-9 cm off the line | GRU, 0.1-0.3 s (5.4 s when the onset falls in the U-turn) | 4/4 |
+| Motor weak right 30% | `FAULT_STOP` 4/4, 8-9 cm off the line | GRU, 0.1-0.2 s (4.2 s, U-turn) | 4/4 |
+| IR stuck center | `FAULT_STOP` 2/4; 1 ran off the track; 1 `LINE_LOST` | stuck rule, 1.1-1.7 s | 3/4 |
+
+- Before the GRU, these weak motor faults were caught in 3/8 and 6/8
+  offline runs, and the stuck sensor in 1/8.
+- No alarm came before a fault's onset.
+- The stuck run that ran off the track: the center sensor stuck at its
+  on-the-line value, so the ESP kept driving straight and never saw a lost
+  line; off the track the other two sensors read flat white floor too, so
+  the stuck rule (which needs another sensor moving) only fired for ~1 s
+  while crossing a line, short of the 2 s hold. Webots ended the run at its
+  12 cm path-error limit. The `LINE_LOST` run had its onset in the U-turn
+  and lost the line before any window was monitored (notified as "lost the
+  track").
+- Re-run with
+  `.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs --matrix data\esp_runs\fault-stop-v3\fault-matrix.json --out <dir> --timeout 300`.
+
+**After the stuck-rule fix and the pull-over sides** (`data\esp_runs\fault-stop-v4`
+and `pull-over-v1`; the stuck rule now needs the robot driving rather than
+another sensor moving, and the pull-over side comes from the map):
+
+| Runs | Ends in | Notes |
+|---|---|---|
+| Healthy, 4 | `AT_DEST` 4/4 | no alarm frame |
+| IR stuck center, 4 | `FAULT_STOP` 3/4, `LINE_LOST` 1/4 | stuck alarm +1.0-1.1 s; the run that ran off the track in v3 now stops; B pulled over left on the loop, 7.6 cm from its line; D's onset is in the U-turn (notified "lost the track") |
+| IR dead left from 1 s on route C, 2 | `FAULT_STOP` 2/2 | pulled over left on edge-005 (Junction 2 to 3), 4-5 cm outside the loop; a right turn there lands on edge-004 |
+| Motor weak right 30% from 1 s on route C, 2 | `FAULT_STOP` 2/2 | alarm at +1.5 s, past Junction 3, so right (edge-006), 5 cm from edge-004 at the junction |
+
+No alarm came before an onset and every stop notified.
 
 Remove `esp_fault_stop_s` (or set it to `null`) to only report alarms. The
 route command carries it as `F@<seconds>`. The data collectors
@@ -719,12 +764,21 @@ already alarming before the onset, in nearly every fault run.
 
 ### Inference on the ESP
 
-The firmware runs both models on every sensor frame and returns the scores and
-alarms in the motor frame (see `firmware/README.md`). After retraining,
-regenerate the weights header and reflash:
+The firmware runs both conv models, the motor GRU and the stuck-sensor rule on
+every sensor frame with esp-dsp, and returns the scores and alarms in the
+motor frame (see `firmware/README.md`). After retraining, regenerate the
+weights header and reflash:
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --out firmware\main\anomaly_model.h
+.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --gru models\esp-gru-v1 --out firmware\main\anomaly_model.h
+```
+
+The GRU and its deployed threshold come from the offline experiment, which
+also writes the `deploy` block of `models\esp-gru-v1\config.json` that the
+export reads (`--reuse-weights` re-evaluates without training, ~2 min):
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.gru_experiment --reuse-weights
 ```
 
 **Agreement with Python.** `scripts/esp/replay_scores.py` replays recorded
@@ -745,6 +799,13 @@ windows):
 - One wheel target in one run differed by 0.001 rad/s. The `-O2` build
   rounds one value the other way.
 
+With the esp-dsp firmware, the motor GRU and the stuck rule
+(`reports\esp-replay-v2\summary.json`: 2 healthy test runs, 20%/30% weak
+motor, stall, stuck encoder, stuck and dead IR): conv scores within 5e-5,
+GRU scores within 1.6e-5 (threshold 0.025), and the GRU, stuck, motor and IR
+alarms identical on every frame. The Python reference for the GRU and the
+stuck rule restarts per leg like the ESP.
+
 **Live end-to-end** (`data\esp_runs\live-v1`, 16 round trips with the ESP
 driving and detecting):
 - The 4 healthy runs raised no alarm.
@@ -756,8 +817,66 @@ driving and detecting):
 - The logged live scores matched Python within 3.3e-5, with no alarm
   mismatches.
 
-Inference costs about 4.5 ms per frame. Each 31 s round trip then takes about
-26 s of wall time instead of about 19 s.
+The first plain C++ inference cost about 4.5 ms per frame. With esp-dsp and
+the weights in RAM the three detectors take about 1.05 ms (see
+`firmware/README.md`).
+
+### Latency table, INT8 benchmark and architecture search
+
+These back the architecture choices with measurements (results in
+`REPORT.md` sections 14-16).
+
+**On-ESP latency table.** The AGV firmware's `B` command times any conv
+autoencoder or GRU size with the same esp-dsp code. Sweep the search space
+(967 architectures, ~2 min; needs COM3):
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.esp_latency --port COM3 --out reports\esp-latency-v1
+```
+
+**Architecture search.** One Optuna study per detector (`motor`, `ir`,
+`gru`), tuning on half the fault runs and minimizing the measured latency;
+studies resume from `reports\arch-search-v1\<model>\study.db`. Conv trials
+take ~3-6 min, GRU trials ~10-20 min on this laptop's CPU:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.search_architectures --model motor --trials 40
+.\.venv\Scripts\python.exe -m scripts.models.search_architectures --model ir --trials 40
+.\.venv\Scripts\python.exe -m scripts.models.search_architectures --model gru --trials 12
+```
+
+Retrain chosen architectures (JSON `{model: [architecture, ...]}`, e.g.
+`reports\arch-search-v1\chosen_conv.json`) with the full budget and compare
+them with the deployed models on the held-out faults and healthy test runs:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.models.search_architectures --final reports\arch-search-v1\chosen_conv.json --final-models motor ir
+```
+
+**INT8 / INT16.** esp-ppq needs Python 3.11-3.12, so it has its own
+environment (`.venv-ppq`, git-ignored):
+
+```powershell
+uv venv --python 3.12 .venv-ppq
+uv pip install --python .venv-ppq\Scripts\python.exe "esp-ppq[cpu]"
+.\.venv-ppq\Scripts\python.exe -m scripts.models.quantize_int8 --quant w8a8 w16a16
+```
+
+This exports `.espdl` models to `models\esp-quantized-v1\<quant>\` and
+writes the simulated accuracy to `reports\esp-int8-v1
+esults.json`. To time
+them on the ESP, flash the separate ESP-DL app (it replaces the AGV firmware
+and uses the default large-app partition table; the `wificfg` data is kept),
+run the benchmark, then flash the AGV firmware again:
+
+```powershell
+cd firmware\esp-dl-bench; idf.py build; idf.py -p COM3 flash; cd ..\..
+.\.venv\Scripts\python.exe -m scripts.esp.int8_bench --port COM3
+cd firmware; idf.py -p COM3 flash; cd ..
+```
+
+ESP-DL's prebuilt loader calls `esp_log_write`, which this IDF 6.0 build does
+not provide; the bench app defines a weak empty one.
 
 ## Deployment and integration status
 
@@ -768,11 +887,12 @@ wheel commands, one way or as round trips, at 2.0-4.0 rad/s. The ESP stopped
 cm, the same as the Supervisor controller.
 
 Anomaly detection also runs on the ESP and agrees with Python (see above).
+On a persistent alarm the robot pulls over to the map-chosen side, stops and
+notifies the phone.
 
-Still to do:
-
-- Decide what the robot does on an alarm; alarms are currently only reported
-  and logged.
+Still to do (see `docs/TODO.md`): IR drift and light IR noise detection,
+deploying the architecture-search winners, reconnecting after a COM3 drop,
+and ESP runs over the parallel edges.
 
 ## Tests
 
@@ -782,6 +902,6 @@ Run the map and telemetry-preparation tests:
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-These are unit tests for the Python tools (36 at last verification). The serial
+These are unit tests for the Python tools (46 at last verification). The serial
 smoke test requires the flashed ESP and an available COM port. Neither replaces
 a closed-loop run: set `control_mode` to `esp32` and run routes A-D in Webots.

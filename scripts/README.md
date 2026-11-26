@@ -12,13 +12,18 @@ project virtual environment in PowerShell.
 | `telemetry/collect_route_runs.py` | Runs Webots headlessly over route/speed (and jitter-seed) combinations and records healthy telemetry; `--control-mode esp32 --round-trip` for ESP-driven round trips. | Collecting more healthy simulation runs. |
 | `telemetry/prepare_telemetry.py` | Validates run CSVs, builds motor/IR windows, splits by run, and fits training scalers. | Preparing model input from telemetry. |
 | `models/train_autoencoder.py` | Trains dense or convolutional motor/IR autoencoders, sets thresholds and evaluates healthy-run alarms (`--reuse-weights` re-evaluates without training). | Training or comparing models. |
-| `models/export_c.py` | Writes a trained conv model pair to `firmware/main/anomaly_model.h`. | After retraining, before reflashing the ESP. |
+| `models/gru_experiment.py` | Offline comparison of the conv models with GRU forecasters, a stuck-IR rule and other baselines on whole runs (`reports/esp-gru-eval-v1`). | Evaluating new detectors before deploying them. |
+| `models/export_c.py` | Writes the conv model pair, the motor GRU and the stuck-rule settings to `firmware/main/anomaly_model.h`, arranged for esp-dsp. | After retraining, before reflashing the ESP. |
+| `models/esp_latency.py` | Times every architecture of the search space on the ESP with the firmware's `B` command. | Building the latency table (`reports/esp-latency-v1`); requires the ESP. |
+| `models/search_architectures.py` | Optuna search per detector (detection on half the fault runs vs measured ESP latency); `--final` retrains chosen candidates and compares them with the deployed models on held-out data. | Choosing or justifying model architectures. |
+| `models/quantize_int8.py` | Quantizes the deployed detectors with esp-ppq (INT8/INT16), exports `.espdl` files and simulates their accuracy on every run. | INT8 benchmark; runs in the separate `.venv-ppq` environment. |
 | `faults/collect_fault_runs.py` | Runs Webots fault scenarios from a fault matrix and records labelled telemetry. | Collecting fault-evaluation data. |
 | `faults/evaluate_faults.py` | Scores fault runs and summarizes detection, delay, false alarms, and cross-coupling. | Evaluating trained models on fault data. |
 | `esp/esp_serial_smoke_test.py` | Sends synthetic sensor frames to the ESP over serial and checks its responses. | Checking the flashed firmware; requires the ESP, a COM port, and `pyserial`. |
 | `esp/flash_wifi.ps1` | Writes `firmware/wifi.csv` (WiFi network, ntfy topic) to the ESP's `wificfg` partition without rebuilding the firmware. | Changing the WiFi network or notification topic; requires ESP-IDF and a free COM port. |
 | `esp/wifi_status.py` | Shows the ESP's WiFi status and, with `--test`, sends a test notification. | Checking phone notifications; requires the ESP and a free COM port. |
 | `esp/replay_scores.py` | Replays recorded ESP runs through the ESP and compares its wheel targets, anomaly scores and alarms with Python. | Verifying on-ESP inference after a firmware or model change; requires the ESP. |
+| `esp/int8_bench.py` | Times the INT8/INT16 detectors on the ESP with ESP-DL and checks their outputs against esp-ppq's simulation. | Benchmarking quantization; requires `firmware/esp-dl-bench` flashed. |
 
 Example:
 
