@@ -9,6 +9,7 @@ project virtual environment in PowerShell.
 | `maps/pathToMap.py` | Converts a track image into a draft graph-map JSON. | Starting a map from a new track image. |
 | `maps/visualizeMap.py` | Creates an interactive HTML preview of a graph map. | Reviewing or correcting a generated/edited map. |
 | `maps/route_planner.py` | Validates a graph and plans a shortest route between nodes. | Checking a route or writing a route JSON. |
+| `maps/make_track.py` | Draws a test track image (`--track track2` or `track3`), converts it to a graph map and copies the base track's world transform. | Making another track to test on; add a world and a mission for it. |
 | `telemetry/collect_route_runs.py` | Runs Webots headlessly over route/speed (and jitter-seed) combinations and records healthy telemetry; `--control-mode esp32 --round-trip` for ESP-driven round trips. | Collecting more healthy simulation runs. |
 | `telemetry/prepare_telemetry.py` | Validates run CSVs, builds motor/IR windows, splits by run, and fits training scalers. | Preparing model input from telemetry. |
 | `models/train_autoencoder.py` | Trains dense or convolutional motor/IR autoencoders, sets thresholds and evaluates healthy-run alarms (`--reuse-weights` re-evaluates without training). | Training or comparing models. |
@@ -19,10 +20,10 @@ project virtual environment in PowerShell.
 | `models/quantize_int8.py` | Quantizes the deployed detectors with esp-ppq (INT8/INT16), exports `.espdl` files and simulates their accuracy on every run. | INT8 benchmark; runs in the separate `.venv-ppq` environment. |
 | `faults/collect_fault_runs.py` | Runs Webots fault scenarios from a fault matrix and records labelled telemetry. | Collecting fault-evaluation data. |
 | `faults/evaluate_faults.py` | Scores fault runs and summarizes detection, delay, false alarms, and cross-coupling. | Evaluating trained models on fault data. |
-| `esp/esp_serial_smoke_test.py` | Sends synthetic sensor frames to the ESP over serial and checks its responses. | Checking the flashed firmware; requires the ESP, a COM port, and `pyserial`. |
+| `esp/esp_serial_smoke_test.py` | Sends synthetic sensor frames to the ESP over serial and checks its responses (48 checks). | Checking the flashed firmware; requires the ESP, a COM port, and `pyserial`. |
 | `esp/flash_wifi.ps1` | Writes `firmware/wifi.csv` (WiFi network, ntfy topic) to the ESP's `wificfg` partition without rebuilding the firmware. | Changing the WiFi network or notification topic; requires ESP-IDF and a free COM port. |
 | `esp/wifi_status.py` | Shows the ESP's WiFi status and, with `--test`, sends a test notification. | Checking phone notifications; requires the ESP and a free COM port. |
-| `esp/replay_scores.py` | Replays recorded ESP runs through the ESP and compares its wheel targets, anomaly scores and alarms with Python. | Verifying on-ESP inference after a firmware or model change; requires the ESP. |
+| `esp/replay_scores.py` | Replays recorded ESP runs through the ESP and compares its wheel targets, anomaly scores and alarms with Python (`--per-edge-odometry` for runs after 2026-11-27 15:00). | Verifying on-ESP inference after a firmware or model change; requires the ESP and the local run CSVs (not in git). |
 | `esp/int8_bench.py` | Times the INT8/INT16 detectors on the ESP with ESP-DL and checks their outputs against esp-ppq's simulation. | Benchmarking quantization; requires `firmware/esp-dl-bench` flashed. |
 
 Example:

@@ -6,18 +6,53 @@ environment, sensors, and encoder readings. The ESP32-S3 is an external
 computation target connected by USB serial; this is **not** a physical AGV
 workflow.
 
+## Quick start (fresh clone with an ESP32-S3)
+
+Needs Webots R2025a, Python 3.12+ and ESP-IDF 6.0.1; the sections below have
+the details of each step.
+
+1. **Python:** `python -m venv .venv`, `.\.venv\Scripts\Activate.ps1`,
+   `pip install -r requirements.txt`. Point both controllers' `runtime.ini` at
+   `.venv\Scripts\python.exe` ([Set up Python and Webots](#set-up-python-and-webots)).
+2. **Firmware:** in an ESP-IDF 6.0.1 shell, `cd firmware`, `idf.py build`,
+   `idf.py -p COM3 flash` (the first build downloads esp-dsp)
+   ([ESP32-S3 firmware](#esp32-s3-firmware-and-serial-smoke-test)).
+3. **Check the ESP:** `.\.venv\Scripts\python.exe -m scripts.esp.esp_serial_smoke_test --port COM3`
+   (48 checks; its fault stops send notifications once WiFi is set).
+4. **WiFi and phone notifications (optional):** copy `firmware\wifi.example.csv`
+   to `firmware\wifi.csv` (git-ignored), set the network and an ntfy topic,
+   run `.\scripts\esp\flash_wifi.ps1`, subscribe to the topic in the ntfy app
+   ([Fault stop and phone notifications](#fault-stop-and-phone-notifications)).
+5. **Drive it:** in `maps\routes\mission.json` set `control_mode` to `esp32`,
+   `esp_serial_port` to the ESP's port, the start/destination nodes, and
+   optionally `return_to_start: true` and `esp_fault_stop_s: 2.0`; open
+   `simulation\worlds\Self Diagnosis AGV.wbt` and run it
+   ([Let the ESP32-S3 control the Webots e-puck](#let-the-esp32-s3-control-the-webots-e-puck)).
+6. **Headless runs and faults:** `scripts.telemetry.collect_route_runs`
+   (healthy) and `scripts.faults.collect_fault_runs` (fault matrix) run Webots
+   without the GUI ([Collect telemetry](#collect-telemetry),
+   [Fault stop](#fault-stop-and-phone-notifications)).
+7. **Other tracks:** `... track2.wbt` / `... track3.wbt` with
+   `--mission maps\routes\mission-track2.json` / `mission-track3.json`
+   ([Other tracks](#other-tracks-track2-track3)).
+
+Only one program may hold the ESP's COM port at a time (close the IDF
+monitor). Raw run logs are git-ignored: a clone has the models, maps, worlds,
+manifests, prepared datasets and reports, but not the recorded `route-*.csv`
+runs that `replay_scores` and the offline evaluations read.
+
 ## Project files and what they do
 
 | Path | Purpose |
 |---|---|
-| `simulation/worlds/Self Diagnosis AGV.wbt` | Webots world, track texture, robot, and selected controller |
+| `simulation/worlds/Self Diagnosis AGV.wbt` | Webots world, track texture, robot, and selected controller (`... track2.wbt`, `... track3.wbt`: the other tracks) |
 | `simulation/controllers/epuck_route/` | Map route execution in Webots; uses Supervisor pose and ground-sensor correction |
 | `simulation/controllers/epuck_data/` | Sensor-only PD line follower and per-session telemetry collector |
 | `maps/image/` | Track images used by the world and map-conversion tools |
 | `maps/paths/` | Editable graph-map JSON files |
 | `maps/visualizations/` | Generated standalone HTML map previews |
-| `maps/routes/mission.json` | Webots route mission, speed, and simulation settings |
-| `scripts/maps/` | Track-image conversion, map visualization, and graph route planning |
+| `maps/routes/mission.json` | Webots route mission, speed, ESP and fault-stop settings, per-edge odometry scales (`mission-track2.json`, `mission-track3.json`: the other tracks, with their map and route table) |
+| `scripts/maps/` | Track-image conversion, map visualization, graph route planning, test-track generation (`make_track.py`) |
 | `scripts/telemetry/` | Healthy Webots run collection and telemetry preparation |
 | `scripts/models/` | Autoencoder training, GRU experiment, weight export, on-ESP latency sweep, INT8 quantization and architecture search |
 | `scripts/faults/` | Fault-run collection and detection evaluation |
@@ -25,7 +60,8 @@ workflow.
 | `tests/` | Automated Python regression tests |
 | `notebooks/` | Exploratory analysis notebooks |
 | `models/` | Trained weights, thresholds, scalers and evaluation results |
-| `data/fault_runs/` | Fault matrix, fault-run CSVs and their manifest |
+| `data/fault_runs/` | Fault matrix and manifest of the Supervisor-era fault runs |
+| `data/esp_runs/` | ESP-controlled healthy, fault, live and test-track runs (run CSVs are local only, git-ignored) |
 | `reports/` | Fault-evaluation summaries, results and plots |
 | `firmware/` | ESP-IDF project: control, anomaly detectors (esp-dsp), fault stop, notifications; `firmware/esp-dl-bench/` is a separate ESP-DL benchmark app |
 | `data/route_runs/` | Per-run telemetry from the map-based Webots controller |
@@ -161,9 +197,12 @@ other edge of a parallel pair; the collector takes it as `--avoid-edges`:
 `replay_scores` rebuilds route commands with the global scale and plain
 turns, as the runs recorded before 2026-11-27 15:00 were; pass
 `--per-edge-odometry` for later runs (per-edge scales and `l`/`r` corners;
-it does not apply `avoid_edges` or another track's map). To re-measure it on another track, compare
-each healthy run's final odometry (0.02 m x mean wheel rotation) with the
-route's map length. The firmware's protocol and behavior are described in
+it does not apply `avoid_edges` or another track's map).
+
+To calibrate the scales on another track, record a few healthy round trips and
+take each edge's ratio of ESP odometry to map length along the middle of the
+edge (how track3's `esp_odometry_scale_by_edge` was set; REPORT.md section
+11). The firmware's protocol and behavior are described in
 `firmware\README.md`.
 
 The Supervisor no longer ends an ESP run itself when the robot reaches the
@@ -844,10 +883,16 @@ driving and detecting):
   mismatches.
 
 The first plain C++ inference cost about 4.5 ms per frame. With esp-dsp and
-the weights in RAM the three detectors take about 1.05 ms (see
-`firmware/README.md`).
+the weights in RAM the three detectors took about 1.05 ms, and about 0.81 ms
+with the architecture-search winners (see `firmware/README.md`).
 
-### Second track (track2)
+Raw run logs (`route-*.csv`, `controller-errors.log`, `data/SensorData*.csv`) are
+git-ignored and not in the repository; the manifests, the prepared datasets
+(`data/datasets`), the models and all reports are. Replaying recorded runs
+(`replay_scores`), the offline fault evaluation and GRU/search retraining
+need the raw logs; driving, detecting, exporting and conv training do not.
+
+### Other tracks (track2, track3)
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.maps.make_track   # image + map (with world transform)
@@ -930,10 +975,13 @@ Anomaly detection also runs on the ESP and agrees with Python (see above).
 On a persistent alarm the robot pulls over to the map-chosen side, stops and
 notifies the phone.
 
-Still to do (see `docs/TODO.md`): IR drift and light IR noise detection,
-deploying the architecture-search winners, reconnecting after a COM3 drop,
-and healthy training runs over edge-002 (the parallel edges are driven
-with `avoid_edges`).
+The same ESP firmware drives track2 and track3 (see "Other tracks"): routes
+complete as round trips with stops within 2 cm, and every injected fault
+stops the robot.
+
+Still to do (see `docs/TODO.md`): IR drift and light IR noise detection, a
+real-unplug test of the COM3 reconnect, the track3 hairpin margin at
+3.5 rad/s, and healthy training runs over edge-002.
 
 ## Tests
 

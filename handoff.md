@@ -87,6 +87,8 @@ pushes.
   conv or GRU; IR alarm = conv or stuck.
 - The ESP resets all detectors (and the GRU state) on each route command, so
   the return leg starts fresh; the replay reference does the same per leg.
+- Spins in place (U-turn, corner turn) and the 0.5 s after them are not
+  monitored.
 
 ## Serial protocol additions this session
 
@@ -94,16 +96,29 @@ pushes.
 - `Q` -> `I,` with last/max microseconds for motor conv, IR conv, motor GRU.
 - `B,C,...` / `B,G,...` latency benchmark (firmware/README.md).
 - Route option `P@<R|L>...`, one side per step like `E@`.
+- Junction actions `l`/`r` (corner: spin onto a crossing line) and `<`/`>`
+  (bear onto a Y branch), chosen by the host from the map.
+- Mission keys: `map_path`, `routes` (per-track route table), `avoid_edges`,
+  `esp_odometry_scale_by_edge`, `esp_sharp_turn_deg` (85).
 
 ## Verified at the end of the session
 
-- Unit tests: `.\.venv\Scripts\python.exe -m unittest discover -s tests` (46).
-- ESP smoke test (`scripts.esp.esp_serial_smoke_test --port COM3`): passes,
-  incl. left pull-over and `P@` validation (its fault stops send real
-  notifications).
-- Replay: 10 runs, 0 alarm mismatches.
-- The AGV firmware is flashed on the ESP (the ESP-DL bench app was flashed
-  temporarily and replaced); WiFi connected.
+- Unit tests: `.\.venv\Scripts\python.exe -m unittest discover -s tests` (47).
+- ESP smoke test (`scripts.esp.esp_serial_smoke_test --port COM3`): 48 checks
+  pass, incl. corner, bear, stale junction and blind arrival (its fault stops
+  send real notifications).
+- Replay: 10 runs, identical wheel targets and alarms (`reports/esp-replay-v4`).
+- A fresh export of the staged repo (as a clone) passes the tests, builds the
+  firmware from scratch and drives all three tracks with the ESP.
+- The final AGV firmware is flashed on the ESP; WiFi connected.
+
+## Repository contents
+
+Raw run logs (`route-*.csv`, `controller-errors.log`, `data/SensorData*.csv`) are
+git-ignored and not in the repository; the manifests, the prepared datasets
+(`data/datasets`), the models and all reports are. Replaying recorded runs
+(`replay_scores`), the offline fault evaluation and GRU/search retraining
+need the raw logs; driving, detecting, exporting and conv training do not.
 
 ## Environment notes
 

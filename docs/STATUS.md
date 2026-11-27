@@ -197,7 +197,9 @@ The Webots simulation remains the environment throughout this plan.
     (`esp-conv-v2`, `esp-gru-v2`): 0.81 ms per frame (was 1.18 ms), replay
     alarms identical, live fault-stop-v5 as before.
 
-- The Python test suite passes (46 tests).
+- The Python test suite passes (47 tests); the ESP smoke test passes (48 checks).
+- Second and third tracks (track2, track3) drive and detect with the same
+  firmware and models: healthy 8/8 each, faults 20/20 and 16/16.
 
 ## Not yet implemented
 

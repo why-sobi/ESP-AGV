@@ -78,7 +78,7 @@ compute target, not a move to a physical AGV.
 - Done: scores and alarms in the motor frame; the controller logs them.
 - Done: all detectors on esp-dsp with weights in RAM, ~1.05 ms per frame
   (`firmware/README.md`); replay within 5e-5 with identical alarms
-  (`reports/esp-replay-v2`).
+  (`reports/esp-replay-v2`). With the search winners (2026-11-27) ~0.81 ms.
 - Done: INT8/INT16 comparison with ESP-DL (`reports/esp-int8-v1`): slower at
   these sizes and INT8 breaks the motor conv model; float32 kept.
 - Done: on-ESP latency table (`reports/esp-latency-v1`) and Optuna search
@@ -106,16 +106,16 @@ compute target, not a move to a physical AGV.
 - Done: the ESP takes a route speed (`V@`, mission `esp_speed_rad_s`), so ESP runs can cover
   the same speed grid as the healthy dataset.
 - Done: pull-over side per route step from the map (`P@`).
-- Open: reconnect handling if COM3 disappears mid-run (currently the run
-  fails; the ESP stops on `LINK_LOST`).
+- Done: reconnect if COM3 disappears mid-run (`EspLink` in `epuck_route`;
+  tested with a fake port, a real unplug is still to test).
 
 ## Navigation follow-up
 
 - Review generated graph semantics and stable node/edge names.
-- Exercise more routes, especially the circular section and multi-branch
-  junctions.
-- Re-test map conversion, visualization, hand-editing, and Webots image/scale
-  alignment on a second track.
+- Done: parallel edges (`avoid_edges`), two further tracks (track2, track3:
+  corners, thick lines, 45° bends, a Y junction, a hairpin, a tight curve)
+  with map conversion, world alignment and per-track odometry scales.
+- Open: the hairpin margin at 3.5 rad/s on track3.
 
 ## Completion criteria
 
@@ -130,5 +130,5 @@ compute target, not a move to a physical AGV.
 - Communication loss, malformed frames, line loss, and destination completion
   result in documented, tested safe behavior.
 
-Status: all met except reconnecting after a COM3 drop (the ESP stops safely,
-but the host run fails instead of resuming).
+Status: all met (the COM3 reconnect is tested with a fake port; a real
+unplug is still to test).
