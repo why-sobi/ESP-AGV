@@ -58,8 +58,10 @@ Lines are ASCII, newline-terminated, 8-N-1, 115200 baud. Only one program may
 own COM3 at a time.
 
 - Configure one route: `R,<step>,<step>,...\n`, where each step is
-  `<action>@<metres>`. Actions are `L`, `S`, or `R` for each junction, and the
-  last step must be the destination `D`. Distances are expected wheel-odometry
+  `<action>@<metres>`. Actions are `L`, `S`, or `R` for each junction, or `l`
+  / `r` for a corner (a turn the map measures at >= 85 degrees 4 cm out: a
+  straight crossing line), or `<` / `>` to bear onto a Y branch (a turn of
+  35-58 degrees), and the last step must be the destination `D`. Distances are expected wheel-odometry
   distances from the start of the route and must not decrease, e.g.
   `R,R@0.265,D@0.779\n`. An optional first step `U@0.000` makes the robot
   U-turn in place before following, e.g. `R,U@0.000,L@0.514,D@0.779\n` for a
@@ -114,8 +116,8 @@ States: `FOLLOWING`, `TURN_LEFT`, `STRAIGHT`, `TURN_RIGHT`, `U_TURN`,
 `AT_DEST`, `LINE_LOST`, `LINK_LOST`, `JUNCTION_MISSED`, `FAULT_PULLOVER`,
 `FAULT_STOP`, `NO_ROUTE`.
 
-Wheel targets are within +/-5 rad/s. They are only negative during a U-turn
-or the spin of a fault pull-over.
+Wheel targets are within +/-5 rad/s. They are only negative during a spin in
+place: a U-turn, a corner turn, or a fault pull-over.
 
 ## Behavior
 
@@ -123,13 +125,30 @@ or the spin of a fault pull-over.
   the route speed `V` (default 3.5 rad/s) on a centered line, falling to 5/7 of
   it (2.5 rad/s by default) for sharp corrections. If the line is lost, the controller turns slowly
   towards where it was last seen for up to 750 ms, then stops with
-  `LINE_LOST`.
+  `LINE_LOST`. Within 5 cm of the destination it instead drives straight on at
+  1 rad/s (up to 3 s): the sensors run past the end of a line or across a T's
+  crossbar before the axle arrives.
 - **Odometry:** distance = 0.02 m x the mean wheel rotation since the first
   sensor frame of the route.
 - **Junctions:** a junction is both side sensors on dark track for two frames.
   It only counts within +/-0.10 m of the distance given for the next junction.
   Elsewhere the pattern is ignored and line following continues. The action is
-  then applied until the side sensors clear for three frames.
+  then applied until the side sensors clear for three frames. If the pattern
+  was already present when the window opened (all three sensors dark along a
+  line as wide as their spread, e.g. horizontal lines on the stretched track
+  image), it says nothing about where the junction is: the action waits until
+  3 cm before the junction distance.
+- **Corners (`l`/`r`):** in the window the speed drops to 1.5 rad/s. The robot
+  spins in place (2 rad/s per wheel) once its axle is on the crossing line:
+  at the junction distance, 4 cm after the junction pattern appears, or 2 cm
+  after all three sensors run off the line's far side, whichever is first.
+  Line following takes over once it has turned at least 60 degrees and the
+  center sensor sees a line, at 1.5 rad/s for the next 4 cm; past 135
+  degrees it stops with `LINE_LOST`.
+- **Bear (`<`/`>`):** a Y branch appears gradually beside the old line, so the
+  turn waits until 3 cm before the junction distance and is held until the
+  robot has turned 25 degrees (encoder heading; released at 80 at most), not
+  just until the junction pattern clears.
 - **Missed junction:** if odometry passes a junction's distance plus 0.10 m
   without seeing it, the controller stops with `JUNCTION_MISSED`.
 - **Destination:** `D` stops the wheels when odometry reaches its distance.
@@ -165,17 +184,20 @@ The firmware runs four detectors on every sensor frame (`main/anomaly.cpp`):
 
 | Detector | Catches | Defined in |
 |---|---|---|
-| Motor conv autoencoder (`models/esp-conv-v1`) | sudden motor and encoder faults | `scripts/models/train_autoencoder.py` |
-| Motor GRU plant model (`models/esp-gru-v1`) | weak motors (20-30% power loss), faster on all motor faults | `scripts/models/gru_experiment.py` |
-| IR conv autoencoder (`models/esp-conv-v1`) | dead, noisy and drifting sensors | `scripts/models/train_autoencoder.py` |
+| Motor conv autoencoder (`models/esp-conv-v2`: window 10, 8 channels, bottleneck 12, hidden 16) | sudden motor and encoder faults | `scripts/models/search_architectures.py` |
+| Motor GRU plant model (`models/esp-gru-v2`: 16 hidden, 31-sample score window) | weak motors (20-30% power loss), faster on all motor faults | `scripts/models/search_architectures.py` (`gru_experiment.py` model) |
+| IR conv autoencoder (`models/esp-conv-v2`, unchanged from `esp-conv-v1`: window 20, 16 channels, bottleneck 8, hidden 32) | dead, noisy and drifting sensors | `scripts/models/train_autoencoder.py` |
 | Stuck-sensor rule | a ground sensor stuck at one value | `scripts/models/gru_experiment.py` |
 
 The motor alarm is either motor detector's, the IR alarm either IR
 detector's; why this pairing is in `reports/esp-gru-eval-v1/FINDINGS.md`.
-`main/anomaly_model.h` is generated; regenerate it after retraining:
+`main/anomaly_model.h` is generated; regenerate it after retraining. The
+motor and IR conv models may use different windows and sizes: each model's
+sizes are in its `ConvAutoencoder` struct and the buffers are sized for the
+largest (kernel 3; channels, bottleneck and hidden multiples of 4).
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --gru models\esp-gru-v1 --out firmware\main\anomaly_model.h
+.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v2 --gru models\esp-gru-v2 --out firmware\main\anomaly_model.h
 ```
 
 - **Samples:** one per frame, from the second frame of a route. The motor
@@ -196,8 +218,9 @@ detector's; why this pairing is in `reports/esp-gru-eval-v1/FINDINGS.md`.
   center sensor stuck at its on-the-line value, which takes the robot off
   the track where all three sensors read flat floor.
 - **Monitoring:** a window is only monitored when it starts at least 0.5 s
-  after the route started and none of its samples is `AT_DEST`, `U_TURN`,
-  `FAULT_PULLOVER`, `FAULT_STOP` or within 0.5 s after a U-turn. Each
+  after the route started and none of its samples is `AT_DEST`, `U_TURN`, a
+  corner spin (a junction turn with wheel targets of opposite signs),
+  `FAULT_PULLOVER`, `FAULT_STOP` or within 0.5 s after a spin. Each
   detector alarms when 3 of its last 5 windows exceed its threshold.
 - **Reset:** a new route command clears the windows, the GRU state and the
   alarm history.
@@ -267,8 +290,8 @@ Espressif's ESP-DL, for `scripts/esp/int8_bench.py`. Flashing it replaces
 this firmware (and its partition table, with the default large single-app
 one; the `wificfg` data is left in place) until this firmware is flashed
 again. Results: `reports/esp-int8-v1/summary.md`.
-- Junction distances come from the map scaled by the mission's
-  `esp_odometry_scale` (0.92, measured on the base track). A track with
+- Junction distances come from the map scaled per edge
+  (`esp_odometry_scale_by_edge`, else `esp_odometry_scale`). A track with
   different curvature may need a re-measured scale, and junctions closer than
   about 0.2 m along a route would make the +/-0.10 m windows overlap.
 - Wheel slip makes odometry read short. Slip is small in the current

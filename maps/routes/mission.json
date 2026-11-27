@@ -4,6 +4,13 @@
   "control_mode": "supervisor",
   "esp_serial_port": "COM3",
   "esp_odometry_scale": 0.92,
+  "esp_odometry_scale_by_edge": {
+    "edge-001": 0.973,
+    "edge-002": 0.973,
+    "edge-004": 0.836,
+    "edge-005": 0.836,
+    "edge-006": 0.973
+  },
   "esp_destination_tolerance_m": 0.05,
   "esp_fault_stop_s": 2.0,
   "return_to_start": false,

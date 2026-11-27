@@ -21,7 +21,7 @@ result.
 ```
 data/          Logged sensor data (CSV)
 docs/          Design notes, status, TODO, and usage guide
-models/        Trained detectors (deployed: esp-conv-v1, esp-gru-v1)
+models/        Trained detectors (deployed: esp-conv-v2, esp-gru-v2)
 reports/       Evaluation results referenced by REPORT.md
 firmware/      ESP-IDF firmware and serial controller prototype
 maps/          Track image and generated graph maps

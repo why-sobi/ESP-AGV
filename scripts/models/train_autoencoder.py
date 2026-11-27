@@ -82,12 +82,27 @@ class ConvAutoencoder(nn.Module):
         return self.decoder(self.encoder(sequence))
 
 
-def build_model(arch, window_size, features, hidden, bottleneck):
+def build_model(arch, window_size, features, hidden, bottleneck, channels=16):
     if arch == "dense":
         return DenseAutoencoder(window_size * features, hidden, bottleneck)
     if arch == "conv":
-        return ConvAutoencoder(window_size, features, hidden, bottleneck)
+        return ConvAutoencoder(window_size, features, hidden, bottleneck, channels)
     raise ValueError(f"Unknown architecture: {arch}")
+
+
+def model_window(config, name):
+    """Window of one model in a model dir config; a per-model entry (esp-conv-v2)
+    overrides the shared one."""
+    return int(config["models"][name].get("window_size_samples", config["window_size_samples"]))
+
+
+def model_architecture(config, name):
+    """channels/kernel/bottleneck/hidden of one model, per-model entries first."""
+    shared = config["architecture"]
+    arch = {"channels": 16, "kernel": 3, "bottleneck": shared["bottleneck"],
+            "hidden": shared["hidden"]}
+    arch.update(config["models"][name].get("architecture", {}))
+    return arch
 
 
 ARCH_LAYERS = {

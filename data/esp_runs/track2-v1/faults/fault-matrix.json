@@ -1,0 +1,18 @@
+﻿{
+  "description": "Generalization check on track2 (scripts/maps/make_track.py), never seen in training: fault stop with the deployed models (esp-conv-v2, esp-gru-v2) on the track2 routes that navigate cleanly (A at 3.5, D at 2.5 and 3.5 rad/s). Run with --mission maps/routes/mission-track2.json and the track2 world.",
+  "onset_s": 8.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true, "esp_fault_stop_s": 2.0},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 3.5, "seed": 30, "onset_s": 4.0},
+    {"route": "D", "speed": 2.5, "seed": 31, "onset_s": 10.0},
+    {"route": "D", "speed": 3.5, "seed": 32, "onset_s": 8.0}
+  ],
+  "faults": [
+    {"name": "motor-weak-right-80", "type": "motor_gain", "target": "right", "severity": 0.8},
+    {"name": "motor-weak-right-70", "type": "motor_gain", "target": "right", "severity": 0.7},
+    {"name": "ir-stuck-center", "type": "ir_stuck", "target": "gs_center"},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0}
+  ]
+}
+

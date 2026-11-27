@@ -1,0 +1,64 @@
+{
+  "description": "End-to-end check after deploying the architecture-search winners (models/esp-conv-v2: motor conv window 10/8 channels; models/esp-gru-v2: 16 hidden, 31-sample score window; IR conv unchanged) and the host-side COM3 reconnect. Same routes, speeds, seeds, onsets and faults as fault-stop-v3; healthy (motor_gain 1.0) is the false-stop control.",
+  "onset_s": 8.0,
+  "mission": {
+    "control_mode": "esp32",
+    "return_to_start": true,
+    "esp_fault_stop_s": 2.0
+  },
+  "spawn_jitter": {
+    "lateral_m": 0.003,
+    "heading_deg": 4.0
+  },
+  "runs": [
+    {
+      "route": "A",
+      "speed": 2.7,
+      "seed": 20,
+      "onset_s": 6.0
+    },
+    {
+      "route": "B",
+      "speed": 3.3,
+      "seed": 21,
+      "onset_s": 9.0
+    },
+    {
+      "route": "C",
+      "speed": 2.4,
+      "seed": 22,
+      "onset_s": 15.0
+    },
+    {
+      "route": "D",
+      "speed": 3.8,
+      "seed": 23,
+      "onset_s": 12.0
+    }
+  ],
+  "faults": [
+    {
+      "name": "healthy",
+      "type": "motor_gain",
+      "target": "left",
+      "severity": 1.0
+    },
+    {
+      "name": "motor-weak-right-80",
+      "type": "motor_gain",
+      "target": "right",
+      "severity": 0.8
+    },
+    {
+      "name": "motor-weak-right-70",
+      "type": "motor_gain",
+      "target": "right",
+      "severity": 0.7
+    },
+    {
+      "name": "ir-stuck-center",
+      "type": "ir_stuck",
+      "target": "gs_center"
+    }
+  ]
+}

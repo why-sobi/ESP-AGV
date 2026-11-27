@@ -1,0 +1,9 @@
+file,start_node,destination_node,wheel_speed_rad_s,status,notes,control_mode,round_trip,seed
+route-20261127-165141-A-2.5.csv,node-002,node-003,2.5,healthy,"30.5 s; 27 line-loss samples (0 after 0.5 s, longest run 0); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-165204-A-3.5.csv,node-002,node-003,3.5,healthy,"23.0 s; 27 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-165224-B-2.5.csv,node-004,node-003,2.5,healthy,"41.9 s; 35 line-loss samples (12 after 0.5 s, longest run 11); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-165253-B-3.5.csv,node-004,node-003,3.5,healthy,"34.4 s; 41 line-loss samples (16 after 0.5 s, longest run 11); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-165318-C-2.5.csv,node-001,node-003,2.5,healthy,"59.4 s; 25 line-loss samples (9 after 0.5 s, longest run 8); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-165357-C-3.5.csv,node-001,node-003,3.5,healthy,"47.2 s; 28 line-loss samples (12 after 0.5 s, longest run 8); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-165433-D-2.5.csv,node-004,node-003,2.5,healthy,"77.9 s; 2 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-165531-D-3.5.csv,node-004,node-003,3.5,healthy,"57.7 s; 2 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.023 m",esp32,1,

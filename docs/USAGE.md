@@ -141,10 +141,27 @@ In ESP mode:
    its distance, and stops when it reaches the destination distance. Webots
    applies the returned wheel targets.
 
-The distances are the map centerline distances multiplied by
-`esp_odometry_scale` (default 0.92). The robot cuts inside curves, so its
-odometry reads less than the drawn centerline; 0.92 is the ratio measured on
-the 64 healthy base-track runs. To re-measure it on another track, compare
+The distances are the map centerline distances multiplied by each edge's
+scale in `esp_odometry_scale_by_edge`, or `esp_odometry_scale` (default
+0.92) for edges not listed. The robot cuts inside curves, so its odometry
+reads less than the drawn centerline: ~0.973 on the long edges, ~0.836 on
+the curved loop (fitted on 237 ESP legs; REPORT.md section 11). 0.92 is the
+average on the standard routes, which combine one of each.
+
+`avoid_edges` (a list of edge ids) plans without those edges, to drive the
+other edge of a parallel pair; the collector takes it as `--avoid-edges`:
+
+```powershell
+# edge-004
+.\.venv\Scripts\python.exe -m scripts.telemetry.collect_route_runs --routes BD --speeds 2.5 3.5 --control-mode esp32 --round-trip --avoid-edges edge-005 --out data\esp_runs\parallel-edges-v2\edge-004
+# edge-002
+.\.venv\Scripts\python.exe -m scripts.telemetry.collect_route_runs --routes AC --speeds 2.5 3.5 --control-mode esp32 --round-trip --avoid-edges edge-003 edge-004 edge-005 --out data\esp_runs\parallel-edges-v2\edge-002
+```
+
+`replay_scores` rebuilds route commands with the global scale and plain
+turns, as the runs recorded before 2026-11-27 15:00 were; pass
+`--per-edge-odometry` for later runs (per-edge scales and `l`/`r` corners;
+it does not apply `avoid_edges` or another track's map). To re-measure it on another track, compare
 each healthy run's final odometry (0.02 m x mean wheel rotation) with the
 route's map length. The firmware's protocol and behavior are described in
 `firmware\README.md`.
@@ -770,12 +787,21 @@ motor frame (see `firmware/README.md`). After retraining, regenerate the
 weights header and reflash:
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v1 --gru models\esp-gru-v1 --out firmware\main\anomaly_model.h
+.\.venv\Scripts\python.exe -m scripts.models.export_c --model models\esp-conv-v2 --gru models\esp-gru-v2 --out firmware\main\anomaly_model.h
 ```
 
-The GRU and its deployed threshold come from the offline experiment, which
-also writes the `deploy` block of `models\esp-gru-v1\config.json` that the
-export reads (`--reuse-weights` re-evaluates without training, ~2 min):
+The deployed motor conv and GRU are the architecture-search winners
+(`reports\arch-search-v1\<model>\final-0`, retrained with the full budget):
+`models\esp-conv-v2` holds that motor model next to the unchanged IR model,
+with each model's window and sizes in `models.<name>`, and `models\esp-gru-v2`
+the 16-hidden GRU. Their thresholds are the search's final-run thresholds
+(no persistent alarm on a healthy validation run; GRU x2); each config's
+`source` and `search_result` record where they came from. `esp-conv-v1` and
+`esp-gru-v1` still export and replay with the same commands.
+
+The v1 GRU and its threshold came from the offline experiment, which also
+writes the `deploy` block of `models\esp-gru-v1\config.json`
+(`--reuse-weights` re-evaluates without training, ~2 min):
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.models.gru_experiment --reuse-weights
@@ -820,6 +846,20 @@ driving and detecting):
 The first plain C++ inference cost about 4.5 ms per frame. With esp-dsp and
 the weights in RAM the three detectors take about 1.05 ms (see
 `firmware/README.md`).
+
+### Second track (track2)
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.maps.make_track   # image + map (with world transform)
+.\.venv\Scripts\python.exe -m scripts.maps.make_track --track track3   # the hard course; mission-track3.json, "Self Diagnosis AGV track3.wbt"
+.\.venv\Scripts\python.exe -m scripts.telemetry.collect_route_runs --routes ABCD --speeds 2.5 3.5 --control-mode esp32 --round-trip --mission maps\routes\mission-track2.json --world "simulation\worlds\Self Diagnosis AGV track2.wbt" --out data\esp_runs\nav-fix-v1\track2
+.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs --matrix data\esp_runs\track2-v2\faults\fault-matrix.json --mission maps\routes\mission-track2.json --world "simulation\worlds\Self Diagnosis AGV track2.wbt" --timeout 300
+```
+
+A mission's `map_path` selects the map (the world must show the same image)
+and its `routes` table (`{"A": {"start", "destination", "avoid_edges"}}`)
+replaces the base track's routes in both collectors. `replay_scores` still
+uses the base track map.
 
 ### Latency table, INT8 benchmark and architecture search
 
@@ -892,7 +932,8 @@ notifies the phone.
 
 Still to do (see `docs/TODO.md`): IR drift and light IR noise detection,
 deploying the architecture-search winners, reconnecting after a COM3 drop,
-and ESP runs over the parallel edges.
+and healthy training runs over edge-002 (the parallel edges are driven
+with `avoid_edges`).
 
 ## Tests
 

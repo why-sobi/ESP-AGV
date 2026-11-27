@@ -17,13 +17,14 @@ def conv_forward_like_firmware(a, x):
             if 0 <= t + k - 1 < window:
                 patch[t, k * features:(k + 1) * features] = x[t + k - 1]
     h1 = np.maximum(patch @ a["conv1_wt"] + a["conv1_b"], 0)  # [t][c]
+    channels = len(a["conv1_b"])
     reduced = (window + 1) // 2
     rows = (reduced + 3) // 4 * 4
-    q = np.zeros((rows, 3 * 16), np.float32)
+    q = np.zeros((rows, 3 * channels), np.float32)
     for t in range(reduced):
         for k in range(3):
             if 0 <= 2 * t + k - 1 < window:
-                q[t, k * 16:(k + 1) * 16] = h1[2 * t + k - 1]
+                q[t, k * channels:(k + 1) * channels] = h1[2 * t + k - 1]
     h2 = np.maximum(q @ a["conv2_wt"] + a["conv2_b"], 0)[:reduced].flatten()
 
     def dense(w, b, v):
@@ -38,14 +39,19 @@ def conv_forward_like_firmware(a, x):
 
 class ExportCTests(unittest.TestCase):
     def test_conv_layout_matches_torch(self):
-        for features in (3, 4):
+        # The deployed IR layout and the search's smaller motor layout
+        # (window 10, 8 channels, bottleneck 12, hidden 16).
+        for features, window, channels, hidden, bottleneck in ((3, 20, 16, 32, 8),
+                                                               (4, 20, 16, 32, 8),
+                                                               (4, 10, 8, 16, 12)):
             torch.manual_seed(features)
-            model = ConvAutoencoder(20, features, 32, 8).eval()
-            arrays = conv_arrays(model.state_dict(), features, 20)
+            model = ConvAutoencoder(window, features, hidden, bottleneck, channels).eval()
+            arrays = conv_arrays(model.state_dict(), features, window, channels)
             for array in arrays.values():
                 if array.ndim == 2:
                     self.assertEqual(array.shape[1] % 4, 0)
-            x = np.random.default_rng(features).normal(size=(20, features)).astype(np.float32)
+            x = np.random.default_rng(features).normal(size=(window, features)).astype(
+                np.float32)
             with torch.no_grad():
                 expected = model(torch.from_numpy(x.reshape(1, -1)))[0].numpy()
             np.testing.assert_allclose(conv_forward_like_firmware(arrays, x), expected,

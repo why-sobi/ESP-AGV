@@ -29,21 +29,27 @@ handoff.
 
 ## Where it stands
 
-Everything below is done and verified. Nothing from 2026-11-26/27 is
-committed yet; the user commits and pushes. 26 tracked `.pyc` files are
-staged for removal (`git rm --cached`).
+Everything below is done and verified. The 2026-11-27 session (search
+winners deployed, COM3 reconnect) is not committed yet; the user commits and
+pushes.
 
 | Piece | State | Evidence |
 |---|---|---|
 | Route following, round trips A-D | Done | Stops 0.2-1.4 cm from the node |
-| Detectors on the ESP (esp-dsp, float32) | Done | ~1.05 ms per 32 ms frame; replay within 5e-5, identical alarms (`reports/esp-replay-v2`) |
+| Detectors on the ESP (esp-dsp, float32) | Done | ~0.81 ms per 32 ms frame (v1: 1.18 ms measured the same way); replay identical alarms, conv within 1.3e-5 (`reports/esp-replay-v3`) |
 | Weak-motor and stuck-IR detection (motor GRU, stuck rule) | Done | Offline 82 -> 94/120 own-detector, 98 -> 110/120 either; no extra false alarm (`reports/esp-gru-eval-v1`) |
 | Fault stop + notifications | Done | Live: weak motor 8/8, stuck IR 3/4 (4th unobservable), dead IR 2/2, every stop notified |
 | Stuck rule needs the robot driving | Done | Fixes the stuck-on-line-value run that drove off the track (`fault-stop-v4`) |
 | Pull-over side from the map (`P@`) | Done | Left on edge-005 Junction 2 -> 3, outside the loop (`pull-over-v1`) |
 | On-ESP latency table | Done | 967 architectures (`reports/esp-latency-v1`) |
 | INT8/INT16 benchmark | Done | ESP-DL ~2.5x slower than esp-dsp; INT8 breaks the motor conv model; float32 kept (`reports/esp-int8-v1`) |
-| Optuna architecture search | Done, not deployed | Smaller motor conv and GRU beat the deployed ones on held-out data (`reports/arch-search-v1`) |
+| Optuna architecture search | Done | (`reports/arch-search-v1`) |
+| Search winners deployed (`models/esp-conv-v2` motor + unchanged IR, `models/esp-gru-v2`) | Done | Offline 94/110 of 120 like v1, motor median alarm 0.16 -> 0.13 s (`reports/deployed-eval-v2`); live 16 runs as expected, 12/12 stops notified (`data/esp_runs/fault-stop-v5`) |
+| COM3 reconnect (`EspLink` in `epuck_route`) | Done | Fake-port test; real unplug not tested |
+| Second track (track2, `scripts/maps/make_track.py`) | Done | After the navigation fixes: healthy 8/8, faults 20/20 stopped and notified, base track still 16/16 and replay identical (`data/esp_runs/nav-fix-v1`, `track2-v2`; REPORT section 11) |
+| Navigation fixes (stale junction pattern, blind arrival, `l`/`r` corners with spin, spins unmonitored, `<`/`>` bear onto Y branches) | Done | Smoke test 48 checks |
+| Hard course (track3: 45° bends, Y junction, hairpin, tight curve) | Done | healthy 8/8, faults 16/16, longest false alarm 0.77 s; base and track2 regression 8/8 (`data/esp_runs/track3-v2`; REPORT section 11). Marginal: hairpin at 3.5 rad/s loses the line 0.74 s of the 0.75 s limit |
+| Parallel edges (`avoid_edges`) + per-edge odometry scales | Done | edge-002/004 and standard routes 12/12, stops 0.1-1.5 cm (`data/esp_runs/parallel-edges-v2`); `replay_scores --per-edge-odometry` for new runs |
 | Docs (REPORT.md, docs/, READMEs, requirements) | Done | |
 
 ## Open work (priority order)
@@ -53,29 +59,26 @@ staged for removal (`git rm --cached`).
    (on-line ~300 and floor ~760 readings shift with drift) or a cross-sensor
    model predicting each sensor from the other two plus motion. Evaluate in
    `scripts/models/gru_experiment.py` style against the same 120 runs.
-2. **Deploy the search winners**: motor conv candidate 0 (window 10, 8
-   channels, bottleneck 12, hidden 16: held-out 28/28 vs 25/28, 100 vs 307
-   us) and GRU candidate 0 (16 hidden, 31-sample score window: 28/28 vs 27/28,
-   127 vs 267 us). Weights: `reports/arch-search-v1/<model>/final-0/weights.pt`.
-   The IR candidate (22/32 vs 17/32) adds 2/18 healthy test alarms: a choice
-   for the user. Needed: configurable window/channels (and kernel) in
-   `export_c.py` + `anomaly.cpp` (currently `kWindow = 20`, `kChannels =
-   16`), save a proper model dir + config (thresholds from the final run),
-   replay, live runs, docs. The search's `ConvAE` has the same layout as the
-   deployed `ConvAutoencoder` with a kernel parameter.
-3. **COM3 drop mid-run** fails the run (the ESP stops on `LINK_LOST`); add
-   reconnect for a single mission.
-4. **Parallel edges** edge-002/edge-004 never driven under ESP control.
+2. **IR search candidate** (22/32 vs 17/32 held-out, +2/18 healthy test
+   alarms): the user's choice. Deploying it is now only a config change in
+   `models/esp-conv-v2` (per-model window/sizes) + export, replay, live.
+3. **Real unplug test** of the COM3 reconnect.
+4. **Healthy runs over edge-002** for training: the parallel edges are now
+   driven (`avoid_edges`, per-edge odometry scales, `parallel-edges-v2`), but
+   the motor conv model raises sub-0.3 s alarms at edge-002's turns (no stop).
+
+5. **Hairpin margin at 3.5 rad/s** (track3): the line search nearly runs out
+   (0.74 of 0.75 s). Options: a longer search, or slowing for tight curves.
 
 ## How the detectors work (Python and ESP identically)
 
 - Motor sample: wheel targets (rounded to 3 decimals as sent) + encoder wheel
   speeds; IR sample: three ground sensors; scaled with the training scaler.
-- Conv AE: reconstruction MSE of the last 20 samples; thresholds motor 0.1894,
-  IR 0.4476.
-- Motor GRU (32 hidden): predicts both wheel speeds from the targets, state
-  from the route start; score = worst wheel's mean squared error over 62
-  samples; threshold 0.0246 (2x the no-validation-alarm value).
+- Conv AE: reconstruction MSE of the last window; motor window 10 (8
+  channels, threshold 0.0861), IR window 20 (16 channels, threshold 0.4476).
+- Motor GRU (16 hidden): predicts both wheel speeds from the targets, state
+  from the route start; score = worst wheel's mean squared error over 31
+  samples; threshold 0.0285 (2x the no-validation-alarm value).
 - Stuck rule: a sensor's change < 0.5 between every pair of the last 32
   frames while mean wheel speed > 1 rad/s.
 - Not monitored: windows starting in the first 0.5 s, or overlapping
@@ -114,7 +117,7 @@ staged for removal (`git rm --cached`).
   fetched into `managed_components/` on the first build).
 - **After retraining:** `python -m scripts.models.gru_experiment --reuse-weights`
   (writes the GRU `deploy` block), then
-  `python -m scripts.models.export_c --model models\esp-conv-v1 --gru models\esp-gru-v1 --out firmware\main\anomaly_model.h`, reflash, replay.
+  `python -m scripts.models.export_c` (defaults: `models\esp-conv-v2`, `models\esp-gru-v2`), reflash, replay.
 - **esp-ppq** needs Python 3.11-3.12: separate `.venv-ppq` (uv, git-ignored).
 - **ESP-DL bench app** (`firmware/esp-dl-bench`) replaces the AGV firmware and
   its partition table when flashed; reflash `firmware/` afterwards (the

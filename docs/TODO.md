@@ -9,13 +9,20 @@ phone. Everything is summarized in `REPORT.md`. Open work, in priority order:
 
 1. Detect IR drift (4-6/8) and IR noise of std 100 or less (0-3/8 by the IR
    model): a level check or a cross-sensor model.
-2. Deploy the architecture-search winners (motor conv: 28/28 held-out at
-   100 us; GRU: 28/28 at 127 us). Needs a configurable conv window and
-   channel count in `export_c.py` and `anomaly.cpp`, then replay and live
-   runs. The smaller IR conv is a trade-off (22/32 vs 17/32, but 2/18 healthy
-   test alarms).
-3. Reconnect when COM3 drops mid-run.
-4. ESP runs over the parallel edges (edge-002, edge-004).
+2. Done 2026-11-27: motor conv and GRU search winners deployed
+   (`esp-conv-v2`, `esp-gru-v2`; replay, offline and live fault-stop-v5).
+   Open: the smaller IR conv is a trade-off (22/32 vs 17/32, but 2/18
+   healthy test alarms); the user decides.
+3. Done 2026-11-27: COM3 reconnect in `epuck_route` (fake-port test; a real
+   unplug test is still to do).
+4. Done 2026-11-27: ESP runs over the parallel edges (`avoid_edges`,
+   per-edge odometry scales; `data/esp_runs/parallel-edges-v2`). Open:
+   healthy training runs over edge-002 (sub-0.3 s motor conv alarms there).
+5. Done 2026-11-27: track2 (second, unseen track) 8/8 healthy and 20/20
+   faults after the navigation fixes (REPORT.md section 11).
+6. Done 2026-11-27: track3 (45° bends, Y junction, hairpin, tight curve) 8/8
+   healthy, 16/16 faults. Open: hairpin margin at 3.5 rad/s (0.74 of 0.75 s
+   line search).
 
 Keep Webots as the simulation environment; the ESP32-S3 is the external
 compute target, not a move to a physical AGV.
@@ -75,7 +82,7 @@ compute target, not a move to a physical AGV.
 - Done: INT8/INT16 comparison with ESP-DL (`reports/esp-int8-v1`): slower at
   these sizes and INT8 breaks the motor conv model; float32 kept.
 - Done: on-ESP latency table (`reports/esp-latency-v1`) and Optuna search
-  (`reports/arch-search-v1`); winners not deployed yet.
+  (`reports/arch-search-v1`); motor conv and GRU winners deployed.
 - Done: on a persistent alarm the robot pulls over (side from the map), stops
   and sends a phone notification.
 

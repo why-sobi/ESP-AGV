@@ -98,6 +98,16 @@ class RouteActionTests(unittest.TestCase):
 
         self.assertEqual(format_route_command(plan), "S@0.900,D@1.800")
 
+    def test_plan_uses_per_edge_scales(self):
+        map_data = build_map((0.0, 2.0))
+        route = shortest_route(TrackMap.from_dict(map_data), "start", "goal")
+        first = route.steps[0].edge_id
+
+        plan = route_action_plan(map_data, route, distance_scale=0.9,
+                                 edge_scales={first: 0.8})
+
+        self.assertEqual(format_route_command(plan), "S@0.800,D@1.700")
+
     def test_plan_measures_reversed_edges(self):
         map_data = build_map((1.0, 1.0))
         map_data["edges"][1]["from"], map_data["edges"][1]["to"] = "goal", "junction"

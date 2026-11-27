@@ -25,6 +25,7 @@ from scripts.telemetry.collect_route_runs import (
     DEFAULT_WORLD,
     ROOT,
     ROUTES,
+    route_spec,
     error_log_size,
     find_webots,
     run_mission,
@@ -98,7 +99,7 @@ def main():
             writer.writeheader()
         for fault_index, fault in enumerate(faults):
             for run_index, run in enumerate(matrix["runs"]):
-                start, destination = ROUTES[run["route"]]
+                start, destination, avoid = route_spec(base_mission, run["route"])
                 spec = {k: v for k, v in fault.items() if k != "name"}
                 spec.setdefault("onset_s", run.get("onset_s", matrix["onset_s"]))
                 spec.setdefault("seed", fault_index * 100 + run_index)
@@ -110,6 +111,8 @@ def main():
                     run_label=f"{run['route']}-{run['speed']:g}-{fault['name']}",
                     fault=spec,
                 )
+                if avoid:
+                    mission["avoid_edges"] = avoid
                 if mission.get("control_mode") == "esp32":
                     mission["esp_speed_rad_s"] = run["speed"]
                 if "seed" in run:

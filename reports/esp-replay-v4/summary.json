@@ -1,0 +1,312 @@
+[
+  {
+    "file": "route-20261126-130838-A-2.25-s2.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1233,
+      "max_abs_diff": 1.2190580964088066e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 1213,
+      "max_abs_diff": 5.0926113128735295e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1191,
+      "max_abs_diff": 1.3246847212313936e-05,
+      "score_at_max_diff": 0.011123753152787685,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-131128-A-2.75-s2.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1039,
+      "max_abs_diff": 1.0735321044924584e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 1019,
+      "max_abs_diff": 5.161495208738653e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 997,
+      "max_abs_diff": 5.3367106914517515e-06,
+      "score_at_max_diff": 0.004122663289308548,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-134215-A-2.4-motor-weak-right-80.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1308,
+      "max_abs_diff": 1.3201426267622773e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1023,
+      "python_alarm_windows": 1023
+    },
+    "ir": {
+      "windows": 1288,
+      "max_abs_diff": 5.363416671733123e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1266,
+      "max_abs_diff": 1.5138898849464955e-05,
+      "score_at_max_diff": 0.2938041388988495,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1023,
+      "python_alarm_windows": 1023
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-134508-A-2.4-motor-weak-right-70.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 1419,
+      "max_abs_diff": 1.0400657653814038e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1154,
+      "python_alarm_windows": 1154
+    },
+    "ir": {
+      "windows": 1399,
+      "max_abs_diff": 5.047301650046299e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 1377,
+      "max_abs_diff": 2.4796947479255316e-05,
+      "score_at_max_diff": 0.8636592030525208,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 1133,
+      "python_alarm_windows": 1133
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-135055-A-2.4-motor-stall-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 241,
+      "max_abs_diff": 5.107574462925868e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 61,
+      "python_alarm_windows": 61
+    },
+    "ir": {
+      "windows": 231,
+      "max_abs_diff": 4.954404830932605e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 220,
+      "max_abs_diff": 1.3886718752686988e-06,
+      "score_at_max_diff": 4.333526611328125,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 61,
+      "python_alarm_windows": 61
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-135627-A-2.4-encoder-stuck-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 630,
+      "max_abs_diff": 5.804834365852329e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 450,
+      "python_alarm_windows": 450
+    },
+    "ir": {
+      "windows": 620,
+      "max_abs_diff": 4.9829617515206e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 609,
+      "max_abs_diff": 1.578506469535057e-06,
+      "score_at_max_diff": 2.9305074214935303,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 450,
+      "python_alarm_windows": 450
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-140116-A-2.4-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 962,
+      "max_abs_diff": 7.201278209686274e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 942,
+      "max_abs_diff": 5.049953460692369e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 657,
+      "python_alarm_windows": 657
+    },
+    "gru": {
+      "windows": 920,
+      "max_abs_diff": 8.083705246448789e-06,
+      "score_at_max_diff": 0.007874083705246449,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 657,
+      "python_alarm_windows": 657
+    }
+  },
+  {
+    "file": "route-20261126-140136-A-3.6-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 472,
+      "max_abs_diff": 6.0298871994018954e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 452,
+      "max_abs_diff": 5.226206779479492e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "gru": {
+      "windows": 430,
+      "max_abs_diff": 2.0805406570345575e-06,
+      "score_at_max_diff": 0.18435291945934296,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    }
+  },
+  {
+    "file": "route-20261126-140325-A-2.4-ir-dead-left.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 650,
+      "max_abs_diff": 5.701173394918532e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 640,
+      "max_abs_diff": 6.203022003159475e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 464,
+      "python_alarm_windows": 464
+    },
+    "gru": {
+      "windows": 629,
+      "max_abs_diff": 4.444404184818576e-06,
+      "score_at_max_diff": 0.008264555595815182,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 440,
+      "python_alarm_windows": 440
+    }
+  },
+  {
+    "file": "route-20261126-231448-C-2.4-ir-stuck-center.csv",
+    "target_mismatches": 0,
+    "motor": {
+      "windows": 946,
+      "max_abs_diff": 1.0043711662299781e-05,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "ir": {
+      "windows": 926,
+      "max_abs_diff": 5.17113327980212e-06,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 360,
+      "python_alarm_windows": 360
+    },
+    "gru": {
+      "windows": 904,
+      "max_abs_diff": 6.918157398701566e-06,
+      "score_at_max_diff": 0.0078740818426013,
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 0,
+      "python_alarm_windows": 0
+    },
+    "stuck": {
+      "alarm_mismatches": 0,
+      "esp_alarm_windows": 360,
+      "python_alarm_windows": 360
+    }
+  }
+]

@@ -28,14 +28,17 @@ LOG_DIR = Path(os.environ.get("AGV_LOG_DIR", ROOT_DIR / "data" / "route_runs"))
 
 
 def _read_inputs():
-    with MAP_PATH.open(encoding="utf-8") as map_file:
-        track_map = json.load(map_file)
-    with MISSION_PATH.open(encoding="utf-8") as mission_file:
+    with MISSION_PATH.open(encoding="utf-8-sig") as mission_file:
         mission = json.load(mission_file)
+    # Optional map_path (relative to the project root) selects another track;
+    # its Webots world must show the same image.
+    map_path = ROOT_DIR / mission["map_path"] if mission.get("map_path") else MAP_PATH
+    with map_path.open(encoding="utf-8") as map_file:
+        track_map = json.load(map_file)
 
     transform = track_map.get("world_transform")
     if not isinstance(transform, dict):
-        raise ValueError(f"Map has no world_transform: {MAP_PATH}")
+        raise ValueError(f"Map has no world_transform: {map_path}")
     if not transform.get("calibrated", False) and not mission.get(
         "allow_uncalibrated_map_for_simulation", False
     ):
@@ -71,8 +74,17 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
     from scripts.maps.route_planner import TrackMap, shortest_route
 
     transform = track_map["world_transform"]
-    route = shortest_route(TrackMap.from_dict(track_map), start, destination)
     edges = {edge["id"]: edge for edge in track_map["edges"]}
+    # Optional: plan without these edges, to drive the longer edge of a
+    # parallel pair (shortest paths never use edge-002 or edge-004). Turn
+    # actions and pull-over sides still see the whole track.
+    avoid = set(mission.get("avoid_edges") or [])
+    if avoid - set(edges):
+        raise ValueError(f"Unknown avoid_edges: {sorted(avoid - set(edges))}")
+    planning_map = dict(
+        track_map, edges=[edge for edge in track_map["edges"] if edge["id"] not in avoid]
+    )
+    route = shortest_route(TrackMap.from_dict(planning_map), start, destination)
 
     route_paths = []
     for step in route.steps:
@@ -104,11 +116,17 @@ def _plan_leg(track_map, mission, start, destination, u_turn_first=False):
 
     # Junction and destination distances for the ESP, as expected wheel
     # odometry: the robot cuts inside curves, so it drives less than the map
-    # centerline (about 0.92 of it on the base track's healthy runs).
+    # centerline. Per edge where the mission calibrates it (about 0.97 on the
+    # long edges, 0.84 on the curved loop), else about 0.92 (the average on
+    # the base track's standard routes).
     plan = route_action_plan(
         track_map,
         route,
         distance_scale=float(mission.get("esp_odometry_scale", 0.92)),
+        edge_scales=mission.get("esp_odometry_scale_by_edge"),
+        # Turns this sharp (a 90-degree corner onto a crossing line) are sent as
+        # l/r: the ESP slows down and spins onto the new line.
+        sharp_turn_degrees=float(mission.get("esp_sharp_turn_deg", 85.0)),
     )
     if u_turn_first:
         plan = [("U", 0.0)] + plan
@@ -350,6 +368,57 @@ def _open_esp_link(port_name, baud_rate):
     return link
 
 
+ESP_RECONNECT_S = 30.0  # How long to retry opening the port after a USB drop.
+
+
+class EspLink:
+    """The ESP serial link, reopened once per failed call when the USB port
+    drops mid-run. Webots waits for the controller, so the simulation is paused
+    while reconnecting; the ESP stops on LINK_LOST meanwhile and resumes its
+    route once frames arrive again (firmware/main/main.cpp)."""
+
+    def __init__(self, port_name, baud_rate):
+        self.port_name = port_name
+        self.baud_rate = baud_rate
+        self.link = _open_esp_link(port_name, baud_rate)
+        self.reconnects = 0
+
+    def call(self, function, *args):
+        """``function(link, *args)``, retried once after a reconnect."""
+        try:
+            return function(self.link, *args)
+        except (OSError, TimeoutError) as error:  # SerialException is an OSError.
+            self._reconnect(error)
+        return function(self.link, *args)
+
+    def _reconnect(self, error):
+        print(f"ESP link on {self.port_name} dropped ({error}); reconnecting for up to "
+              f"{ESP_RECONNECT_S:.0f} s")
+        try:
+            self.link.close()
+        except OSError:
+            pass
+        deadline = time.monotonic() + ESP_RECONNECT_S
+        while True:
+            try:
+                self.link = _open_esp_link(self.port_name, self.baud_rate)
+                # End any frame the drop cut off, and drop the ESP's reply to it.
+                self.link.write(b"\n")
+                time.sleep(0.1)
+                self.link.reset_input_buffer()
+                break
+            except OSError:
+                if time.monotonic() > deadline:
+                    raise
+                time.sleep(1.0)
+        self.reconnects += 1
+        print(f"ESP link reconnected ({self.reconnects} so far this run)")
+
+    def close(self):
+        if self.link.is_open:
+            self.link.close()
+
+
 ESP_STATES = (
     "FOLLOWING",
     "TURN_LEFT",
@@ -462,8 +531,8 @@ def main():
                 "AGV_ESP_PORT", mission.get("esp_serial_port", "COM3")
             )
             esp_baud = int(mission.get("esp_baud", 115200))
-            esp_link = _open_esp_link(esp_port, esp_baud)
-            _configure_esp_route(esp_link, esp_route)
+            esp_link = EspLink(esp_port, esp_baud)
+            esp_link.call(_configure_esp_route, esp_route)
             print(
                 f"ESP32 control enabled on {esp_port} at {esp_baud} baud; "
                 f"route actions: {esp_route}"
@@ -603,7 +672,7 @@ def main():
                     route.start,
                     u_turn_first=True,
                 )
-                _configure_esp_route(esp_link, esp_route)
+                esp_link.call(_configure_esp_route, esp_route)
                 print(
                     f"Return leg {route.start} -> {route.destination}: "
                     f"{' -> '.join(route.nodes)}; route actions: {esp_route}"
@@ -669,8 +738,8 @@ def main():
                     esp_route_index,
                     esp_distance,
                     esp_anomaly,
-                ) = _step_esp(
-                    esp_link,
+                ) = esp_link.call(
+                    _step_esp,
                     esp_sequence,
                     time_step,
                     sensor_values,
@@ -830,7 +899,7 @@ def main():
     finally:
         if log_file is not None and not log_file.closed:
             log_file.close()
-        if esp_link is not None and esp_link.is_open:
+        if esp_link is not None:
             esp_link.close()
 
 

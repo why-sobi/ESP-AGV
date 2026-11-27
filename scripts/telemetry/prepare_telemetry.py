@@ -166,18 +166,23 @@ def _features(rows, run_id, window_size):
 def unmonitored_samples(rows, settle_s=0.5):
     """Per derived sample (rows[1:], as in _features): True in a commanded manoeuvre.
 
-    The first ``settle_s`` after a U-turn also counts: the line follower is
-    still settling onto the line, like the warm-up at the start of a run.
+    A spin in place counts too: the U-turn, and a corner turn (a junction turn
+    whose wheel targets have opposite signs, firmware/main/main.cpp). The first
+    ``settle_s`` after a spin also counts: the line follower is still settling
+    onto the line, like the warm-up at the start of a run.
     """
     flags = []
     last_turn = None
     for row in rows[1:]:
         time_s = float(row["time"])
         state = row.get("esp_state", "")
-        if state == "U_TURN":
+        spinning = state == "U_TURN" or (
+            state in ("TURN_LEFT", "TURN_RIGHT")
+            and (float(row["target_vel_left"]) < 0.0) != (float(row["target_vel_right"]) < 0.0))
+        if spinning:
             last_turn = time_s
         settling = last_turn is not None and time_s - last_turn < settle_s
-        flags.append(state in UNMONITORED_STATES or settling)
+        flags.append(state in UNMONITORED_STATES or spinning or settling)
     return np.asarray(flags, dtype=bool)
 
 

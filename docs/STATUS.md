@@ -193,7 +193,9 @@ The Webots simulation remains the environment throughout this plan.
   - Optuna search (`reports/arch-search-v1`): smaller motor conv (100 us,
     28/28 held-out vs 25/28) and GRU (127 us, 28/28 vs 27/28) beat the
     deployed ones; the smaller IR conv detects more (22/32 vs 17/32) but adds
-    2/18 healthy test alarms. Not deployed yet.
+    2/18 healthy test alarms. Motor conv and GRU deployed 2026-11-27
+    (`esp-conv-v2`, `esp-gru-v2`): 0.81 ms per frame (was 1.18 ms), replay
+    alarms identical, live fault-stop-v5 as before.
 
 - The Python test suite passes (46 tests).
 
@@ -201,11 +203,11 @@ The Webots simulation remains the environment throughout this plan.
 
 - Detection of IR drift (4-6/8) and IR noise of std 100 or less (0-3/8 by
   the IR model).
-- Deploying the architecture-search winners (the conv window and channel
-  count are compile-time constants in the firmware).
-- Reconnecting when COM3 drops mid-run (the run fails; the ESP stops on
-  `LINK_LOST`).
-- ESP-mode runs over the parallel edges (edge-002, edge-004).
+- The smaller IR conv from the search (a trade-off; user's choice).
+- A real-unplug test of the COM3 reconnect (tested with a fake port).
+- Healthy training runs over edge-002 (the motor conv model raises sub-0.3 s
+  alarms at its turns; parallel edges themselves are driven with
+  `avoid_edges`).
 - Faults that start in a U-turn and lose the line before any monitored window
   are only caught as `LINE_LOST`.
 
@@ -217,7 +219,8 @@ The Webots simulation remains the environment throughout this plan.
   attempt held out whole speed/route combinations at 0.5 rad/s spacing, and the
   IR model then raised false alarms on corners it had not seen at that speed
   (2.6% of windows). The 0.1 rad/s grid fixed that.
-- Shortest-path routing never uses the parallel edges edge-002 and edge-004.
+- Shortest-path routing never uses the parallel edges edge-002 and edge-004;
+  `avoid_edges` drives them, but no dataset includes them.
 - The motor PCA baseline is nearly as good as the autoencoders. The IR
   autoencoders clearly beat it.
 - A stuck sensor frozen at a plausible value (the centre sensor on the line) is

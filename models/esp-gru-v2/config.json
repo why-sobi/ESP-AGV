@@ -1,0 +1,87 @@
+{
+  "architecture": "GRU(1 layer) + Linear head, stateful, reset at route start",
+  "hidden": 16,
+  "motor": {
+    "inputs": [
+      "target_vel_left(t)",
+      "target_vel_right(t)"
+    ],
+    "outputs": [
+      "actual_vel_left(t)",
+      "actual_vel_right(t)"
+    ]
+  },
+  "scaler": {
+    "motor": {
+      "mean": [
+        2.1818952851310347,
+        2.4442396549452874,
+        2.1827946957723525,
+        2.4448671473721832
+      ],
+      "scale": [
+        1.394499968748465,
+        0.9270904718669417,
+        1.3939023604661434,
+        0.926120687968931
+      ]
+    },
+    "ir": {
+      "mean": [
+        490.4193949528281,
+        374.5884875439313,
+        498.99318791209834
+      ],
+      "scale": [
+        223.03015918363386,
+        162.2341904971937,
+        225.09186087936726
+      ]
+    }
+  },
+  "scaler_source": "models/esp-conv-v1",
+  "training": {
+    "chunk": 256,
+    "burn_in": 32,
+    "batch_size": 32,
+    "iterations": 4000,
+    "lr": 0.0037346671857171965,
+    "seed": 0
+  },
+  "deploy": {
+    "motor_gru": {
+      "threshold_no_validation_alarm": 0.014252159744501116,
+      "margin": 2.0,
+      "threshold": 0.02850431948900223,
+      "score_window_samples": 31,
+      "score": "per wheel, mean squared scaled prediction error over the score window; the larger wheel"
+    },
+    "ir_stuck": {
+      "samples": 31,
+      "eps": 0.5,
+      "speed": 1.0,
+      "rule": "a sensor whose sample-to-sample change (raw units) stays below eps for `samples` differences while the mean wheel speed (|left|+|right|)/2 over the same samples+1 frames exceeds `speed` (rad/s)"
+    },
+    "persistence": {
+      "k": 3,
+      "n": 5
+    },
+    "warmup_s": 0.5
+  },
+  "source": "reports/arch-search-v1/gru/final-0 (Optuna candidate 0, full retraining); motor model only",
+  "search_result": {
+    "detected": 28,
+    "runs": 28,
+    "median_delay_s": 0.1280000000000001,
+    "healthy_alarm_runs": {
+      "validation": 0,
+      "test": 0
+    },
+    "latency_us": 127,
+    "weight_bytes": 4368,
+    "training": {
+      "best_iteration": 4000,
+      "validation_loss": 0.006025996059179306
+    }
+  }
+}

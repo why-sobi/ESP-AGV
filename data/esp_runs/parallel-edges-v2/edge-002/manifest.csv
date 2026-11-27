@@ -1,0 +1,5 @@
+file,start_node,destination_node,wheel_speed_rad_s,status,notes,control_mode,round_trip,seed
+route-20261127-145352-A-2.5.csv,node-003,node-001,2.5,healthy,"73.7 s; 11 line-loss samples (10 after 0.5 s, longest run 8); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-145440-A-3.5.csv,node-003,node-001,3.5,healthy,"55.0 s; 21 line-loss samples (20 after 0.5 s, longest run 17); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-145518-C-2.5.csv,node-002,node-004,2.5,healthy,"73.5 s; 4 line-loss samples (3 after 0.5 s, longest run 3); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-145606-C-3.5.csv,node-002,node-004,3.5,healthy,"54.8 s; 14 line-loss samples (13 after 0.5 s, longest run 12); 0 irregular intervals; max centerline error 0.025 m",esp32,1,

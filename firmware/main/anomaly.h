@@ -32,20 +32,21 @@ class WindowGate {
 
 // Model weights live in flash; the detectors copy them into internal RAM once,
 // so the per-frame SIMD routines do not stream them through the flash cache
-// (which the WiFi stack on the other core shares).
+// (which the WiFi stack on the other core shares). Sized for the largest model;
+// each model uses the leading part.
 struct ConvWeights {
-  alignas(16) float conv1_wt[anomaly_model::kConv1Patch * anomaly_model::kChannels];
-  alignas(16) float conv1_b[anomaly_model::kChannels];
-  alignas(16) float conv2_wt[3 * anomaly_model::kChannels * anomaly_model::kChannels];
-  alignas(16) float conv2_b[anomaly_model::kChannels];
-  alignas(16) float enc_w[anomaly_model::kBottleneck * anomaly_model::kChannels *
-                          anomaly_model::kReduced];
-  alignas(16) float enc_b[anomaly_model::kBottleneck];
-  alignas(16) float dec1_w[anomaly_model::kHidden * anomaly_model::kBottleneck];
-  alignas(16) float dec1_b[anomaly_model::kHidden];
-  alignas(16) float dec2_w[anomaly_model::kWindow * anomaly_model::kMaxFeatures *
-                           anomaly_model::kHidden];
-  alignas(16) float dec2_b[anomaly_model::kWindow * anomaly_model::kMaxFeatures];
+  alignas(16) float conv1_wt[anomaly_model::kConv1Patch * anomaly_model::kMaxChannels];
+  alignas(16) float conv1_b[anomaly_model::kMaxChannels];
+  alignas(16) float conv2_wt[3 * anomaly_model::kMaxChannels * anomaly_model::kMaxChannels];
+  alignas(16) float conv2_b[anomaly_model::kMaxChannels];
+  alignas(16) float enc_w[anomaly_model::kMaxBottleneck * anomaly_model::kMaxChannels *
+                          anomaly_model::kMaxReduced];
+  alignas(16) float enc_b[anomaly_model::kMaxBottleneck];
+  alignas(16) float dec1_w[anomaly_model::kMaxHidden * anomaly_model::kMaxBottleneck];
+  alignas(16) float dec1_b[anomaly_model::kMaxHidden];
+  alignas(16) float dec2_w[anomaly_model::kMaxWindow * anomaly_model::kMaxFeatures *
+                           anomaly_model::kMaxHidden];
+  alignas(16) float dec2_b[anomaly_model::kMaxWindow * anomaly_model::kMaxFeatures];
 };
 
 struct GruWeights {
@@ -70,7 +71,7 @@ class Persistence {
 };
 
 // Conv autoencoder (motor or ground IR): reconstruction MSE of the last
-// kWindow samples.
+// model.window samples.
 class AnomalyDetector {
  public:
   explicit AnomalyDetector(const anomaly_model::ConvAutoencoder &model);
@@ -93,7 +94,7 @@ class AnomalyDetector {
 
   const anomaly_model::ConvAutoencoder &model_;
   ConvWeights weights_;  // RAM copy of model_'s layers.
-  float window_[anomaly_model::kWindow][anomaly_model::kMaxFeatures]{};  // Scaled, ring.
+  float window_[anomaly_model::kMaxWindow][anomaly_model::kMaxFeatures]{};  // Scaled, ring.
   int next_ = 0;
   WindowGate gate_;
   Persistence persistence_;

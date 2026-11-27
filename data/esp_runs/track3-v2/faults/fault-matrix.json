@@ -1,0 +1,18 @@
+{
+  "description": "Hard-course check on track3 (scripts/maps/make_track.py --track track3: octagon 45-degree bends, Y junction, hairpin, tight curve), never seen in training: fault stop with the deployed models. Run with --mission maps/routes/mission-track3.json and the track3 world.",
+  "onset_s": 8.0,
+  "mission": {"control_mode": "esp32", "return_to_start": true, "esp_fault_stop_s": 2.0},
+  "spawn_jitter": {"lateral_m": 0.003, "heading_deg": 4.0},
+  "runs": [
+    {"route": "A", "speed": 3.0, "seed": 40, "onset_s": 8.0},
+    {"route": "B", "speed": 3.0, "seed": 41, "onset_s": 7.0},
+    {"route": "C", "speed": 3.0, "seed": 42, "onset_s": 9.0},
+    {"route": "D", "speed": 3.0, "seed": 43, "onset_s": 12.0}
+  ],
+  "faults": [
+    {"name": "motor-weak-right-80", "type": "motor_gain", "target": "right", "severity": 0.8},
+    {"name": "motor-weak-right-70", "type": "motor_gain", "target": "right", "severity": 0.7},
+    {"name": "ir-stuck-center", "type": "ir_stuck", "target": "gs_center"},
+    {"name": "ir-dead-left", "type": "ir_dead", "target": "gs_left", "severity": 0.0}
+  ]
+}

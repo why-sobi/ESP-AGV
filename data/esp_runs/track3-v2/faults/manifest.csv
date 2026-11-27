@@ -1,0 +1,17 @@
+file,route,start_node,destination_node,wheel_speed_rad_s,fault_name,fault_type,target,severity,onset_s,outcome,duration_s,faulty_samples,control_mode,seed
+route-20261127-173600-A-3-motor-weak-right-80.csv,A,node-003,node-002,3.0,motor-weak-right-80,motor_gain,right,0.8,8.0,stopped_early,13.536,175,esp32,40
+route-20261127-173614-B-3-motor-weak-right-80.csv,B,node-001,node-004,3.0,motor-weak-right-80,motor_gain,right,0.8,7.0,stopped_early,12.64,178,esp32,41
+route-20261127-173629-C-3-motor-weak-right-80.csv,C,node-001,node-002,3.0,motor-weak-right-80,motor_gain,right,0.8,9.0,stopped_early,14.56,175,esp32,42
+route-20261127-173644-D-3-motor-weak-right-80.csv,D,node-004,node-002,3.0,motor-weak-right-80,motor_gain,right,0.8,12.0,stopped_early,17.536,175,esp32,43
+route-20261127-173701-A-3-motor-weak-right-70.csv,A,node-003,node-002,3.0,motor-weak-right-70,motor_gain,right,0.7,8.0,stopped_early,13.696,180,esp32,40
+route-20261127-173715-B-3-motor-weak-right-70.csv,B,node-001,node-004,3.0,motor-weak-right-70,motor_gain,right,0.7,7.0,stopped_early,12.768,182,esp32,41
+route-20261127-173729-C-3-motor-weak-right-70.csv,C,node-001,node-002,3.0,motor-weak-right-70,motor_gain,right,0.7,9.0,stopped_early,14.72,180,esp32,42
+route-20261127-173745-D-3-motor-weak-right-70.csv,D,node-004,node-002,3.0,motor-weak-right-70,motor_gain,right,0.7,12.0,stopped_early,17.696,180,esp32,43
+route-20261127-173802-A-3-ir-stuck-center.csv,A,node-003,node-002,3.0,ir-stuck-center,ir_stuck,gs_center,,8.0,stopped_early,14.112,193,esp32,40
+route-20261127-173817-B-3-ir-stuck-center.csv,B,node-001,node-004,3.0,ir-stuck-center,ir_stuck,gs_center,,7.0,stopped_early,13.12,193,esp32,41
+route-20261127-173831-C-3-ir-stuck-center.csv,C,node-001,node-002,3.0,ir-stuck-center,ir_stuck,gs_center,,9.0,stopped_early,15.136,193,esp32,42
+route-20261127-173847-D-3-ir-stuck-center.csv,D,node-004,node-002,3.0,ir-stuck-center,ir_stuck,gs_center,,12.0,stopped_early,18.08,192,esp32,43
+route-20261127-173904-A-3-ir-dead-left.csv,A,node-003,node-002,3.0,ir-dead-left,ir_dead,gs_left,0.0,8.0,stopped_early,13.344,169,esp32,40
+route-20261127-173918-B-3-ir-dead-left.csv,B,node-001,node-004,3.0,ir-dead-left,ir_dead,gs_left,0.0,7.0,stopped_early,12.384,170,esp32,41
+route-20261127-173932-C-3-ir-dead-left.csv,C,node-001,node-002,3.0,ir-dead-left,ir_dead,gs_left,0.0,9.0,stopped_early,14.56,175,esp32,42
+route-20261127-173947-D-3-ir-dead-left.csv,D,node-004,node-002,3.0,ir-dead-left,ir_dead,gs_left,0.0,12.0,stopped_early,17.344,169,esp32,43

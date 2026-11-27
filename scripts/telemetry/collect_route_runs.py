@@ -49,6 +49,18 @@ ROUTES = {
 }
 
 
+def route_spec(mission, route):
+    """(start, destination, avoid_edges) of a route letter: from the mission's
+    ``routes`` table when it has one (another track, e.g. track2), else the base
+    track's ROUTES."""
+    table = mission.get("routes")
+    if table:
+        spec = table[route]
+        return spec["start"], spec["destination"], spec.get("avoid_edges")
+    start, destination = ROUTES[route]
+    return start, destination, None
+
+
 def find_webots(explicit=None):
     candidates = []
     if explicit:
@@ -82,12 +94,22 @@ def summarize_run(path, max_irregular=0, max_loss_streak=0):
     intervals = [b - a for a, b in zip(times, times[1:])]
     median = sorted(intervals)[len(intervals) // 2]
     irregular = sum(1 for dt in intervals if abs(dt - median) > max(0.001, 0.1 * median))
-    # A U-turn sweeps the sensors off the line on purpose.
+    # A U-turn and a corner turn (spinning onto a crossing line) sweep the
+    # sensors off the line on purpose.
     lost = [
-        row["line_error"] == "" and row.get("esp_state") not in ("U_TURN", "UNLOADING")
+        row["line_error"] == ""
+        and row.get("esp_state") not in ("U_TURN", "UNLOADING", "TURN_LEFT", "TURN_RIGHT")
         for row in rows
     ]
-    late = [is_lost and time > 0.5 for is_lost, time in zip(lost, times)]
+    # The ESP runs in blind for the last few cm to a destination (past the end
+    # of a line or across a T's crossbar; firmware kArrivalSlackM): a loss that
+    # ends in AT_DEST is arriving, not losing the line.
+    arriving = [False] * len(rows)
+    for i in range(len(rows) - 1, -1, -1):
+        arriving[i] = rows[i].get("esp_state") == "AT_DEST" or (
+            lost[i] and i + 1 < len(rows) and arriving[i + 1])
+    late = [is_lost and not arrive and time > 0.5
+            for is_lost, arrive, time in zip(lost, arriving, times)]
     longest = streak = 0
     for is_late in late:
         streak = streak + 1 if is_late else 0
@@ -170,7 +192,7 @@ def run_mission(webots, world, mission, out_dir, timeout):
 
 def run_one(webots, world, base_mission, route, speed, out_dir, timeout, seed=None,
             jitter=None):
-    start, destination = ROUTES[route]
+    start, destination, avoid = route_spec(base_mission, route)
     mission = dict(
         base_mission,
         start_node=start,
@@ -178,6 +200,8 @@ def run_one(webots, world, base_mission, route, speed, out_dir, timeout, seed=No
         wheel_speed_rad_s=speed,
         run_label=f"{route}-{speed:g}" + ("" if seed is None else f"-s{seed}"),
     )
+    if avoid:
+        mission["avoid_edges"] = avoid
     if mission.get("control_mode") == "esp32":
         mission["esp_speed_rad_s"] = speed
     if seed is not None:
@@ -223,18 +247,23 @@ def main():
                         help="Repeat a run this many times if the ESP serial link drops")
     parser.add_argument("--resume", action="store_true",
                         help="Skip route/speed/seed runs already healthy in the manifest")
+    parser.add_argument("--avoid-edges", nargs="+", default=None,
+                        help="Plan routes without these edges (mission avoid_edges), e.g. "
+                             "edge-005 to drive edge-004")
     args = parser.parse_args()
 
-    unknown = set(args.routes) - set(ROUTES)
-    if unknown:
-        parser.error(f"unknown routes: {''.join(sorted(unknown))}")
     webots = find_webots(args.webots)
     base_mission = json.loads(args.mission.read_text(encoding="utf-8-sig"))
+    unknown = set(args.routes) - set(base_mission.get("routes") or ROUTES)
+    if unknown:
+        parser.error(f"unknown routes: {''.join(sorted(unknown))}")
     # Dataset runs only report alarms: a fault stop would end them early.
     base_mission.pop("esp_fault_stop_s", None)
     if args.control_mode:
         base_mission["control_mode"] = args.control_mode
     base_mission["return_to_start"] = args.round_trip
+    if args.avoid_edges:
+        base_mission["avoid_edges"] = args.avoid_edges
     if args.round_trip and base_mission.get("control_mode") != "esp32":
         parser.error("--round-trip needs control mode esp32")
     jitter = {"lateral_m": args.jitter_lateral_m, "heading_deg": args.jitter_heading_deg}
@@ -263,7 +292,8 @@ def main():
         for route in args.routes:
             for speed in args.speeds:
                 for seed in args.seeds or [None]:
-                    key = (ROUTES[route][0], speed, "" if seed is None else str(seed))
+                    key = (route_spec(base_mission, route)[0], speed,
+                           "" if seed is None else str(seed))
                     if key in done:
                         continue
                     for attempt in range(args.serial_retries + 1):

@@ -35,6 +35,8 @@ from scripts.models.train_autoencoder import (
     fit_pca,
     flatten,
     load_dataset,
+    model_architecture,
+    model_window,
     persistence_alarms,
     window_scores,
 )
@@ -47,25 +49,29 @@ def primary_model(fault_type):
     return PRIMARY[fault_type.split("_")[0]]
 
 
-def load_detectors(model_dirs):
-    """Return {method: {model name: (reconstruct, threshold, mean, scale)}} and window size."""
+def load_detectors(model_dirs, per_model_windows=False):
+    """Return {method: {model name: (reconstruct, threshold, mean, scale)}} and the
+    window size; with ``per_model_windows``, {model name: window size} instead,
+    which allows the motor and IR models to use different windows."""
     detectors = {}
-    window_size = None
+    windows = None
     for model_dir in model_dirs:
         model_dir = Path(model_dir)
         config = json.loads((model_dir / "config.json").read_text(encoding="utf-8"))
         arch = config["architecture"]["type"].removesuffix("_autoencoder")
-        window_size = window_size or config["window_size_samples"]
-        if config["window_size_samples"] != window_size:
-            raise ValueError("All models must use the same window size.")
+        windows = windows or {name: model_window(config, name) for name in MODELS}
+        if {name: model_window(config, name) for name in MODELS} != windows:
+            raise ValueError("All model dirs must use the same window sizes.")
+        if not per_model_windows and len(set(windows.values())) > 1:
+            raise ValueError("The motor and IR models use different windows.")
         method = f"{model_dir.name} ({arch})"
         detectors[method] = {}
         for name in MODELS:
             info = config["models"][name]
             features = len(info["features"])
-            network = build_model(arch, window_size, features,
-                                  config["architecture"]["hidden"],
-                                  config["architecture"]["bottleneck"])
+            sizes = model_architecture(config, name)
+            network = build_model(arch, windows[name], features, sizes["hidden"],
+                                  sizes["bottleneck"], sizes["channels"])
             network.load_state_dict(torch.load(model_dir / info["weights"], weights_only=True))
             network.eval()
 
@@ -78,8 +84,10 @@ def load_detectors(model_dirs):
                 np.asarray(info["scaler_mean"]), np.asarray(info["scaler_scale"]),
             )
 
-        if "pca_baseline" not in detectors:
-            # Same dataset/bottleneck for every model dir; refit PCA once.
+        if "pca_baseline" not in detectors and all("results" in config["models"][name]
+                                                   for name in MODELS):
+            # Same dataset/bottleneck for every model dir; refit PCA once. Not for
+            # dirs without training results (esp-conv-v2's search-trained motor model).
             dataset = ROOT / config["dataset"]
             _, arrays, _, _ = load_dataset(dataset)
             detectors["pca_baseline"] = {}
@@ -91,8 +99,9 @@ def load_detectors(model_dirs):
                     np.asarray(info["scaler_mean"]), np.asarray(info["scaler_scale"]),
                 )
     # Put the baseline last for readability.
-    detectors["pca_baseline"] = detectors.pop("pca_baseline")
-    return detectors, window_size
+    if "pca_baseline" in detectors:
+        detectors["pca_baseline"] = detectors.pop("pca_baseline")
+    return detectors, windows if per_model_windows else windows["motor"]
 
 
 def run_windows(path, window_size):

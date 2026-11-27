@@ -30,12 +30,50 @@ def _oriented_geometry(edge: dict[str, Any], source: str, target: str) -> list[l
     )
 
 
+CORNER_SAMPLE_M = 0.04  # How far along each edge a corner's angle is measured.
+# Turns up to this (above straight) bear onto a Y branch: track3's 45-degree Y
+# measures ~56 (the skeleton puts its node ~4 cm past the branch point), the
+# base track's turns 61-76.
+BEAR_MAX_DEGREES = 58.0
+
+
+def _point_along(geometry: list[list[float]], transform: dict[str, Any],
+                 distance_m: float) -> tuple[float, float]:
+    """World point ``distance_m`` along a polyline from its first point (its
+    last point if shorter)."""
+    points = [_world_point(point, transform) for point in geometry]
+    travelled = 0.0
+    for a, b in zip(points, points[1:]):
+        step = math.dist(a, b)
+        if step > 0.0 and travelled + step >= distance_m:
+            u = (distance_m - travelled) / step
+            return a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1])
+        travelled += step
+    return points[-1]
+
+
+def _corner_angle(vertex: tuple[float, float], incoming_geometry: list[list[float]],
+                  outgoing_geometry: list[list[float]], transform: dict[str, Any]) -> float:
+    """Turn angle, degrees, between the points CORNER_SAMPLE_M before and after
+    the junction along the route: a branch that curves away (the base track's
+    circle) reads less sharp than one that stays at 90 degrees (a straight
+    crossing line), though both leave the junction at 90 degrees."""
+    before = _point_along(list(reversed(incoming_geometry)), transform, CORNER_SAMPLE_M)
+    after = _point_along(outgoing_geometry, transform, CORNER_SAMPLE_M)
+    incoming = (vertex[0] - before[0], vertex[1] - before[1])
+    outgoing = (after[0] - vertex[0], after[1] - vertex[1])
+    cross = incoming[0] * outgoing[1] - incoming[1] * outgoing[0]
+    dot = incoming[0] * outgoing[0] + incoming[1] * outgoing[1]
+    return math.degrees(math.atan2(cross, dot))
+
+
 def _junction_turn(
     node: dict[str, Any],
     incoming_geometry: list[list[float]],
     outgoing_geometry: list[list[float]],
     transform: dict[str, Any],
     straight_threshold_degrees: float,
+    sharp_turn_degrees: float | None = None,
 ) -> str:
     vertex = _world_point([node["x"], node["y"]], transform)
 
@@ -61,9 +99,22 @@ def _junction_turn(
     cross = incoming[0] * outgoing[1] - incoming[1] * outgoing[0]
     dot = incoming[0] * outgoing[0] + incoming[1] * outgoing[1]
     angle = math.degrees(math.atan2(cross, dot))
+    if sharp_turn_degrees is not None:
+        # Measured CORNER_SAMPLE_M along each edge: robust to a messy skeleton
+        # right at the node (Y junctions), and tells corners from curves.
+        angle = _corner_angle(vertex, incoming_geometry, outgoing_geometry, transform)
     if abs(angle) <= straight_threshold_degrees:
         return "S"
-    return "L" if angle > 0 else "R"
+    turn = "L" if angle > 0 else "R"
+    if sharp_turn_degrees is not None:
+        # A corner (a sharp turn onto a straight crossing line): the ESP spins
+        # onto it. A gentle turn onto a Y branch ('<'/'>', bear left/right): the
+        # ESP holds the turn until it has turned enough to leave the old line.
+        if abs(angle) >= sharp_turn_degrees:
+            return turn.lower()
+        if abs(angle) <= BEAR_MAX_DEGREES:
+            return "<" if angle > 0 else ">"
+    return turn
 
 
 def _polyline_length(geometry: list[list[float]], transform: dict[str, Any]) -> float:
@@ -76,19 +127,24 @@ def route_action_plan(
     route: Any,
     straight_threshold_degrees: float = 35.0,
     distance_scale: float = 1.0,
+    edge_scales: dict[str, float] | None = None,
+    sharp_turn_degrees: float | None = None,
 ) -> list[tuple[str, float]]:
     """Return ``(action, distance_m)`` per intermediate junction, then ``D``.
 
     ``distance_m`` is the distance along the route's edge centerlines from the
-    start node to that junction (or to the destination), multiplied by
+    start node to that junction (or to the destination), each edge's length
+    multiplied by its scale: ``edge_scales[edge_id]`` if given, else
     ``distance_scale``. The robot cuts inside curves, so its wheel odometry
-    reads less than the drawn centerline; the scale converts map distance to
-    the expected odometry distance. The start node is omitted: the robot
-    begins on it.
+    reads less than the drawn centerline, more so on curved edges; the scale
+    converts map distance to the expected odometry distance. The start node is
+    omitted: the robot begins on it. Turns of ``sharp_turn_degrees`` or more
+    are lowercase (``l``/``r``, corners) when it is given.
     """
-    if distance_scale <= 0.0:
+    edge_scales = edge_scales or {}
+    if distance_scale <= 0.0 or any(scale <= 0.0 for scale in edge_scales.values()):
         raise ValueError("distance_scale must be positive.")
-    actions = route_actions(map_data, route, straight_threshold_degrees)
+    actions = route_actions(map_data, route, straight_threshold_degrees, sharp_turn_degrees)
     edges = {edge["id"]: edge for edge in map_data.get("edges", [])}
     transform = map_data["world_transform"]
 
@@ -96,8 +152,9 @@ def route_action_plan(
     travelled = 0.0
     for step in route.steps:
         geometry = _oriented_geometry(edges[step.edge_id], step.source, step.target)
-        travelled += _polyline_length(geometry, transform)
-        distances.append(travelled * distance_scale)
+        scale = edge_scales.get(step.edge_id, distance_scale)
+        travelled += _polyline_length(geometry, transform) * scale
+        distances.append(travelled)
     return list(zip(actions, distances))
 
 
@@ -191,6 +248,7 @@ def route_actions(
     map_data: dict[str, Any],
     route: Any,
     straight_threshold_degrees: float = 35.0,
+    sharp_turn_degrees: float | None = None,
 ) -> str:
     """Return one relative action per intermediate junction, then destination.
 
@@ -233,6 +291,7 @@ def route_actions(
                 outgoing_geometry,
                 transform,
                 straight_threshold_degrees,
+                sharp_turn_degrees,
             )
         )
 

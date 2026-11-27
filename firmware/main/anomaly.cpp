@@ -12,12 +12,19 @@ using namespace anomaly_model;
 
 // esp-dsp takes its ESP32-S3 SIMD path only for 16-byte-aligned data and
 // lengths (and matrix sizes) that are multiples of 4; export_c.py pads the
-// weights accordingly.
-constexpr int kEncInputs = kChannels * kReduced;
-static_assert(kEncInputs % 4 == 0 && kBottleneck % 4 == 0 && kHidden % 4 == 0, "padding");
-static_assert(kWindow % 4 == 0 && kConv1Patch % 4 == 0 && kReducedPadded % 4 == 0, "padding");
+// weights accordingly and the matrix multiplies run on rows padded to 4.
+constexpr int round4(int value) { return (value + 3) / 4 * 4; }
+
+constexpr bool fits(const ConvAutoencoder &m) {
+  return m.channels % 4 == 0 && m.bottleneck % 4 == 0 && m.hidden % 4 == 0 &&
+         m.features <= kMaxFeatures && m.window <= kMaxWindow && m.channels <= kMaxChannels &&
+         m.bottleneck <= kMaxBottleneck && m.hidden <= kMaxHidden;
+}
+static_assert(fits(kMotor) && fits(kIr), "conv model sizes");
+static_assert(kConv1Patch % 4 == 0 && kMaxWindowPadded % 4 == 0 && kMaxReducedPadded % 4 == 0,
+              "padding");
 static_assert(kGruHidden % 4 == 0 && kGruInputs % 4 == 0, "padding");
-static_assert(WindowGate::kCapacity >= kGruWindow && WindowGate::kCapacity >= kWindow &&
+static_assert(WindowGate::kCapacity >= kGruWindow && WindowGate::kCapacity >= kMaxWindow &&
                   WindowGate::kCapacity >= IrStuckDetector::kSpan,
               "gate capacity");
 
@@ -42,7 +49,7 @@ float sigmoid(float value) { return 1.0F / (1.0F + std::exp(-value)); }
 
 template <size_t N>
 void copy_weights(const float *source, float (&target)[N], size_t count = N) {
-  std::copy(source, source + count, target);
+  std::copy(source, source + std::min(count, N), target);
 }
 
 uint32_t elapsed_us(int64_t started) {
@@ -94,16 +101,18 @@ bool Persistence::update(bool exceed) {
 
 AnomalyDetector::AnomalyDetector(const ConvAutoencoder &model) : model_(model) {
   ConvWeights &w = weights_;
-  copy_weights(model.conv1_wt, w.conv1_wt);
-  copy_weights(model.conv1_b, w.conv1_b);
-  copy_weights(model.conv2_wt, w.conv2_wt);
-  copy_weights(model.conv2_b, w.conv2_b);
-  copy_weights(model.enc_w, w.enc_w);
-  copy_weights(model.enc_b, w.enc_b);
-  copy_weights(model.dec1_w, w.dec1_w);
-  copy_weights(model.dec1_b, w.dec1_b);
-  copy_weights(model.dec2_w, w.dec2_w, kWindow * model.features * kHidden);
-  copy_weights(model.dec2_b, w.dec2_b, kWindow * model.features);
+  const int channels = model.channels;
+  const int outputs = model.window * model.features;
+  copy_weights(model.conv1_wt, w.conv1_wt, kConv1Patch * channels);
+  copy_weights(model.conv1_b, w.conv1_b, channels);
+  copy_weights(model.conv2_wt, w.conv2_wt, 3 * channels * channels);
+  copy_weights(model.conv2_b, w.conv2_b, channels);
+  copy_weights(model.enc_w, w.enc_w, model.bottleneck * channels * ((model.window + 1) / 2));
+  copy_weights(model.enc_b, w.enc_b, model.bottleneck);
+  copy_weights(model.dec1_w, w.dec1_w, model.hidden * model.bottleneck);
+  copy_weights(model.dec1_b, w.dec1_b, model.hidden);
+  copy_weights(model.dec2_w, w.dec2_w, outputs * model.hidden);
+  copy_weights(model.dec2_b, w.dec2_b, outputs);
 }
 
 void AnomalyDetector::reset() {
@@ -118,9 +127,9 @@ void AnomalyDetector::add_sample(const float *raw, uint32_t elapsed_ms, bool mon
   for (int f = 0; f < model_.features; ++f) {
     window_[next_][f] = (raw[f] - model_.mean[f]) / model_.scale[f];
   }
-  next_ = (next_ + 1) % kWindow;
+  next_ = (next_ + 1) % model_.window;
   gate_.push(elapsed_ms, monitored);
-  if (gate_.count() < kWindow) {
+  if (gate_.count() < model_.window) {
     return;
   }
 
@@ -129,73 +138,76 @@ void AnomalyDetector::add_sample(const float *raw, uint32_t elapsed_ms, bool mon
   last_inference_us_ = elapsed_us(started);
   max_inference_us_ = std::max(max_inference_us_, last_inference_us_);
   has_score_ = true;
-  persistence_.update(gate_.monitored(kWindow) && score_ > model_.threshold);
+  persistence_.update(gate_.monitored(model_.window) && score_ > model_.threshold);
 }
 
-// Forward pass of ConvAutoencoder in scripts/models/train_autoencoder.py:
-// Conv1d(F,16,k3,p1) ReLU, Conv1d(16,16,k3,s2,p1) ReLU, Flatten,
-// Linear(160,8), Linear(8,32) ReLU, Linear(32,20*F); score = MSE vs the input.
-// Each conv is one esp-dsp matrix multiply of an im2col patch matrix
-// [time][tap * channels] by the exported [tap * channels][out channel] weight.
+// Forward pass of ConvAutoencoder in scripts/models/train_autoencoder.py
+// (W = window, C = channels, F = features):
+// Conv1d(F,C,k3,p1) ReLU, Conv1d(C,C,k3,s2,p1) ReLU, Flatten,
+// Linear(C*ceil(W/2),bottleneck), Linear(bottleneck,hidden) ReLU,
+// Linear(hidden,W*F); score = MSE vs the input. Each conv is one esp-dsp matrix
+// multiply of an im2col patch matrix [time][tap * channels] by the exported
+// [tap * channels][out channel] weight; rows past the window are zero padding
+// for the SIMD path.
 float AnomalyDetector::compute_score() const {
   const int features = model_.features;
-  float x[kWindow][kMaxFeatures];  // Time-ordered (oldest first) scaled window.
-  for (int t = 0; t < kWindow; ++t) {
-    const int slot = (next_ + t) % kWindow;
+  const int window = model_.window;
+  const int channels = model_.channels;
+  const int reduced = (window + 1) / 2;
+  float x[kMaxWindow][kMaxFeatures];  // Time-ordered (oldest first) scaled window.
+  for (int t = 0; t < window; ++t) {
+    const int slot = (next_ + t) % window;
     for (int f = 0; f < features; ++f) {
       x[t][f] = window_[slot][f];
     }
   }
 
-  alignas(16) float patch1[kWindow][kConv1Patch] = {};
-  for (int t = 0; t < kWindow; ++t) {
+  alignas(16) float patch1[kMaxWindowPadded][kConv1Patch] = {};
+  for (int t = 0; t < window; ++t) {
     for (int k = 0; k < 3; ++k) {
       const int source = t + k - 1;
-      if (source >= 0 && source < kWindow) {
+      if (source >= 0 && source < window) {
         std::copy(x[source], x[source] + features, &patch1[t][k * features]);
       }
     }
   }
-  alignas(16) float h1[kWindow][kChannels];
-  dspm_mult_f32(&patch1[0][0], weights_.conv1_wt, &h1[0][0], kWindow, kConv1Patch, kChannels);
-  for (int t = 0; t < kWindow; ++t) {
-    for (int c = 0; c < kChannels; ++c) {
-      h1[t][c] = std::max(h1[t][c] + weights_.conv1_b[c], 0.0F);
-    }
+  alignas(16) float h1[kMaxWindowPadded * kMaxChannels];  // [t][channel]
+  dspm_mult_f32(&patch1[0][0], weights_.conv1_wt, h1, round4(window), kConv1Patch, channels);
+  for (int i = 0; i < window * channels; ++i) {
+    h1[i] = std::max(h1[i] + weights_.conv1_b[i % channels], 0.0F);
   }
 
-  // Stride-2 conv; rows past kReduced are zero padding for the SIMD path.
-  alignas(16) float patch2[kReducedPadded][3 * kChannels] = {};
-  for (int t = 0; t < kReduced; ++t) {
+  // Stride-2 conv.
+  const int patch2_width = 3 * channels;
+  alignas(16) float patch2[kMaxReducedPadded * 3 * kMaxChannels] = {};  // [t][tap * channel]
+  for (int t = 0; t < reduced; ++t) {
     for (int k = 0; k < 3; ++k) {
       const int source = 2 * t + k - 1;
-      if (source >= 0 && source < kWindow) {
-        std::copy(h1[source], h1[source] + kChannels, &patch2[t][k * kChannels]);
+      if (source >= 0 && source < window) {
+        std::copy(h1 + source * channels, h1 + (source + 1) * channels,
+                  patch2 + t * patch2_width + k * channels);
       }
     }
   }
-  // Rows 0..kReduced-1 flattened are the time-major encoder input.
-  alignas(16) float h2[kReducedPadded][kChannels];
-  dspm_mult_f32(&patch2[0][0], weights_.conv2_wt, &h2[0][0], kReducedPadded, 3 * kChannels,
-                kChannels);
-  for (int t = 0; t < kReduced; ++t) {
-    for (int c = 0; c < kChannels; ++c) {
-      h2[t][c] = std::max(h2[t][c] + weights_.conv2_b[c], 0.0F);
-    }
+  // Rows 0..reduced-1 flattened are the time-major encoder input.
+  alignas(16) float h2[kMaxReducedPadded * kMaxChannels];
+  dspm_mult_f32(patch2, weights_.conv2_wt, h2, round4(reduced), patch2_width, channels);
+  for (int i = 0; i < reduced * channels; ++i) {
+    h2[i] = std::max(h2[i] + weights_.conv2_b[i % channels], 0.0F);
   }
 
-  alignas(16) float z[kBottleneck];
-  dense(weights_.enc_w, weights_.enc_b, &h2[0][0], z, kBottleneck, kEncInputs);
-  alignas(16) float hidden[kHidden];
-  dense(weights_.dec1_w, weights_.dec1_b, z, hidden, kHidden, kBottleneck);
-  for (float &value : hidden) {
-    value = std::max(value, 0.0F);
+  alignas(16) float z[kMaxBottleneck];
+  dense(weights_.enc_w, weights_.enc_b, h2, z, model_.bottleneck, channels * reduced);
+  alignas(16) float hidden[kMaxHidden];
+  dense(weights_.dec1_w, weights_.dec1_b, z, hidden, model_.hidden, model_.bottleneck);
+  for (int i = 0; i < model_.hidden; ++i) {
+    hidden[i] = std::max(hidden[i], 0.0F);
   }
 
   // Output is time-major [t0 f0, t0 f1, ...], like the flattened input.
-  const int outputs = kWindow * features;
-  alignas(16) float reconstruction[kWindow * kMaxFeatures];
-  dense(weights_.dec2_w, weights_.dec2_b, hidden, reconstruction, outputs, kHidden);
+  const int outputs = window * features;
+  alignas(16) float reconstruction[kMaxWindow * kMaxFeatures];
+  dense(weights_.dec2_w, weights_.dec2_b, hidden, reconstruction, outputs, model_.hidden);
   float squared_error = 0.0F;
   for (int j = 0; j < outputs; ++j) {
     const float error = reconstruction[j] - x[j / features][j % features];

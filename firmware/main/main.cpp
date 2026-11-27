@@ -48,6 +48,38 @@ constexpr uint32_t kSensorTimeoutMs = 250;     // Stop if the host stops sending
 // kJunctionWindowM of the distance the host gave for that junction.
 constexpr float kWheelRadiusM = 0.02F;     // E-puck wheel radius.
 constexpr float kJunctionWindowM = 0.10F;  // Accept a junction this far either side.
+// A junction pattern already present when the window opens (all three sensors
+// dark along a line as wide as the sensor spread, e.g. horizontal lines on the
+// stretched track image) says nothing about where the junction is: act on it
+// only this close to the expected distance, where junctions are taken.
+constexpr float kStaleJunctionLeadM = 0.03F;
+// A corner ('l'/'r': the map's turn is ~90 degrees onto a crossing line): slow
+// down, drive the wheel axle onto the junction, spin in place like the U-turn
+// until at least kCornerMinRad has turned and the center sensor is on a line,
+// and keep the speed down this far after it while the PD loop settles.
+constexpr float kCornerSpeed = 1.5F;       // rad/s approaching and settling.
+constexpr float kCornerSettleM = 0.04F;
+constexpr float kCornerSpinSpeed = 2.0F;   // rad/s, as the U-turn.
+constexpr float kCornerMinRad = 1.05F;     // 60 degrees.
+constexpr float kCornerMaxRad = 2.36F;     // 135 degrees: the line was not found.
+// When the sensors run off the far side of the crossing line, the axle is
+// still this far short of its centre (sensors ~3 cm ahead of the axle, minus
+// half a line width): drive on this far, then spin.
+constexpr float kCornerAxleM = 0.02F;
+// A bear turn ('<'/'>') onto a Y branch: the junction pattern clears while the
+// branch is still beside the old line, so the turn is held until the robot has
+// turned this far (encoder heading), at most kBearMaxRad.
+constexpr float kBearMinRad = 0.44F;  // 25 degrees.
+constexpr float kBearMaxRad = 1.4F;   // 80 degrees.
+// When the junction pattern appears, the sensors are at the crossing line's
+// near side: the axle is ~3 cm plus half a line width short of its centre.
+constexpr float kCornerEntryAxleM = 0.04F;
+// Within this distance of the destination, losing the line is arriving (the
+// sensors run past the end of the line or across a T's crossbar first): drive
+// straight on to the destination distance instead of searching.
+constexpr float kArrivalSlackM = 0.05F;
+constexpr float kArrivalSpeed = 1.0F;           // rad/s while running in blind.
+constexpr uint32_t kArrivalLimitMs = 3000;      // Then stop with LINE_LOST anyway.
 
 // U-turn: spin left in place, measuring the turn from the encoders, until at
 // least kUTurnMinRad has turned and the center sensor is back on the line.
@@ -98,6 +130,22 @@ struct Controller {
   bool junction_latched = false;
   unsigned junction_frames = 0;
   unsigned junction_clear_frames = 0;
+  // The next junction's window: open, and whether its pattern was already
+  // present when it opened and has not cleared since (kStaleJunctionLeadM).
+  bool junction_window_open = false;
+  bool junction_pattern_stale = false;
+  bool junction_started_dark = false;  // The pattern was present when the window opened.
+  float corner_exit_m = -1.0F;         // Where the sensors left the crossing line.
+  float corner_white_m = 0.0F;         // Start of the current all-white run.
+  float corner_entry_m = -1.0F;        // Where the junction pattern first appeared.
+  unsigned corner_white_frames = 0;
+  unsigned junction_gap_frames = 0;
+  bool bear_turn = false;        // Latched junction turn is a '<'/'>' bear.
+  float junction_heading_rad = 0.0F;  // Heading when the junction latched.
+  bool corner_turn = false;      // Corner turn under way or settling (kCornerSpeed).
+  bool corner_spinning = false;  // Spinning in place onto the crossing line.
+  float corner_heading_rad = 0.0F;
+  float corner_end_m = 0.0F;     // Speed limit lifts here once the turn is done.
   float previous_error = 0.0F;
   float filtered_error_rate = 0.0F;
   float last_turn_direction = -1.0F;
@@ -216,15 +264,21 @@ void update_detectors(float left, float right) {
   DetectionTiming &timing = g_detection;
   timing.elapsed_ms += static_cast<uint32_t>(std::lround(g_frame.dt_ms));
   const State state = g_controller.state;
-  if (state == State::kUTurn) {
+  // Spins in place: the U-turn and a corner turn (the frame's wheel targets
+  // have opposite signs; scripts/telemetry/prepare_telemetry.py tells them
+  // apart that way).
+  const bool spinning = state == State::kUTurn ||
+                        ((state == State::kJunctionLeft || state == State::kJunctionRight) &&
+                         (left < 0.0F) != (right < 0.0F));
+  if (spinning) {
     timing.u_turn_seen = true;
     timing.last_u_turn_ms = timing.elapsed_ms;
   }
-  // Commanded manoeuvres, and the line follower settling after a U-turn, are
+  // Commanded manoeuvres, and the line follower settling after a spin, are
   // not monitored (scripts/telemetry/prepare_telemetry.py).
   const bool settling = timing.u_turn_seen &&
       timing.elapsed_ms - timing.last_u_turn_ms < static_cast<uint32_t>(anomaly_model::kSettleMs);
-  const bool monitored = state != State::kAtDestination && state != State::kUTurn &&
+  const bool monitored = state != State::kAtDestination && !spinning &&
                          state != State::kFaultPullOver && state != State::kFaultStop &&
                          !settling;
 
@@ -304,6 +358,10 @@ void send_error(const char *reason) {
 }
 
 // Parse "<action>@<metres>" steps separated by commas, e.g. "R@0.265,D@0.779".
+// 'l'/'r' are corners (a sharp turn onto a crossing line, from the map): the
+// robot slows down and spins in place onto the new line at the junction.
+// '<'/'>' bear left/right onto a Y branch (a gentle turn, from the map): the
+// turn is held until the robot has turned kBearMinRad.
 // Distances are odometry distances from the start of the route; they must not
 // decrease, and the last step must be the destination 'D'. A 'U' (U-turn in
 // place) may only be the first step, e.g. "U@0.000,L@0.514,D@0.779". An
@@ -374,8 +432,8 @@ bool configure_route(char *steps) {
       return false;
     }
     const char action = token[0];
-    if ((action != 'L' && action != 'S' && action != 'R' && action != 'D' &&
-         action != 'U') ||
+    if ((action != 'L' && action != 'S' && action != 'R' && action != 'l' && action != 'r' &&
+         action != '<' && action != '>' && action != 'D' && action != 'U') ||
         token[1] != '@' || (action == 'U' && length != 0)) {
       return false;
     }
@@ -416,6 +474,9 @@ bool configure_route(char *steps) {
   g_controller.junction_latched = false;
   g_controller.junction_frames = 0;
   g_controller.junction_clear_frames = 0;
+  g_controller.junction_window_open = false;
+  g_controller.corner_turn = false;
+  g_controller.corner_spinning = false;
   g_controller.previous_error = 0.0F;
   g_controller.filtered_error_rate = 0.0F;
   g_controller.turn_search_ms = 0;
@@ -606,7 +667,20 @@ void check_route_distance() {
   }
 }
 
-void maybe_enter_junction(bool left_active, bool right_active) {
+// Heading for a corner: the next step is a corner ('l'/'r', from the map).
+// (A pattern already present at an 'L'/'R' window, e.g. on the base track's
+// circle, is an ordinary turn delayed to kStaleJunctionLeadM.)
+bool approaching_corner() {
+  const Controller &c = g_controller;
+  if (c.junction_latched || !c.junction_window_open || !c.route_loaded) {
+    return false;
+  }
+  const char action = c.route[c.route_index].action;
+  return action == 'l' || action == 'r';
+}
+
+// ``line_seen``: any sensor on a line (all three white: past the line's end).
+void maybe_enter_junction(bool left_active, bool right_active, bool line_seen) {
   if (g_controller.junction_latched || !g_controller.route_loaded) {
     return;
   }
@@ -614,23 +688,95 @@ void maybe_enter_junction(bool left_active, bool right_active) {
   const bool in_window =
       next.action != 'D' &&
       std::fabs(g_controller.distance_m - next.distance_m) <= kJunctionWindowM;
+  const bool pattern = left_active && right_active;
 
-  if (in_window && left_active && right_active) {
+  if (in_window && !g_controller.junction_window_open) {
+    g_controller.junction_window_open = true;
+    g_controller.junction_pattern_stale = pattern;
+    g_controller.junction_started_dark = pattern;
+    g_controller.corner_exit_m = -1.0F;
+    g_controller.corner_entry_m = -1.0F;
+    g_controller.corner_white_frames = 0;
+    g_controller.junction_gap_frames = 0;
+  }
+  if (in_window && approaching_corner()) {
+    // A corner: spin once the axle is on the crossing line, from odometry or
+    // from where the sensors ran off its far side, whichever comes first.
+    // Off the line for kJunctionReleaseFrames in a row (a single white frame
+    // is drift on a wide line): it started where the white run started.
+    if (line_seen) {
+      g_controller.corner_white_frames = 0;
+    } else if (g_controller.corner_white_frames++ == 0) {
+      g_controller.corner_white_m = g_controller.distance_m;
+    }
+    if (g_controller.corner_white_frames >= kJunctionReleaseFrames &&
+        g_controller.corner_exit_m < 0.0F) {
+      g_controller.corner_exit_m = g_controller.corner_white_m;
+    }
+    // A pattern appearing in the window: the sensors reached the crossing
+    // line's near side (confirmed like a junction).
+    if (!g_controller.junction_started_dark && pattern) {
+      if (++g_controller.junction_frames >= kJunctionConfirmFrames &&
+          g_controller.corner_entry_m < 0.0F) {
+        g_controller.corner_entry_m = g_controller.distance_m;
+      }
+    } else {
+      g_controller.junction_frames = 0;
+    }
+    const bool on_corner =
+        g_controller.distance_m >= next.distance_m ||
+        (g_controller.corner_exit_m >= 0.0F &&
+         g_controller.distance_m >= g_controller.corner_exit_m + kCornerAxleM) ||
+        (g_controller.corner_entry_m >= 0.0F &&
+         g_controller.distance_m >= g_controller.corner_entry_m + kCornerEntryAxleM);
+    if (on_corner) {
+      ++g_controller.route_index;
+      g_controller.junction_window_open = false;
+      g_controller.junction_latched = true;
+      g_controller.junction_clear_frames = 0;
+      g_controller.turn_search_ms = 0;
+      g_controller.corner_turn = true;
+      g_controller.corner_spinning = true;
+      g_controller.corner_heading_rad = g_controller.heading_rad;
+      g_controller.corner_end_m = 1e9F;
+      g_controller.junction_frames = 0;
+      g_controller.state = next.action == 'L' || next.action == 'l' ? State::kJunctionLeft
+                                                                      : State::kJunctionRight;
+    }
+    return;
+  }
+  if (pattern) {
+    g_controller.junction_gap_frames = 0;
+  } else if (++g_controller.junction_gap_frames >= kJunctionReleaseFrames) {
+    g_controller.junction_pattern_stale = false;  // A new pattern can start.
+  }
+  // A Y branch ('<'/'>') appears gradually, beside the old line: like a stale
+  // pattern, its turn waits for the junction distance (less the lead).
+  const bool bear = next.action == '<' || next.action == '>';
+  const bool due = (!g_controller.junction_pattern_stale && !bear) ||
+                   g_controller.distance_m >= next.distance_m - kStaleJunctionLeadM;
+
+  if (in_window && pattern && due) {
     ++g_controller.junction_frames;
     if (g_controller.junction_frames >= kJunctionConfirmFrames) {
       ++g_controller.route_index;
+      g_controller.junction_window_open = false;
       g_controller.junction_latched = true;
       g_controller.junction_clear_frames = 0;
       g_controller.turn_search_ms = 0;
 
+      g_controller.bear_turn = next.action == '<' || next.action == '>';
+      g_controller.junction_heading_rad = g_controller.heading_rad;
       switch (next.action) {
         case 'L':
+        case '<':
           g_controller.state = State::kJunctionLeft;
           break;
         case 'S':
           g_controller.state = State::kJunctionStraight;
           break;
         case 'R':
+        case '>':
           g_controller.state = State::kJunctionRight;
           break;
       }
@@ -640,21 +786,58 @@ void maybe_enter_junction(bool left_active, bool right_active) {
   }
 }
 
+// Spin in place for a corner turn; true when it answered the frame.
+bool run_corner_turn(uint32_t sequence, bool center_active) {
+  Controller &c = g_controller;
+  if (!c.corner_spinning) {
+    return false;
+  }
+  const float turned = std::fabs(c.heading_rad - c.corner_heading_rad);
+  if (turned >= kCornerMinRad && center_active) {
+    c.corner_spinning = false;
+    c.junction_latched = false;
+    c.junction_clear_frames = 0;
+    c.corner_end_m = c.distance_m + kCornerSettleM;
+    c.state = State::kFollowing;
+    c.previous_error = 0.0F;
+    c.filtered_error_rate = 0.0F;
+    c.turn_search_ms = 0;
+    return false;  // Follow the new line from this frame.
+  }
+  if (turned > kCornerMaxRad) {
+    c.corner_spinning = false;
+    c.state = State::kLineLost;
+    c.route_loaded = false;
+    notify_safety_stop();
+    send_response(sequence, 0.0F, 0.0F);
+    return true;
+  }
+  const float direction = c.state == State::kJunctionLeft ? 1.0F : -1.0F;  // Left-positive.
+  send_response(sequence, -direction * kCornerSpinSpeed, direction * kCornerSpinSpeed);
+  return true;
+}
+
 void maybe_leave_junction(bool left_active, bool right_active) {
-  if (!g_controller.junction_latched) {
+  if (!g_controller.junction_latched || g_controller.corner_spinning) {
     return;
   }
 
-  if (left_active && right_active) {
+  const float turned = std::fabs(g_controller.heading_rad - g_controller.junction_heading_rad);
+  const bool bearing = g_controller.bear_turn && turned < kBearMinRad;
+  if (g_controller.bear_turn && turned > kBearMaxRad) {
+    g_controller.junction_clear_frames = kJunctionReleaseFrames;  // Release now.
+  } else if ((left_active && right_active) || bearing) {
     g_controller.junction_clear_frames = 0;
   } else {
     ++g_controller.junction_clear_frames;
-    if (g_controller.junction_clear_frames >= kJunctionReleaseFrames) {
-      g_controller.junction_latched = false;
-      g_controller.junction_clear_frames = 0;
-      g_controller.state = State::kFollowing;
-      g_controller.turn_search_ms = 0;
-    }
+  }
+  if (g_controller.junction_clear_frames >= kJunctionReleaseFrames) {
+    g_controller.bear_turn = false;
+    g_controller.corner_end_m = g_controller.distance_m + kCornerSettleM;
+    g_controller.junction_latched = false;
+    g_controller.junction_clear_frames = 0;
+    g_controller.state = State::kFollowing;
+    g_controller.turn_search_ms = 0;
   }
 }
 
@@ -705,7 +888,10 @@ void process_sensor_frame(char *line) {
     return;
   }
 
-  maybe_enter_junction(left_active, right_active);
+  maybe_enter_junction(left_active, right_active, strength >= kMinLineStrength);
+  if (run_corner_turn(sequence, center >= kMinLineStrength)) {
+    return;
+  }
   maybe_leave_junction(left_active, right_active);
   check_route_distance();
 
@@ -744,6 +930,17 @@ void process_sensor_frame(char *line) {
   } else {
     // Line lost: turn slowly towards where it was last seen, for a bounded time.
     g_controller.turn_search_ms += static_cast<uint32_t>(dt_ms);
+    const RouteStep &next = g_controller.route[g_controller.route_index];
+    const bool arriving =
+        next.action == 'D' && g_controller.distance_m >= next.distance_m - kArrivalSlackM;
+    if (arriving && g_controller.turn_search_ms <= kArrivalLimitMs) {
+      send_response(sequence, kArrivalSpeed, kArrivalSpeed);
+      return;
+    }
+    if (approaching_corner() && g_controller.turn_search_ms <= kTurnSearchLimitMs) {
+      send_response(sequence, kCornerSpeed, kCornerSpeed);  // Onto the corner.
+      return;
+    }
     if (g_controller.turn_search_ms > kTurnSearchLimitMs) {
       g_controller.state = State::kLineLost;
       g_controller.route_loaded = false;
@@ -759,7 +956,15 @@ void process_sensor_frame(char *line) {
   }
 
   const float turn_amount = std::min(1.0F, std::fabs(error));
-  const float max_speed = g_controller.max_speed;
+  float max_speed = g_controller.max_speed;
+  // Slow down for a 90-degree corner: approaching one (a turn at a junction
+  // whose pattern was already present) and until it is settled.
+  if (g_controller.corner_turn && g_controller.distance_m > g_controller.corner_end_m) {
+    g_controller.corner_turn = false;
+  }
+  if (approaching_corner() || g_controller.corner_turn) {
+    max_speed = std::min(max_speed, kCornerSpeed);
+  }
   const float base_speed = max_speed - max_speed * (1.0F - kMinSpeedRatio) * turn_amount;
   float steering = kKp * error + kKd * g_controller.filtered_error_rate;
   steering = std::clamp(steering, -kMaxSteering, kMaxSteering);

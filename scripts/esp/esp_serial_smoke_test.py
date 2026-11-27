@@ -1,8 +1,10 @@
 """Exercise the ESP32-S3 line-control protocol over its USB serial port."""
 
 import argparse
+import json
 import math
 import time
+from pathlib import Path
 
 import serial
 
@@ -78,7 +80,19 @@ def check(condition, passed, failed):
     print(f"PASS {passed}")
 
 
+def deployed_windows(model_dir="models/esp-conv-v2"):
+    """Window of the deployed motor and IR conv models (firmware/main/anomaly_model.h)."""
+    from scripts.models.train_autoencoder import MODELS, model_window
+
+    root = Path(__file__).resolve().parents[2]
+    config = json.loads((root / model_dir / "config.json").read_text(encoding="utf-8"))
+    return {name: model_window(config, name) for name in MODELS}
+
+
 def main():
+    # Read before the port opens: the import is slow enough for the ESP to
+    # report a lost link mid-test.
+    windows = deployed_windows()
     parser = argparse.ArgumentParser(
         description=(
             "Check ESP serial commands, PD response, distance-gated junction "
@@ -140,6 +154,7 @@ def main():
         )
 
         esp.frame(CENTERED, 0.10)
+        esp.frame(CENTERED, 0.21)  # The window opens on a plain line.
         esp.frame(ALL_DARK, 0.28)
         junction = esp.frame(ALL_DARK, 0.29)
         check(
@@ -237,19 +252,94 @@ def main():
             f"Default speed not restored: {default['raw']}",
         )
 
-        # Anomaly scores appear once a 20-sample window exists. A sample
-        # needs a wheel speed, so the first frame of a route adds none.
-        esp.route("D@5.0")
-        frames = [esp.frame(CENTERED, 0.001 * i) for i in range(22)]
+        # A junction pattern already present when the window opens (a wide
+        # line) is not where the junction is: turn only 3 cm before it.
+        esp.route("L@0.30,D@0.60")
+        esp.frame(CENTERED, 0.0)
+        esp.frame(ALL_DARK, 0.15)
+        waiting = esp.frame(ALL_DARK, 0.21)
+        esp.frame(ALL_DARK, 0.272)
+        turning = esp.frame(ALL_DARK, 0.275)
         check(
-            frames[19]["ir_score"] == -1.0
-            and frames[19]["motor_score"] == -1.0
-            and frames[20]["ir_score"] >= 0.0
-            and frames[20]["motor_score"] >= 0.0
-            and frames[21]["motor_alarm"] == 0
-            and frames[21]["ir_alarm"] == 0,
-            f"anomaly scores start after a full window: {frames[21]['raw']}",
-            f"Anomaly scores not reported as expected: {frames[18]['raw']} / {frames[21]['raw']}",
+            waiting["state"] == "FOLLOWING" and waiting["route_index"] == 0
+            and turning["state"] == "TURN_LEFT"
+            and turning["left_speed"] < turning["right_speed"],
+            f"pattern present at window start: turn 3 cm before the junction: "
+            f"{turning['raw']}",
+            f"Stale junction pattern handled wrongly: {waiting['raw']} / {turning['raw']}",
+        )
+
+        # Bear ('<', a Y branch from the map): the turn holds after the
+        # junction pattern clears, until 25 degrees have turned.
+        esp.route("<@0.30,D@0.60")
+        esp.frame(CENTERED, 0.0)
+        esp.frame(CENTERED, 0.21)
+        early = esp.frame(ALL_DARK, 0.25)  # Too early for a Y branch.
+        esp.frame(ALL_DARK, 0.28)
+        esp.frame(ALL_DARK, 0.29)
+        for distance in (0.30, 0.31, 0.32, 0.33):
+            holding = esp.frame(CENTERED, distance, 0.2)
+        released = [esp.frame(CENTERED, 0.34 + 0.01 * i, 0.5) for i in range(3)][-1]
+        check(
+            early["state"] == "FOLLOWING"
+            and holding["state"] == "TURN_LEFT" and released["state"] == "FOLLOWING",
+            f"bear: turn held until 25 degrees, then follow: {released['raw']}",
+            f"Bear turn incorrect: {holding['raw']} / {released['raw']}",
+        )
+
+        # Corner ('l', from the map): slow down, spin in place once the axle
+        # is on the crossing line, then follow it once 60 degrees have turned.
+        ack = esp.route("l@0.30,D@0.60")
+        esp.frame(CENTERED, 0.0)
+        slow = esp.frame(CENTERED, 0.21)
+        esp.frame(ALL_DARK, 0.26)
+        esp.frame(ALL_DARK, 0.27)
+        corner = esp.frame(ALL_DARK, 0.305)
+        midway = esp.frame(ALL_LIGHT, 0.305, 0.5)
+        done = esp.frame(CENTERED, 0.305, 1.2)
+        check(
+            ack == "A,ROUTE_OK"
+            and abs(slow["left_speed"] - 1.5) <= 0.05
+            and corner["state"] == "TURN_LEFT" and corner["route_index"] == 1
+            and corner["left_speed"] < 0.0 < corner["right_speed"]
+            and midway["state"] == "TURN_LEFT"
+            and done["state"] == "FOLLOWING"
+            and max(done["left_speed"], done["right_speed"]) <= 1.5 + 0.01,
+            f"corner: slow, spin in place, follow the new line: {done['raw']}",
+            f"Corner turn incorrect: {slow['raw']} / {corner['raw']} / {midway['raw']} / "
+            f"{done['raw']}",
+        )
+
+        # The sensors leave the line in the last few cm (past a line's end or
+        # across a T's crossbar): run straight on to the destination.
+        esp.route("D@0.60")
+        esp.frame(CENTERED, 0.0)
+        esp.frame(CENTERED, 0.50)
+        blind = esp.frame(ALL_LIGHT, 0.56)
+        arrived = esp.frame(ALL_LIGHT, 0.61)
+        check(
+            blind["state"] == "FOLLOWING"
+            and abs(blind["left_speed"] - blind["right_speed"]) <= 0.01
+            and blind["left_speed"] > 0.0
+            and arrived["state"] == "AT_DEST",
+            f"line lost in the last 5 cm: straight on to the destination: {arrived['raw']}",
+            f"Arrival run-in incorrect: {blind['raw']} / {arrived['raw']}",
+        )
+
+        # Anomaly scores appear once each model's window exists (the
+        # deployed models' windows; motor and IR may differ). A sample needs a
+        # wheel speed, so the first frame of a route adds none.
+        last = max(windows.values()) + 1
+        esp.route("D@5.0")
+        frames = [esp.frame(CENTERED, 0.001 * i) for i in range(last + 1)]
+        check(
+            all(frames[w - 1][f"{name}_score"] == -1.0 and frames[w][f"{name}_score"] >= 0.0
+                for name, w in windows.items())
+            and frames[last]["motor_alarm"] == 0
+            and frames[last]["ir_alarm"] == 0,
+            f"anomaly scores start after a full window ({windows}): {frames[last]['raw']}",
+            f"Anomaly scores not reported as expected for windows {windows}: "
+            f"{[frames[w - 1]['raw'] for w in windows.values()]} / {frames[last]['raw']}",
         )
         port.write(b"Q\n")
         timing = read_line(port, 2.0)

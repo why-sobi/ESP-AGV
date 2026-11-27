@@ -253,7 +253,38 @@ Once a surveyed map exists, the planner can be called with
     retrained with the full budget. The search found smaller motor conv and
     GRU models that are 2-3x faster and detect as well or better; the
     smaller IR model trades 2/18 healthy test alarms for 5 more detections.
-    They are not deployed yet (`reports/arch-search-v1`).
+    (`reports/arch-search-v1`).
+21. **Deploy the motor conv and GRU winners, keep the IR model
+    (2026-11-27).** Both are better or equal on every measure; the IR
+    candidate adds healthy alarms, so it is left for the user. The motor and
+    IR models now use different windows (10 and 20), so each conv model
+    carries its own sizes (`models.<name>` in `esp-conv-v2`, fields of
+    `ConvAutoencoder` in the header) and the firmware sizes buffers for the
+    largest. Result: 1.18 → 0.81 ms per frame, same detections offline, live
+    behaviour unchanged.
+22. **Reconnect COM3 in the host, not the ESP (2026-11-27).** The ESP already
+    stops on `LINK_LOST` and resumes when frames return; the controller
+    reopens the port (up to 30 s, Webots paused) and resends the frame.
+23. **Per-edge odometry scales (2026-11-27).** Driving edge-002 showed the
+    single 0.92 scale was an average of ~0.973 (long edges) and ~0.836 (the
+    loop): routes with two long edges stopped 8-10 cm short. One scale per
+    edge type fits all 237 measured legs within 0.7 cm and also brings the
+    standard routes' stops closer. `avoid_edges` drives the parallel edges
+    without changing the planner.
+24. **Corners are marked by the map, not guessed by the ESP (2026-11-27).**
+    The ESP cannot tell a 90° corner onto a straight line from the base
+    track's 90° junctions onto its circle from the sensors; the host measures
+    the turn 4 cm along each edge and sends `l`/`r` at ≥85° (base track
+    61-76°, track2 90°). Guessing from an already-dark pattern broke the base
+    track's circle junctions. Corners spin in place like the U-turn and, like
+    it, are not monitored.
+25. **Y branches are bear turns, also marked by the map (2026-11-27).** A
+    45° branch peels off beside the old line, so the junction pattern clears
+    before the robot has left it. Holding every turn for a minimum angle would
+    change the base track's turns (some release after 5°), so the host sends
+    `<`/`>` for 35-58° and only those wait for the junction distance and
+    hold until 25° have turned. Each track gets per-edge odometry scales from
+    its own healthy runs (mid-edge ratios).
 
 ## Failure points observed
 
@@ -319,18 +350,17 @@ Once a surveyed map exists, the planner can be called with
 
 ## Remaining work
 
-1. Validate the reviewed graph semantics and branch choices at all junctions,
-   including the parallel edges (edge-002, edge-004), which shortest-path
-   routes never use.
+1. Validate the reviewed graph semantics and branch choices at all junctions
+   (the parallel edges edge-002 and edge-004 are now driven with
+   `avoid_edges`; edge-003 has never been driven).
 2. Refine the generated graph and names against the visualized path; pixel
    skeleton extraction can merge nearby segments or produce parallel edges.
 3. Keep route tracking/localization behind an interface that can be replaced
    for hardware; the current Supervisor controller is simulation-only.
 4. Detect IR drift and light IR noise (a level check or a cross-sensor
    model; a one-step GRU does not help).
-5. Deploy the architecture-search winners (configurable conv window and
-   channel count in the export and firmware).
-6. Reconnect when COM3 drops mid-run.
+5. Done: architecture-search winners (motor conv, GRU) deployed.
+6. Done: reconnect when COM3 drops mid-run (real unplug test to do).
 7. Done: healthy and fault runs under ESP control, models on the ESP that
    agree with Python, the response to an alarm (pull over, stop, notify),
    weak-motor and stuck-sensor detection, and evidence for the architectures

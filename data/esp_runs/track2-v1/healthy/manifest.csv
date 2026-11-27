@@ -1,0 +1,9 @@
+file,start_node,destination_node,wheel_speed_rad_s,status,notes,control_mode,round_trip,seed
+route-20261127-151114-A-2.5.csv,node-002,node-003,2.5,failed,"controller did not report completion (non-zero exit or timeout); 30.5 s; 26 line-loss samples (25 after 0.5 s, longest run 24); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-151137-A-3.5.csv,node-002,node-003,3.5,healthy,"23.0 s; 27 line-loss samples (25 after 0.5 s, longest run 23); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-151155-B-2.5.csv,node-004,node-003,2.5,failed,"controller did not report completion (non-zero exit or timeout); 9.2 s; 24 line-loss samples (24 after 0.5 s, longest run 24); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-151207-B-3.5.csv,node-004,node-003,3.5,failed,"controller did not report completion (non-zero exit or timeout); 6.8 s; 25 line-loss samples (24 after 0.5 s, longest run 24); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-151218-C-2.5.csv,node-001,node-003,2.5,failed,"controller did not report completion (non-zero exit or timeout); 9.2 s; 24 line-loss samples (24 after 0.5 s, longest run 24); 0 irregular intervals; max centerline error 0.025 m",esp32,1,
+route-20261127-151230-C-3.5.csv,node-001,node-003,3.5,failed,"controller did not report completion (non-zero exit or timeout); 6.8 s; 25 line-loss samples (24 after 0.5 s, longest run 24); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-151240-D-2.5.csv,node-004,node-003,2.5,healthy,"77.9 s; 2 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.024 m",esp32,1,
+route-20261127-151331-D-3.5.csv,node-004,node-003,3.5,healthy,"57.7 s; 2 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.025 m",esp32,1,

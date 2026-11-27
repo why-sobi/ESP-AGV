@@ -85,6 +85,7 @@ Webots applies the wheel targets; every frame is logged to CSV
 | esp-dsp deployment | All detectors on Espressif's SIMD library, weights in RAM | 4.4 ms → 1.05 ms per frame for three models instead of two |
 | Fixes from live runs | Stuck rule needs driving (not another sensor moving); pull-over side from the map | Stuck IR stops 2/4 → 3/4 live (4th unobservable); no pull-over onto the loop's other line |
 | Evidence for architectures | Latency of 967 architectures measured on the ESP; INT8/INT16 benchmark; Optuna search | Float32 esp-dsp 2.5× faster than ESP-DL INT8; smaller models found that are 2-3× faster and detect as well or better |
+| Search winners deployed | Per-model conv sizes in export and firmware; `esp-conv-v2` (motor) + `esp-gru-v2`; COM3 reconnect | 1.18 → 0.81 ms per frame; same 94/110 of 120 offline; live 15/16 as expected (fault-stop-v5) |
 
 ## 3. Navigation and control
 
@@ -114,8 +115,10 @@ Round trips run the return leg after a 1 s unload, starting with a U-turn.
 
 - **Junctions:** taken 2.5-3.6 cm before the node; the all-dark pattern is
   only accepted within ±0.10 m of the expected odometry distance. Wheel
-  odometry reads ~0.92 of the map length (the robot cuts corners), so
-  distances are scaled by 0.92.
+  odometry reads less than the map length (the robot cuts corners): ~0.973
+  on the long edges and ~0.836 on the curved loop. A single 0.92 fits every
+  standard route (one long edge plus one loop edge) but stops 8-10 cm short
+  on two long edges, so distances now use these per-edge scales (section 11).
 - **Destination:** stops 1.0-1.4 cm from the node (one way), 0.2-1.3 cm on
   return legs; maximum path error 2.4-2.5 cm (same as the Supervisor
   controller).
@@ -352,6 +355,154 @@ last value and never see a weak wheel.
 | Motor weak right 30% | `FAULT_STOP` 4/4, 8-9 cm off the line | GRU 0.1-0.2 s (4.2 s, U-turn) | 4/4 |
 | IR stuck centre | `FAULT_STOP` 2/4, ran off the track 1/4, `LINE_LOST` 1/4 | stuck 1.1-1.7 s | 3/4 |
 
+### fault-stop-v5 (search winners deployed, 2026-11-27)
+
+Same routes, seeds, onsets and faults as fault-stop-v3, with the smaller motor
+conv and GRU (section 16):
+
+| Fault (4 runs) | Ends in | First alarm after onset | Notified |
+|---|---|---|---|
+| Healthy | `AT_DEST` 4/4, no alarm frame | - | - |
+| Motor weak right 20% | `FAULT_STOP` 4/4 | 0.12-0.24 s (3.8 s, onset in the U-turn); v3 0.15-0.34 s (5.4 s) | 4/4 |
+| Motor weak right 30% | `FAULT_STOP` 4/4 | 0.12-0.14 s (3.9 s, U-turn); v3 0.12-0.21 s (4.2 s) | 4/4 |
+| IR stuck centre | `FAULT_STOP` 3/4, `LINE_LOST` 1/4 (D, onset in the U-turn) | 0.7-1.1 s | 4/4 |
+
+12 notifications for the 12 stops; no alarm before an onset.
+
+### parallel-edges-v1/v2 (edge-002 and edge-004, 2026-11-27)
+
+The mission option `avoid_edges` plans without the listed edges, so the
+shortest path takes the other edge of a parallel pair. Round trips at 2.5 and
+3.5 rad/s, no faults:
+
+| Edges | Routes | Global scale 0.92 (v1) | Per-edge scales (v2) |
+|---|---|---|---|
+| edge-004 (avoid edge-005) | B: right turn onto it at node-002; D: left at node-003 | 4/4 complete, stops 0.1-1.6 cm | 4/4, stops 0.1-1.5 cm |
+| edge-002 (avoid edge-003/004/005) | A: straight onto it at node-004; C: left at node-001 | 0/4: `AT_DEST` 8.4-10 cm before the node | 4/4, stops 0.3-0.9 cm |
+| Standard A-D, 3.0 rad/s | | | 4/4, stops 0.1-1.4 cm, no alarm frame |
+
+- **Cause of the v1 failures:** odometry reads ~0.973 of the map length on
+  the long edges (001, 002, 006) and ~0.836 on the loop (004, 005); 0.92 was
+  their average on routes that combine one of each. A least-squares fit over
+  237 legs (healthy ESP runs plus these) of one scale per edge type predicts
+  every leg's arrival within 0.7 cm; it is the mission's
+  `esp_odometry_scale_by_edge` (edge-003, never driven, keeps 0.92).
+- Max path error 2.4-2.5 cm, as on the standard routes.
+- **Alarms:** none on edge-004. On edge-002 the motor conv model raises
+  short persistent alarms (≤0.29 s, below the 2 s fault-stop hold, so no
+  stop) at the left turn from edge-001 onto edge-002 and on arrival after
+  edge-002: manoeuvres missing from the training data. The v1 motor model
+  does the same (≤0.35 s). Adding edge-002 runs to the healthy data would
+  remove them.
+
+### track2: a second, unseen track (2026-11-27)
+
+`scripts/maps/make_track.py` draws `maps/image/track2.png` in the base
+track's style (40 px lines, rounded corners, T-junctions only; a rounded
+rectangle split by a vertical bar, with a horizontal bar from its middle to
+the right side), converts it to `maps/paths/track2.json` and copies the base
+track's world transform. `simulation/worlds/Self Diagnosis AGV track2.wbt`
+shows it; `maps/routes/mission-track2.json` selects the map (`map_path`),
+defines routes A-D covering all six edges (`routes`, with `avoid_edges`)
+and uses one odometry scale, 0.973 (the base track's long-edge value, not
+tuned here). Nothing was trained on this track.
+
+**First run (`track2-v1`, firmware as on the base track):** healthy 3/8.
+Detection carried over: on the three routes that navigated, 12/12 faults
+stopped and notified, no pre-onset alarm, false alarms ≤0.32 s. Navigation
+failed on geometry the base track never has:
+- **Junction approached along a horizontal line (B, C):** the 2400 × 1800
+  image is stretched onto the 1 m square arena, so horizontal lines are 2.2 cm
+  thick and vertical ones 1.7 cm. On a horizontal line all three ground
+  sensors read dark all the time, which is the junction pattern, so the ESP
+  turned as soon as the ±0.10 m window opened, ~11 cm early.
+- **Destination reached from the stem of a T (A 2.5 return):** the front
+  sensors cross the line and see white ~4 cm before the stop distance; the
+  750 ms line search ran out 0.4 mm before it (`LINE_LOST`).
+- **90-degree corners onto a straight crossing line (B, C):** the ordinary
+  latched turn (error ±1) has a ~5.4 cm radius at 3.5 rad/s and misses them.
+  The base track's turns (61-76° measured 4 cm out) curve away onto its
+  circle.
+
+**Navigation fixes (firmware and host):**
+- A junction pattern already present when the window opens waits until 3 cm
+  before the junction distance (base-track junctions are taken 2.5-3.6 cm
+  before the node).
+- Line lost within 5 cm of the destination: straight on at 1 rad/s to the
+  stop distance (≤3 s).
+- Corners: the host sends `l`/`r` for turns of ≥85° measured 4 cm along each
+  edge (track2's 90° corners; none on the base track, whose turns measure
+  61-76°: its circle leaves at 90° but curves away). The ESP slows to
+  1.5 rad/s, spins in place once the axle is on the crossing line (junction
+  distance, 4 cm after the pattern appears, or 2 cm after the sensors run off
+  the line's far side), and follows once ≥60° has turned with the centre
+  sensor on a line.
+- Corner spins are not monitored, like the U-turn (both firmware and the
+  Python reference; a spin is a junction turn with opposite-sign wheel
+  targets): before that, the motor conv and GRU alarmed for up to 1.86 s on
+  healthy right-hand corner spins, near the 2 s stop hold.
+- Tried and dropped: treating any already-dark L/R junction as a corner
+  spun the robot at the base track's circle junctions, where the pattern is
+  often present when the window opens.
+
+**Results with the fixes (`nav-fix-v1`, `track2-v2`):**
+
+| Runs | Result |
+|---|---|
+| Base track A-D × 2.5/3.5, round trips | 8/8, stops 0.1-1.5 cm |
+| Base track over edge-002 and edge-004 | 8/8 |
+| track2 A-D × 2.5/3.5, round trips | 8/8 (was 3/8), stops 0.1-1.8 cm; longest healthy alarm 0.42 s (was 1.86 s) |
+| track2 faults, A/B/C/D, 20 runs | `FAULT_STOP` 20/20, every stop notified, none before onset; motor 0.10-0.27 s, dead IR 0.4-0.5 s, stuck IR 0.9-1.1 s |
+| Replay of the 10 base runs | identical wheel targets and alarms |
+| ESP smoke test | 47 checks, incl. stale junction, corner and blind arrival |
+
+Max path error 2.5 cm on both tracks. Logged ESP alarms on the track2 runs
+match the Python reference (spin gating included) on every frame.
+
+### track3: the hard course (2026-11-27)
+
+`python -m scripts.maps.make_track --track track3`: an octagonal outer loop
+(every corner two true 45° bends), a Y junction (a branch leaving the top line
+at 45°), a hairpin (180°, ~6.3 cm radius), a tight 90° curve (~4 cm radius) and
+a cross bar; 4 junctions, 6 edges. Routes A-D
+(`maps/routes/mission-track3.json`) cover every edge: A down the Y branch,
+through the hairpin and the tight curve; B bears onto and off the Y branch; C
+straight through the Y along the octagon; D the cross bar, a corner and the
+long bottom loop. Nothing was trained on this track.
+
+**First run (`track3-v1`):** healthy 2/8 (only D). The PD loop held the
+hairpin and the tight curve (path error ≤2.2 cm); the failures were:
+- **Odometry:** one scale (0.973) stopped A and C ~6-7 cm past the node. Mid-
+  edge odometry ratios on this track are 0.86-0.94 on the polyline/curved
+  edges and 1.00 on the straight cross bar; they are now the mission's
+  per-edge scales.
+- **Y junction:** the turn onto the 45° branch released after two frames (the
+  pattern clears while the branch is still beside the old line) and the robot
+  followed the top line.
+- **Turn classification:** the skeleton puts the Y's node ~4 cm past the
+  branch point, so the angle at the node's neighbours called C's straight
+  pass a turn.
+
+**Fixes:** L/R/S/corner are classified from the angle 4 cm along each edge
+(new routes only; replays of older runs keep the old commands, and the base
+track's commands are unchanged apart from edge-002's near-straight junction,
+now `S`). Turns of 35-58° are sent as `<`/`>` (bear): the ESP waits for the
+junction distance less 3 cm and holds the turn until it has turned 25°.
+
+**Results (`track3-v2`, final firmware):**
+
+| Runs | Result |
+|---|---|
+| track3 A-D × 2.5/3.5, round trips | 8/8, stops 0.3-2.0 cm, max path error 2.5 cm |
+| track3 faults, A-D at 3.0, 16 runs | `FAULT_STOP` 16/16, notified, none before onset; motor 0.10-0.23 s, dead IR 0.29-0.50 s, stuck IR 1.0-1.1 s |
+| Healthy false alarms | longest 0.77 s (A at 3.5, hairpin), below the 2 s stop hold |
+| Regression: base track and track2 A-D at 3.5 | 8/8 |
+| Replay of the 10 base runs; smoke test | identical; 48 checks |
+
+- Marginal: at 3.5 rad/s the hairpin loses the line for up to 23 frames
+  (0.74 s) against the 750 ms search limit; at 2.5 rad/s for 1 frame.
+- Logged ESP alarms match the Python reference on every frame.
+
 ### fault-stop-v4 and pull-over-v1 (after both fixes)
 
 | Runs | Ends in | Notes |
@@ -510,8 +661,24 @@ No version alarmed on a healthy validation run or before a fault's onset.
 - **Pattern:** shorter windows (10 samples, 0.32 s) and fewer channels/units
   than the deployed sizes. The deployed architectures were reasonable but
   larger than needed.
-- **Not deployed yet:** the firmware's conv window (20) and channel count (16)
-  are compile-time constants.
+- **Deployed (2026-11-27):** motor conv candidate 0 and GRU candidate 0
+  (`models/esp-conv-v2` with the unchanged IR model, `models/esp-gru-v2`;
+  the IR candidate stays undeployed because of its healthy alarms). The
+  export and firmware now take each conv model's window, channels,
+  bottleneck and hidden size, with buffers sized for the largest.
+  - Re-exporting v1 with the new code changes only the size constants, not a
+    weight.
+  - **Replay** (`reports/esp-replay-v3`, the same 10 runs as v2): 0 alarm
+    mismatches; conv within 1.3e-5, GRU within 2.5e-5 (at a score of 0.86,
+    30× the threshold; the GRU check is now relative above 0.2).
+  - **ESP time,** median over one replayed run on the same firmware:
+    motor conv 342 → 123 µs, GRU 411 → 259 µs, IR conv 424 µs (unchanged);
+    1.18 → 0.81 ms per frame.
+  - **Offline, all 120 fault runs** (`reports/deployed-eval-v2`): 94/120 by
+    the fault's own detector and 110/120 by either for both v1 and v2,
+    0 pre-onset, same healthy alarms. Motor faults alarm sooner: median
+    0.16 → 0.13 s, mean 1.57 → 1.32 s.
+  - Live: fault-stop-v5 (section 11).
 
 ## 17. Current performance summary
 
@@ -522,10 +689,10 @@ No version alarmed on a healthy validation run or before a fault's onset.
 | False alarms | Healthy validation 0/18, healthy test 2/18 (motor conv, unchanged), pre-onset 0/120; live healthy runs 16/16 without an alarm (live-v1, fault-stop-v1, -v3, -v4) |
 | Motor faults | All 7 types 8/8, median alarm 0.10-0.29 s after onset |
 | IR faults | Stuck 6/8 (6 observable), dead 8/8, noise std 200 8/8; noise std ≤100 0-3/8 and drift 4-6/8 by the IR model |
-| Live fault stops (after fixes) | Weak motor 8/8, stuck IR 3/4 (4th unobservable), dead IR 2/2, every stop notified |
-| ESP compute | ~1.05 ms of each 32 ms frame for three models (3%); was 4.4 ms for two |
+| Live fault stops (after fixes) | Weak motor 8/8, stuck IR 3/4 (4th unobservable), dead IR 2/2, every stop notified; same with the v2 models (fault-stop-v5) |
+| ESP compute | ~0.81 ms of each 32 ms frame (2.5%) after deploying the search winners; 1.18 ms for v1 measured the same way |
 | ESP memory | ~63 KB of weights in RAM; 165 KB heap free; image 0.96 MB (69% of partition free) |
-| ESP vs Python | conv within 5e-5, GRU within 1.6e-5, alarms identical on every frame |
+| ESP vs Python | conv within 1.3e-5, GRU within 2.5e-5 (relative 3e-5), alarms identical on every frame (esp-replay-v3) |
 | Tests | 46 unit tests; ESP smoke test (PD, junctions, U-turn, fault stop both sides, WiFi, malformed routes) |
 
 ## 18. Known limitations and open work
@@ -538,14 +705,16 @@ In priority order:
    not help (it copies the slow ramp). Candidates: a level check (the
    on-line and floor readings shift with drift) or a cross-sensor model that
    predicts each sensor from the other two and the motion.
-2. **Deploy the search winners** (motor conv candidate 0, GRU candidate 0;
-   IR conv is a trade-off): make the conv window and channel count
-   configurable in `export_c.py`/`anomaly.cpp`, then replay and live runs.
-3. **COM3 drops** end a run instead of reconnecting (completion criterion
-   "communication loss … safe behaviour" only partly met; the ESP itself
-   stops safely on `LINK_LOST`).
-4. **Parallel edges** edge-002 and edge-004 have never been driven under ESP
-   control (shortest paths never use them).
+2. **Done: search winners deployed** (motor conv, GRU). Open: the smaller
+   IR conv (22/32 vs 17/32 held-out, but 2/18 healthy test alarms) is a
+   choice for the user.
+3. **Done: COM3 reconnect.** `epuck_route` reopens the port for up to 30 s
+   when a serial call fails, with Webots paused, and resends the frame; the
+   ESP stops on `LINK_LOST` meanwhile and resumes. Tested against a fake
+   port that drops and comes back; not yet with a real unplug.
+4. **Done: parallel edges** driven with `avoid_edges` (section 11). Open: the
+   healthy training data has no edge-002 runs, so the motor conv model
+   raises sub-0.3 s alarms there (no stop).
 5. **Faults during a U-turn** that lose the line before any monitored window
    cannot be detected (2 stuck and 3 drift runs of 120); they still stop with
    `LINE_LOST` and notify.
@@ -568,7 +737,7 @@ In priority order:
 | `scripts/maps/`, `scripts/telemetry/`, `scripts/faults/` | map tools, data collection/preparation, fault runs and evaluation |
 | `scripts/models/` | training, GRU experiment, export, latency sweep, quantization, architecture search |
 | `scripts/esp/` | route conversion and pull-over sides, smoke test, replay, WiFi tools, INT8 bench |
-| `models/` | `esp-conv-v1`, `esp-gru-v1` (deployed), `esp-quantized-v1` (INT8/INT16 exports), older `conv-v1`/`dense-v1` |
+| `models/` | `esp-conv-v2`, `esp-gru-v2` (deployed), `esp-conv-v1`, `esp-gru-v1` (previous), `esp-quantized-v1` (INT8/INT16 exports), older `conv-v1`/`dense-v1` |
 | `reports/` | every evaluation referenced above |
 | `data/esp_runs/` | healthy, fault and live ESP runs |
 | `docs/` | `USAGE.md` (commands), `STATUS.md`, `DECISIONS.md`, `TODO.md` |

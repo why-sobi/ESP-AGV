@@ -10,3 +10,13 @@ __pycache__/
 
 # Local WiFi credentials (see firmware/wifi.example.csv).
 firmware/wifi.csv
+
+# Run logs: recorded telemetry CSVs and controller error logs (kept locally;
+# the manifests and data/datasets that the scripts read stay tracked).
+data/**/route-*.csv
+data/**/controller-errors.log
+data/SensorData*.csv
+data/sensor_runs/
+
+# Webots per-world project files.
+simulation/worlds/.*.wbproj

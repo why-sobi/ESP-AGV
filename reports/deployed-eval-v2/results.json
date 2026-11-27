@@ -1,0 +1,152 @@
+{
+  "models/esp-conv-v1": {
+    "own": 94,
+    "either": 110,
+    "runs": 120,
+    "pre_onset": 0,
+    "median_delay_s": 1.056000000000001,
+    "motor_median_delay_s": 0.16000000000000014,
+    "motor_mean_delay_s": 1.5742857142857147,
+    "healthy": {
+      "validation": 1,
+      "test": 2
+    },
+    "per_fault": {
+      "motor-weak-right-80": [
+        8,
+        8
+      ],
+      "motor-weak-right-70": [
+        8,
+        8
+      ],
+      "motor-weak-left-50": [
+        8,
+        8
+      ],
+      "motor-stall-left": [
+        8,
+        8
+      ],
+      "motor-intermittent-right": [
+        8,
+        8
+      ],
+      "encoder-stuck-left": [
+        8,
+        8
+      ],
+      "encoder-noise-right": [
+        8,
+        8
+      ],
+      "ir-stuck-center": [
+        6,
+        8
+      ],
+      "ir-dead-left": [
+        8,
+        8
+      ],
+      "ir-noise-right-50": [
+        0,
+        8
+      ],
+      "ir-noise-right-100": [
+        3,
+        8
+      ],
+      "ir-noise-right-200": [
+        8,
+        8
+      ],
+      "ir-noise-left-100": [
+        3,
+        8
+      ],
+      "ir-drift-center": [
+        4,
+        8
+      ],
+      "ir-drift-right": [
+        6,
+        8
+      ]
+    }
+  },
+  "models/esp-conv-v2": {
+    "own": 94,
+    "either": 110,
+    "runs": 120,
+    "pre_onset": 0,
+    "median_delay_s": 1.056000000000001,
+    "motor_median_delay_s": 0.1280000000000001,
+    "motor_mean_delay_s": 1.3200000000000003,
+    "healthy": {
+      "validation": 1,
+      "test": 2
+    },
+    "per_fault": {
+      "motor-weak-right-80": [
+        8,
+        8
+      ],
+      "motor-weak-right-70": [
+        8,
+        8
+      ],
+      "motor-weak-left-50": [
+        8,
+        8
+      ],
+      "motor-stall-left": [
+        8,
+        8
+      ],
+      "motor-intermittent-right": [
+        8,
+        8
+      ],
+      "encoder-stuck-left": [
+        8,
+        8
+      ],
+      "encoder-noise-right": [
+        8,
+        8
+      ],
+      "ir-stuck-center": [
+        6,
+        8
+      ],
+      "ir-dead-left": [
+        8,
+        8
+      ],
+      "ir-noise-right-50": [
+        0,
+        8
+      ],
+      "ir-noise-right-100": [
+        3,
+        8
+      ],
+      "ir-noise-right-200": [
+        8,
+        8
+      ],
+      "ir-noise-left-100": [
+        3,
+        8
+      ],
+      "ir-drift-center": [
+        4,
+        8
+      ],
+      "ir-drift-right": [
+        6,
+        8
+      ]
+    }
+  }
+}

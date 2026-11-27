@@ -1,0 +1,50 @@
+{
+  "start_node": "node-002",
+  "destination_node": "node-003",
+  "control_mode": "supervisor",
+  "esp_serial_port": "COM3",
+  "esp_odometry_scale": 0.973,
+  "esp_destination_tolerance_m": 0.05,
+  "esp_fault_stop_s": 2.0,
+  "return_to_start": false,
+  "unload_s": 1.0,
+  "spawn_at_start_node": true,
+  "wheel_speed_rad_s": 2.5,
+  "lookahead_m": 0.045,
+  "node_radius_m": 0.025,
+  "max_path_error_m": 0.12,
+  "line_threshold": 400.0,
+  "sensor_heading_gain": 0.2,
+  "quit_webots_on_complete": false,
+  "map_path": "maps/paths/track2.json",
+  "routes": {
+    "A": {
+      "start": "node-002",
+      "destination": "node-003"
+    },
+    "B": {
+      "start": "node-004",
+      "destination": "node-003",
+      "avoid_edges": [
+        "edge-006"
+      ]
+    },
+    "C": {
+      "start": "node-001",
+      "destination": "node-003",
+      "avoid_edges": [
+        "edge-001",
+        "edge-004"
+      ]
+    },
+    "D": {
+      "start": "node-004",
+      "destination": "node-003",
+      "avoid_edges": [
+        "edge-002",
+        "edge-003",
+        "edge-006"
+      ]
+    }
+  }
+}
