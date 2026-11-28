@@ -80,3 +80,9 @@ route-20261114-003029-D-3.1.csv,node-004,node-002,3.1,healthy,12.5 s; 1 line-los
 route-20261114-003031-D-3.2.csv,node-004,node-002,3.2,healthy,12.1 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.025 m
 route-20261114-003033-D-3.3.csv,node-004,node-002,3.3,healthy,11.8 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.023 m
 route-20261114-003035-D-3.4.csv,node-004,node-002,3.4,healthy,11.6 s; 1 line-loss samples (0 after 0.5 s); 0 irregular intervals; max centerline error 0.024 m
+route-20261128-155841-X-3.csv,node-001,node-004,3.0,healthy,"18.4 s; 47 line-loss samples (0 after 0.5 s, longest run 0); 0 irregular intervals; max centerline error 0.005 m"
+route-20261128-155921-X-3.csv,node-004,node-003,3.0,healthy,"31.2 s; 2 line-loss samples (1 after 0.5 s, longest run 1); 0 irregular intervals; max centerline error 0.009 m"
+route-20261128-160121-X-3.csv,node-004,node-003,3.0,healthy,"37.6 s; 42 line-loss samples (15 after 0.5 s, longest run 11); 0 irregular intervals; max centerline error 0.025 m"
+route-20261128-160410-X-3.csv,node-001,node-002,3.0,healthy,"42.1 s; 1 line-loss samples (0 after 0.5 s, longest run 0); 0 irregular intervals; max centerline error 0.024 m"
+route-20261128-160503-X-3.csv,node-001,node-003,3.0,healthy,"33.8 s; 59 line-loss samples (22 after 0.5 s, longest run 21); 0 irregular intervals; max centerline error 0.025 m"
+route-20261128-160656-X-3.csv,node-001,node-003,3.0,healthy,"33.8 s; 59 line-loss samples (22 after 0.5 s, longest run 21); 0 irregular intervals; max centerline error 0.025 m"

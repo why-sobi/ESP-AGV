@@ -149,6 +149,81 @@ mechanism. The ESP receives only relative junction actions with odometry
 distances, plus the ground-sensor and encoder readings; the ESP-control mode
 below converts the planned graph route to that form.
 
+### Run one route on any track (headless)
+
+Pick the track and the two nodes; nothing is edited and no Webots window
+opens:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.telemetry.collect_route_runs `
+  --track track2 --start node-001 --destination node-004 --speeds 3.0 `
+  --control-mode esp32 --round-trip --out data\route_runs\try --timeout 300
+```
+
+- `--track`: `base` (default), `track2` or `track3`; it selects the track's
+  mission (`maps\routes\mission*.json`) and world. Every track has the nodes
+  `node-001` to `node-004` (Junction 1-4); a wrong node lists the valid ones.
+- Leave out `--control-mode esp32 --round-trip` for a one-way Supervisor run
+  (no ESP needed). `--avoid-edges edge-005` forces another path, and
+  `--speeds 2.5 3.5` runs the route once per speed.
+- The console prints `healthy` or `failed` with the line-loss and path-error
+  checks; the run CSV (`route-<time>-X-<speed>.csv`) and `manifest.csv` go to
+  `--out`. Fault stops are off in these runs; use `collect_fault_runs` to
+  test faults.
+- To watch it, use the demo launcher below, or set the same nodes in `maps\routes\mission.json`
+  (`start_node`, `destination_node`, `control_mode`, and `map_path` for
+  track2/track3), open the matching `simulation\worlds\*.wbt` and press
+  Reset (Ctrl+Shift+T).
+
+### Demo: watch a clean or faulty run in Webots
+
+`scripts.run_demo` opens the Webots window (real time) on the chosen track
+and drives one route with the ESP, by default as a round trip with fault
+stops on. Nothing is edited; Reset (Ctrl+Shift+T) replays the same run, and
+closing the window ends the script.
+
+```powershell
+# Clean run
+.\.venv\Scripts\python.exe -m scripts.run_demo --track track2 --start node-001 --destination node-004
+# Weak right motor from 6 s: pulls over, stops, phone notification
+.\.venv\Scripts\python.exe -m scripts.run_demo --track track2 --start node-001 --destination node-004 --fault weak-motor
+```
+
+- `--fault`: `weak-motor`, `stall`, `intermittent`, `encoder-stuck`,
+  `encoder-noise`, `ir-stuck`, `ir-dead`, `ir-noise`, `ir-drift`, with the
+  ESP fault matrix's targets and severities. `--target` and `--severity`
+  override them; `--onset` sets the start time (default 6 s).
+- A fault stop and its notification need an alarm that lasts 2 s before the
+  route ends, so give the fault time: an early `--onset` on short routes
+  (node-001 to node-004 arrives at ~10 s). For a demo, `weak-motor` and
+  `ir-dead` stop within about a second of the alarm. `ir-noise` (std 200)
+  can flicker on and off without stopping on some routes (seen on
+  node-001 to node-004); `--severity 300` stopped there. `stall` and
+  `intermittent` often stop on line loss first, and `ir-drift` is often not
+  detected.
+- `--speed` (default 3.0 rad/s), `--seed <n>` for start-pose jitter,
+  `--one-way`, `--no-fault-stop` (alarms only), `--supervisor` (no ESP; one
+  way only).
+- The Webots console prints a timeline: `FAULT ON`, `ESP motor/IR alarm
+  ON`/`off` and each ESP state (`FAULT_PULLOVER`, `FAULT_STOP`, ...). The
+  alarm goes off during the pull-over because manoeuvres are not monitored.
+- To show the whole chain (fault, its effect, detection, pull-over,
+  notification), `ir-dead` is the clearest: the robot swerves visibly (up to
+  6 cm off the line, against 0.2 cm before), the IR alarm follows ~0.25 s
+  after the onset and the pull-over 2 s later. `weak-motor` is caught in
+  ~0.1 s but barely changes the path, because the ESP's steering
+  compensates by slowing the other wheel; `--severity 0.3` (30% of the
+  commanded speed) makes that visible as a slowdown (6.0 to 2.1 cm/s on
+  node-001 to node-004 at 3 rad/s), still within 0.7 cm of the line.
+- `--fast`: the window runs as fast as the ESP allows (about 3-4x real
+  time, like the >> button) instead of real time. `--headless`: no window;
+  prints how the run ended, e.g. `ended FAULT_STOP`, `first motor alarm at
+  6.11 s (0.11 s after the onset)`. Real time is what makes the window slow:
+  Webots waits for the clock, while rendering itself costs little.
+- On track3 a clean run can show a brief motor alarm (up to 0.77 s on that
+  unseen course); only an alarm lasting 2 s stops the robot.
+- Run CSVs go to `data\route_runs\demo` (`--out`).
+
 ### Let the ESP32-S3 control the Webots e-puck
 
 Install the requirements so the Webots Python environment has `pyserial`:

@@ -24,6 +24,14 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WORLD = ROOT / "simulation" / "worlds" / "Self Diagnosis AGV.wbt"
 DEFAULT_MISSION = ROOT / "maps" / "routes" / "mission.json"
 DEFAULT_OUT = ROOT / "data" / "route_runs"
+# --track: the mission and world of each track (the world shows the map's image).
+TRACKS = {
+    "base": (DEFAULT_MISSION, DEFAULT_WORLD),
+    "track2": (ROOT / "maps" / "routes" / "mission-track2.json",
+               ROOT / "simulation" / "worlds" / "Self Diagnosis AGV track2.wbt"),
+    "track3": (ROOT / "maps" / "routes" / "mission-track3.json",
+               ROOT / "simulation" / "worlds" / "Self Diagnosis AGV track3.wbt"),
+}
 MANIFEST_FIELDS = (
     "file",
     "start_node",
@@ -229,8 +237,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--routes", default="ABCD", help="Route letters from ROUTES, e.g. ABCD")
     parser.add_argument("--speeds", nargs="+", type=float, default=[2.0, 2.5, 3.0, 3.5])
-    parser.add_argument("--world", type=Path, default=DEFAULT_WORLD)
-    parser.add_argument("--mission", type=Path, default=DEFAULT_MISSION, help="Base mission")
+    parser.add_argument("--track", choices=sorted(TRACKS),
+                        help="Use this track's mission and world (default: base)")
+    parser.add_argument("--start", help="Start node (e.g. node-001); with --destination "
+                                        "replaces --routes with this one route")
+    parser.add_argument("--destination", help="Destination node, e.g. node-004")
+    parser.add_argument("--world", type=Path, help="Defaults to the track's world")
+    parser.add_argument("--mission", type=Path, help="Base mission (default: the track's)")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--manifest", type=Path, help="Defaults to <out>/manifest.csv")
     parser.add_argument("--webots", help="Path to the Webots executable")
@@ -252,8 +265,23 @@ def main():
                              "edge-005 to drive edge-004")
     args = parser.parse_args()
 
+    track_mission, track_world = TRACKS[args.track or "base"]
+    args.mission = args.mission or track_mission
+    args.world = args.world or track_world
     webots = find_webots(args.webots)
     base_mission = json.loads(args.mission.read_text(encoding="utf-8-sig"))
+    if bool(args.start) != bool(args.destination):
+        parser.error("--start and --destination go together")
+    if args.start:
+        map_path = (ROOT / base_mission["map_path"] if base_mission.get("map_path")
+                    else ROOT / "maps" / "paths" / "base track.json")
+        nodes = {node["id"] for node in json.loads(map_path.read_text(encoding="utf-8"))["nodes"]}
+        for node in (args.start, args.destination):
+            if node not in nodes:
+                parser.error(f"{node} is not a node of {map_path.name}: {', '.join(sorted(nodes))}")
+        # One custom route, "X"; --avoid-edges still applies.
+        base_mission["routes"] = {"X": {"start": args.start, "destination": args.destination}}
+        args.routes = "X"
     unknown = set(args.routes) - set(base_mission.get("routes") or ROUTES)
     if unknown:
         parser.error(f"unknown routes: {''.join(sorted(unknown))}")

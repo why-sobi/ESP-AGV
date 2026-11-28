@@ -18,6 +18,7 @@ data/**/controller-errors.log
 data/SensorData*.csv
 data/sensor_runs/
 data/esp_runs/
+data/route_runs/
 
 # Webots per-world project files.
 simulation/worlds/.*.wbproj

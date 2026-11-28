@@ -681,6 +681,10 @@ def main():
         esp_sequence = 0
         on_return_leg = False
         unloading_until = None
+        # Console timeline (fault onset, alarms, ESP states), e.g. for demos.
+        fault_announced = False
+        shown_state = None
+        shown_alarms = ("0", "0")
 
         while robot.step(time_step) != -1:
             position = self_node.getPosition()
@@ -827,6 +831,19 @@ def main():
             if control_mode == "esp32":
                 row.extend((esp_state, esp_route_index, esp_distance, *esp_anomaly))
             writer.writerow(row)
+            if fault.active(now) and not fault_announced:
+                print(f"t={now:.2f} s  FAULT ON: {fault.type} on {fault.target}"
+                      f" (severity {fault.severity:g})")
+                fault_announced = True
+            if control_mode == "esp32":
+                alarms = (esp_anomaly[2] or "0", esp_anomaly[3] or "0")
+                for name, before, after in zip(("motor", "IR"), shown_alarms, alarms):
+                    if after != before:
+                        print(f"t={now:.2f} s  ESP {name} alarm {'ON' if after == '1' else 'off'}")
+                shown_alarms = alarms
+                if esp_state != shown_state:
+                    print(f"t={now:.2f} s  ESP state {esp_state}")
+                    shown_state = esp_state
             if resource_file is not None and now >= next_resource_t:
                 # Between frames, so no motor reply is in flight.
                 usage = esp_link.call(_query_esp_resources)
