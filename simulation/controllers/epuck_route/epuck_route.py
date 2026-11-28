@@ -25,6 +25,9 @@ ROUTE_PATH = Path(
     os.environ.get("AGV_ROUTE_PATH", ROOT_DIR / "maps" / "routes" / "active_route.json")
 )
 LOG_DIR = Path(os.environ.get("AGV_LOG_DIR", ROOT_DIR / "data" / "route_runs"))
+# Seconds between ESP resource queries ("U": heap, per-task CPU and stack) in
+# ESP mode, logged next to the run as <run>.resources.jsonl; unset: off.
+RESOURCE_LOG_S = float(os.environ.get("AGV_ESP_RESOURCE_LOG_S", "0") or 0)
 
 
 def _read_inputs():
@@ -489,6 +492,28 @@ def _step_esp(link, sequence, time_step, sensor_values, encoder_values):
     return left_target, right_target, state, int(fields[5]), float(fields[6]), anomaly
 
 
+def _query_esp_resources(link):
+    """Send "U" and parse the reply: heap figures and one entry per task
+    (firmware/main/main.cpp, send_resource_usage)."""
+    link.write(b"U\n")
+    fields = _read_esp_line(link, 1.0).split(",")
+    if fields[0] != "U" or len(fields) != 11:
+        raise RuntimeError(f"Malformed ESP resource response: {fields!r}")
+    names = (
+        "heap_free", "heap_min_free", "heap_largest_block", "internal_free",
+        "internal_min_free", "psram_total", "psram_free", "heap_total", "tasks", "window_us",
+    )
+    usage = dict(zip(names, (int(value) for value in fields[1:])))
+    usage["task_list"] = []
+    for _ in range(usage["tasks"]):
+        name, core, permille, stack = _read_esp_line(link, 1.0).split(",")[1:]
+        usage["task_list"].append({
+            "name": name, "core": int(core), "cpu_permille": int(permille),
+            "stack_free_min": int(stack),
+        })
+    return usage
+
+
 def main():
     robot = Supervisor()
     time_step = int(robot.getBasicTimeStep())
@@ -627,6 +652,12 @@ def main():
                 "esp_gru_score", "esp_gru_alarm", "esp_stuck_alarm",
             ))
         writer.writerow(header)
+        resource_file = None
+        next_resource_t = 0.0
+        if control_mode == "esp32" and RESOURCE_LOG_S > 0:
+            resource_file = log_path.with_suffix(".resources.jsonl").open("w", encoding="utf-8")
+            esp_link.call(_query_esp_resources)  # Starts the CPU window.
+            next_resource_t = RESOURCE_LOG_S
         fault = FaultInjector(mission.get("fault"))
         if fault.spec:
             print(f"FAULT INJECTION: {fault.spec}")
@@ -796,6 +827,12 @@ def main():
             if control_mode == "esp32":
                 row.extend((esp_state, esp_route_index, esp_distance, *esp_anomaly))
             writer.writerow(row)
+            if resource_file is not None and now >= next_resource_t:
+                # Between frames, so no motor reply is in flight.
+                usage = esp_link.call(_query_esp_resources)
+                usage.update(time=now, esp_state=esp_state)
+                resource_file.write(json.dumps(usage) + "\n")
+                next_resource_t = now + RESOURCE_LOG_S
             buffered_rows += 1
             if buffered_rows >= batch_size:
                 log_file.flush()
@@ -870,6 +907,8 @@ def main():
 
         log_file.flush()
         log_file.close()
+        if resource_file is not None:
+            resource_file.close()
         print(f"Route telemetry saved to {log_path}")
         if failure is not None:
             print(f"RUN FAILED: {failure}. Do not use this run as healthy data.")

@@ -587,6 +587,23 @@ which was needed once when `wificfg` was added.
   `ESP_ERR_HTTP_CONNECT/<esp-tls error>/<mbedTLS error>`. The ESP tries 6
   times.
 
+### Resource usage (heap, CPU, stacks)
+
+Set `AGV_ESP_RESOURCE_LOG_S` (seconds) before any ESP-mode run and
+`epuck_route` sends the ESP a `U` query at that interval between frames,
+writing `<run>.resources.jsonl` next to the run CSV. Summarize a directory
+(add `--port COM3` for a final snapshot, whose lowest-heap figure includes
+the last notification):
+
+```powershell
+$env:AGV_ESP_RESOURCE_LOG_S = "1"
+.\.venv\Scripts\python.exe -m scripts.faults.collect_fault_runs --matrix data\esp_runs\resources-v1\fault-matrix.json --out <dir> --timeout 300
+.\.venv\Scripts\python.exe -m scripts.esp.resource_usage --runs <dir> --out reports\esp-resources-v1 --port COM3
+```
+
+Flash and static RAM per component: `idf.py size` and `idf.py size-components`
+in `firmware`. Results: `reports\esp-resources-v1\summary.md`.
+
 ## Train and evaluate the autoencoders
 
 PyTorch (CPU) is in `requirements.txt`. Train both the motor and the IR model

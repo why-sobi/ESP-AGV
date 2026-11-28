@@ -20,15 +20,15 @@
 
 % TODO: replace with the team's full names, department, university and emails.
 \author{
-\IEEEauthorblockN{Author Name 1}
-\IEEEauthorblockA{\textit{Department, University}\\
-City, Country\\
-email@example.com}
+\IEEEauthorblockN{Ahsan Azad}
+\IEEEauthorblockA{\textit{AI, FAST-NUCES}\\
+Islamabad, Pakistan\\
+ahsansps.rwp@gmail.com}
 \and
-\IEEEauthorblockN{Author Name 2}
-\IEEEauthorblockA{\textit{Department, University}\\
-City, Country\\
-email@example.com}
+\IEEEauthorblockN{Muhammad Soban}
+\IEEEauthorblockA{\textit{AI, FAST-NUCES}\\
+Islamabad, Pakistan\\
+sobisoban05@gmail.com}
 }
 
 \maketitle
@@ -50,7 +50,8 @@ onset and no alarm on any healthy validation run. All seven motor and encoder fa
 types are detected in 8/8 runs with a median delay of 0.10--0.29\,s. Inference uses
 Espressif's esp-dsp SIMD library in float32 and costs about 0.81\,ms of each
 32\,ms control frame, matching the Python reference within $2.5\times10^{-5}$ with
-identical alarm decisions. A multi-objective architecture search driven by
+identical alarm decisions; the whole control task uses 7\% of one core, and the
+firmware leaves 159\,KB of heap free at its lowest. A multi-objective architecture search driven by
 latencies measured on the device found detectors that are 2--3$\times$ faster and
 3$\times$ smaller than the hand-designed ones while detecting as many or more
 faults. Without retraining any detector, the system also completes all routes,
@@ -200,7 +201,7 @@ Odometry-gated junctions & Wide lines make all-dark sensor patterns ambiguous \\
 Train on healthy data only & Real faults are rare and unlabelled \\
 Separate motor and IR detectors & An alarm names the subsystem; per-model thresholds \\
 Run-level thresholds & Window percentiles let clustered healthy outliers alarm \\
-Float32 with esp-dsp & 2.5$\times$ faster than INT8 ESP-DL; INT8 breaks the motor model \\
+Float32 with esp-dsp & 2.4--3.1$\times$ faster than INT8/INT16 ESP-DL; INT8 breaks the motor model \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -323,8 +324,9 @@ Unseen tracks & 52 & track2 and track3 (final firmware) \\
 
 \subsection{ESP--Python agreement}
 A replay tool streams recorded runs through the ESP and compares its wheel
-targets, scores and alarms with Python on every frame. Over 65{,}044 windows
-(first version) and repeated after each firmware change, conv scores agree within
+targets, scores and alarms with Python on every frame. The first version agreed
+within $4.5\times10^{-5}$ over 65{,}044 windows; with the esp-dsp firmware,
+re-checked after each firmware change, conv scores agree within
 $1.3\times10^{-5}$ and GRU scores within $2.5\times10^{-5}$ (relative above 0.2),
 with identical alarms on every frame.
 
@@ -416,12 +418,47 @@ the destination node with a maximum path error of 2.5\,cm. On the unseen tracks,
 8/8 healthy round trips completed on each, and all injected faults stopped the
 robot and notified (track2 20/20, track3 16/16), with no model retraining.
 
-\subsection{Computational cost}
-Table~\ref{tab:latency} shows the per-frame cost on the ESP32-S3. Moving to
-esp-dsp with weights in RAM cut the cost from 4.3\,ms for two models to 1.05\,ms
-for three, and deploying the search winners to 0.81\,ms, about 2.5\% of the
-32\,ms frame. About 51\,KB of weights reside in RAM; the firmware image is
-0.94\,MB, leaving 70\% of the 3\,MB application partition free.
+\subsection{Computational cost and memory}
+Table~\ref{tab:latency} shows the per-frame cost of the detectors on the
+ESP32-S3. Moving to esp-dsp with weights in RAM cut the cost from 4.3\,ms for
+two models to 1.05\,ms for three, and deploying the search winners to 0.81\,ms,
+about 2.5\% of the 32\,ms frame.
+
+Table~\ref{tab:resources} gives the whole firmware's footprint. Flash and
+static RAM come from the ESP-IDF size tools. The runtime figures come from a
+resource query that reports free heap and, from FreeRTOS run-time statistics,
+the CPU time and peak stack use of every task. It was polled once per second
+during eight live round trips: four healthy and four with a weak motor, each
+ending in a fault stop and a notification. Most of the flash goes to the WiFi
+and TLS stacks; the detectors' code and weights take 48\,KB. In RAM, the
+detectors take 55\,KB, because each autoencoder's buffers are sized for the
+larger model. The control task, which runs line following, odometry, the
+detectors and the serial protocol, uses 2.31\,ms of CPU per frame, or 7.2\% of
+core~1 in real time. WiFi uses 1.6\% of core~0. The lowest free heap, 159\,KB,
+occurs while the HTTPS notification is being sent. The 8\,MB PSRAM on the board
+is not needed and is not enabled.
+
+\begin{table}[t]
+\caption{Firmware resource use on the ESP32-S3 (KB = 1000 bytes)}
+\label{tab:resources}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{1.75cm}p{1.75cm}p{4.3cm}@{}}
+\toprule
+Resource & Used & Main users \\
+\midrule
+App flash & 943\,KB of 3\,MiB (30\%) & WiFi/lwIP 371\,KB, TLS/HTTPS 252\,KB, application 48\,KB (weights 29.5\,KB), esp-dsp $<$1\,KB \\
+Flash chip & 3.1 of 16\,MiB & 12.9\,MiB not partitioned \\
+Static SRAM & 162 of 342\,KB (47\%) & detectors 55\,KB, WiFi 46\,KB \\
+Heap, driving & 204\,KB free of 301\,KB & WiFi connected \\
+Heap, lowest & 159\,KB free & HTTPS notification (TLS $\approx$46\,KB) \\
+PSRAM & 0 of 8\,MiB & not enabled \\
+CPU core 1 & 7.2\% (2.31\,ms/frame) & control task; detectors 0.81\,ms \\
+CPU core 0 & 1.6\% (max 4.9\%) & WiFi 1.3\% \\
+Stack peaks & 7.8 of 12.3\,KB; 4.4 of 8.2\,KB & control task; notification task \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[t]
 \caption{Detector time per 32\,ms frame on the ESP32-S3}

@@ -96,6 +96,15 @@ own COM3 at a time.
   `esp_stuck_alarm`.
 - Inference timing: `Q\n` replies
   `I,<motor_last_us>,<motor_max_us>,<ir_last_us>,<ir_max_us>,<gru_last_us>,<gru_max_us>\n`.
+- Resource usage: `U\n` replies
+  `U,<heap_free>,<heap_min_free>,<largest_block>,<internal_free>,<internal_min_free>,<psram_total>,<psram_free>,<heap_total>,<tasks>,<window_us>\n`
+  (bytes; `heap_min_free` is the lowest since boot), then one
+  `T,<name>,<core>,<cpu_permille>,<stack_free_min>\n` per FreeRTOS task:
+  its share of one core since the previous `U` (`window_us`; core `-1`: not
+  pinned) and its lowest free stack in bytes. Uses FreeRTOS run-time stats
+  (`sdkconfig.defaults`). `epuck_route` polls it between frames when
+  `AGV_ESP_RESOURCE_LOG_S` is set; `scripts/esp/resource_usage.py`
+  summarizes the logs.
 - Latency benchmark (`main/bench.cpp`, not during a route):
   `B,C,<features>,<window>,<channels>,<kernel>,<bottleneck>,<hidden>,<repeats>\n`
   (conv autoencoder) or `B,G,<inputs>,<hidden>,<outputs>,<repeats>\n` (GRU

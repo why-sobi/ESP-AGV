@@ -24,5 +24,6 @@ pdflatex main.tex
 
 - Replace the author block placeholders (names, department, university,
   emails) near the top of `main.tex`.
-- All numbers come from `REPORT.md` and `reports/` as of commit `622e6ea`. If
+- All numbers come from `REPORT.md` and `reports/` as of commit `622e6ea`, plus
+  the resource table from `reports/esp-resources-v1`. If
   models or results change, update the tables to match.

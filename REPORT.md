@@ -345,6 +345,26 @@ last value and never see a weak wheel.
   of all three models.
 - Image 0xeae30 bytes (~0.96 MB), 69% of the 3 MB app partition free.
 
+### Resource use (2026-11-28, `reports/esp-resources-v1`)
+
+A `U` query reports heap and, from FreeRTOS run-time stats, each task's CPU
+share and stack peak; `epuck_route` polled it every 1 s
+(`AGV_ESP_RESOURCE_LOG_S=1`) over 8 live round trips (healthy A-D completed,
+motor weak right 30% A-D fault-stopped and notified 4/4).
+
+| | Used | Of |
+|---|---|---|
+| App flash | 943 KB (WiFi/lwIP 371, TLS/HTTPS 252, our code 48 incl. 29.5 KB weights, esp-dsp < 1) | 3 MiB partition (16 MiB chip, 12.9 MiB unpartitioned) |
+| Static SRAM | 162 KB (detectors 55, WiFi 46) | 342 KB |
+| Heap free | 204-205 KB driving; lowest 159 KB, during the HTTPS notification | 301 KB |
+| PSRAM | 0 (not enabled) | 8 MiB |
+| Core 1 | `serial_control` 2.31 ms CPU per frame = 7.2% at real time (detectors 0.81 ms) | 32 ms frame |
+| Core 0 | 1.6% mean, 4.9% max (WiFi 1.3%) | |
+| Stacks | serial_control 7,776 of 12,288 B; notify 4,448 of 8,192 B | |
+
+Webots runs in fast mode, so core 1 is busier than in real time (11.6%
+measured); `scripts/esp/resource_usage.py` converts to CPU time per frame.
+
 ## 11. Live fault-stop checks
 
 ### fault-stop-v3 (motor GRU and first stuck rule)
@@ -692,7 +712,8 @@ No version alarmed on a healthy validation run or before a fault's onset.
 | IR faults | Stuck 6/8 (6 observable), dead 8/8, noise std 200 8/8; noise std ≤100 0-3/8 and drift 4-6/8 by the IR model |
 | Live fault stops (after fixes) | Weak motor 8/8, stuck IR 3/4 (4th unobservable), dead IR 2/2, every stop notified; same with the v2 models (fault-stop-v5); unseen tracks: track2 20/20, track3 16/16 |
 | ESP compute | ~0.81 ms of each 32 ms frame (2.5%) after deploying the search winners; 1.18 ms for v1 measured the same way |
-| ESP memory | ~51 KB of weights in RAM with the v2 models (both conv buffers sized for the larger IR model; was ~63 KB); image 0.94 MB (70% of the 3 MB partition free) |
+| ESP memory | Detectors 55 KB of static RAM with the v2 models (both conv buffers sized for the larger IR model); heap 159 KB free at its lowest; image 0.94 MB (70% of the 3 MB partition free); PSRAM unused (reports/esp-resources-v1) |
+| ESP CPU | Control task 2.31 ms per 32 ms frame (7.2% of core 1); WiFi 1.6% of core 0 |
 | ESP vs Python | conv within 1.3e-5, GRU within 2.5e-5 (relative 3e-5), alarms identical on every frame (esp-replay-v3/-v4); logged live alarms match Python on track2/track3 |
 | Tests | 47 unit tests; ESP smoke test, 48 checks (PD, junctions, stale junction pattern, corner, bear, blind arrival, U-turn, fault stop both sides, WiFi, malformed routes) |
 

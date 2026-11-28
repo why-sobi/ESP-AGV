@@ -1,0 +1,202 @@
+{
+  "runs": [
+    "route-20261128-151853-A-2.7-healthy",
+    "route-20261128-151923-B-3.3-healthy",
+    "route-20261128-151949-C-2.4-healthy",
+    "route-20261128-152021-D-3.8-healthy",
+    "route-20261128-152045-A-2.7-motor-weak-right-70",
+    "route-20261128-152100-B-3.3-motor-weak-right-70",
+    "route-20261128-152117-C-2.4-motor-weak-right-70",
+    "route-20261128-152138-D-3.8-motor-weak-right-70"
+  ],
+  "queries": 193,
+  "heap_total": 300508,
+  "psram_total": 0,
+  "heap_free_min_while_driving": 204056,
+  "heap_free_max_while_driving": 205092,
+  "heap_min_free_ever": 158540,
+  "heap_largest_block_min": 122880,
+  "final_snapshot": {
+    "heap_free": 204184,
+    "heap_min_free": 158540,
+    "heap_largest_block": 122880,
+    "internal_free": 204184,
+    "internal_min_free": 158540,
+    "psram_total": 0,
+    "psram_free": 0,
+    "heap_total": 300508,
+    "tasks": 11,
+    "window_us": 11268834,
+    "task_list": [
+      {
+        "name": "serial_control",
+        "core": 1,
+        "cpu_permille": 2,
+        "stack_free_min": 4512
+      },
+      {
+        "name": "IDLE0",
+        "core": 0,
+        "cpu_permille": 677,
+        "stack_free_min": 808
+      },
+      {
+        "name": "IDLE1",
+        "core": 1,
+        "cpu_permille": 996,
+        "stack_free_min": 808
+      },
+      {
+        "name": "tcpip",
+        "core": -1,
+        "cpu_permille": 2,
+        "stack_free_min": 1872
+      },
+      {
+        "name": "Tmr Svc",
+        "core": -1,
+        "cpu_permille": 0,
+        "stack_free_min": 1448
+      },
+      {
+        "name": "sys_evt",
+        "core": 0,
+        "cpu_permille": 0,
+        "stack_free_min": 1744
+      },
+      {
+        "name": "notify",
+        "core": 0,
+        "cpu_permille": 296,
+        "stack_free_min": 3744
+      },
+      {
+        "name": "esp_timer",
+        "core": 0,
+        "cpu_permille": 1,
+        "stack_free_min": 3124
+      },
+      {
+        "name": "wifi",
+        "core": 0,
+        "cpu_permille": 23,
+        "stack_free_min": 4204
+      },
+      {
+        "name": "ipc1",
+        "core": 1,
+        "cpu_permille": 0,
+        "stack_free_min": 620
+      },
+      {
+        "name": "ipc0",
+        "core": 0,
+        "cpu_permille": 0,
+        "stack_free_min": 620
+      }
+    ]
+  },
+  "cores": {
+    "0": {
+      "load_mean_pct": 1.56,
+      "load_max_pct": 4.9
+    },
+    "1": {
+      "load_mean_pct": 11.75,
+      "load_max_pct": 13.4
+    }
+  },
+  "tasks": {
+    "IDLE0": {
+      "core": 0,
+      "cpu_mean_pct": 98.44,
+      "cpu_max_pct": 100.7,
+      "stack_bytes": 1536,
+      "stack_free_min": 808,
+      "stack_peak_used": 728
+    },
+    "IDLE1": {
+      "core": 1,
+      "cpu_mean_pct": 88.25,
+      "cpu_max_pct": 98.3,
+      "stack_bytes": 1536,
+      "stack_free_min": 808,
+      "stack_peak_used": 728
+    },
+    "serial_control": {
+      "core": 1,
+      "cpu_mean_pct": 11.64,
+      "cpu_max_pct": 13.3,
+      "stack_bytes": 12288,
+      "stack_free_min": 4512,
+      "stack_peak_used": 7776,
+      "cpu_us_per_frame_mean": 2308.0,
+      "cpu_us_per_frame_max": 2445.7,
+      "realtime_load_pct": 7.21
+    },
+    "wifi": {
+      "core": 0,
+      "cpu_mean_pct": 1.34,
+      "cpu_max_pct": 3.6,
+      "stack_bytes": null,
+      "stack_free_min": 4204,
+      "stack_peak_used": null
+    },
+    "esp_timer": {
+      "core": 0,
+      "cpu_mean_pct": 0.05,
+      "cpu_max_pct": 0.4,
+      "stack_bytes": 3584,
+      "stack_free_min": 3124,
+      "stack_peak_used": 460
+    },
+    "tcpip": {
+      "core": -1,
+      "cpu_mean_pct": 0.01,
+      "cpu_max_pct": 0.4,
+      "stack_bytes": 3072,
+      "stack_free_min": 1872,
+      "stack_peak_used": 1200
+    },
+    "sys_evt": {
+      "core": 0,
+      "cpu_mean_pct": 0.0,
+      "cpu_max_pct": 0.0,
+      "stack_bytes": 2304,
+      "stack_free_min": 1744,
+      "stack_peak_used": 560
+    },
+    "ipc0": {
+      "core": 0,
+      "cpu_mean_pct": 0.0,
+      "cpu_max_pct": 0.0,
+      "stack_bytes": 1280,
+      "stack_free_min": 620,
+      "stack_peak_used": 660
+    },
+    "Tmr Svc": {
+      "core": -1,
+      "cpu_mean_pct": 0.0,
+      "cpu_max_pct": 0.0,
+      "stack_bytes": 2048,
+      "stack_free_min": 1448,
+      "stack_peak_used": 600
+    },
+    "notify": {
+      "core": 0,
+      "cpu_mean_pct": 0.0,
+      "cpu_max_pct": 0.0,
+      "stack_bytes": 8192,
+      "stack_free_min": 3744,
+      "stack_peak_used": 4448
+    },
+    "ipc1": {
+      "core": 1,
+      "cpu_mean_pct": 0.0,
+      "cpu_max_pct": 0.0,
+      "stack_bytes": 1280,
+      "stack_free_min": 620,
+      "stack_peak_used": 660
+    }
+  }
+}

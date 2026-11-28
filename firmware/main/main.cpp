@@ -9,6 +9,7 @@
 #include "notify.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
+#include "esp_heap_caps.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -975,6 +976,71 @@ void process_sensor_frame(char *line) {
   send_response(sequence, left_target, right_target);
 }
 
+// Resource usage: "U,<free>,<min_free>,<largest>,<internal_free>,
+// <internal_min_free>,<psram_total>,<psram_free>,<heap_total>,<tasks>,<window_us>"
+// (bytes), then one "T,<name>,<core>,<cpu_permille>,<stack_free_min>" line per
+// task. cpu_permille is the task's share of one core since the previous "U"
+// (core -1: not pinned); stack_free_min is the lowest free stack in bytes.
+void send_resource_usage() {
+  constexpr int kMaxTasks = 32;
+  struct Previous {
+    TaskHandle_t handle;
+    configRUN_TIME_COUNTER_TYPE run_time;
+  };
+  static Previous previous[kMaxTasks];
+  static int previous_count = 0;
+  static int64_t previous_us = 0;
+
+  static TaskStatus_t tasks[kMaxTasks];
+  const UBaseType_t count = uxTaskGetSystemState(tasks, kMaxTasks, nullptr);
+  const int64_t now_us = esp_timer_get_time();
+  const int64_t window_us = now_us - previous_us;
+
+  char response[192];
+  int length = std::snprintf(
+      response, sizeof(response), "U,%u,%u,%u,%u,%u,%u,%u,%u,%u,%lld\n",
+      static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_8BIT)),
+      static_cast<unsigned>(heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT)),
+      static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_8BIT)),
+      static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
+      static_cast<unsigned>(heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL)),
+      static_cast<unsigned>(heap_caps_get_total_size(MALLOC_CAP_SPIRAM)),
+      static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_SPIRAM)),
+      static_cast<unsigned>(heap_caps_get_total_size(MALLOC_CAP_8BIT)),
+      static_cast<unsigned>(count), static_cast<long long>(window_us));
+  if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
+    uart_write_bytes(kSerialPort, response, length);
+  }
+
+  for (UBaseType_t i = 0; i < count; ++i) {
+    configRUN_TIME_COUNTER_TYPE before = 0;
+    for (int j = 0; j < previous_count; ++j) {
+      if (previous[j].handle == tasks[i].xHandle) {
+        before = previous[j].run_time;
+        break;
+      }
+    }
+    // Run time counts esp_timer microseconds.
+    const long long permille =
+        window_us > 0 ? static_cast<long long>(tasks[i].ulRunTimeCounter - before) * 1000 / window_us
+                      : 0;
+    const BaseType_t pinned = xTaskGetCoreID(tasks[i].xHandle);
+    const int core = pinned == tskNO_AFFINITY ? -1 : static_cast<int>(pinned);
+    length = std::snprintf(response, sizeof(response), "T,%s,%d,%lld,%u\n", tasks[i].pcTaskName,
+                           core, permille,
+                           static_cast<unsigned>(tasks[i].usStackHighWaterMark));
+    if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
+      uart_write_bytes(kSerialPort, response, length);
+    }
+  }
+
+  previous_count = static_cast<int>(count);
+  for (UBaseType_t i = 0; i < count; ++i) {
+    previous[i] = {tasks[i].xHandle, tasks[i].ulRunTimeCounter};
+  }
+  previous_us = now_us;
+}
+
 void process_command(char *line) {
   if (std::strncmp(line, "R,", 2) == 0) {
     if (!configure_route(line + 2)) {
@@ -1001,6 +1067,10 @@ void process_command(char *line) {
     if (length > 0 && static_cast<size_t>(length) < sizeof(response)) {
       uart_write_bytes(kSerialPort, response, length);
     }
+    return;
+  }
+  if (line[0] == 'U' && line[1] == '\0') {
+    send_resource_usage();
     return;
   }
   if (line[0] == 'B' && line[1] == ',') {
